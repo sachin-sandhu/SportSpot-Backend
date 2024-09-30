@@ -1,0 +1,42 @@
+version: "3.8"
+name: 'sportspot'
+
+services:
+  backend:
+    depends_on:
+      mongodb:
+        condition: service_healthy
+      azurestorageemulator:
+        condition: service_started
+    build:
+      context: ./SportSpot
+      dockerfile: Dockerfile
+    ports:
+      - "8080:8080"
+
+  mongodb:
+    restart: always
+    tty: true
+    hostname: "mongodb"
+    image: "mongo:latest"
+    ports:
+      - '27017:27017'
+    expose:
+      - "27017"
+    volumes:
+      - mongo_data:/data/db
+    healthcheck:
+      test: echo 'db.runCommand("ping").ok' | mongosh mongodb:27017/test --quiet
+      interval: 5s
+      timeout: 5s
+      retries: 60
+
+  azurestorageemulator:
+    image: "mcr.microsoft.com/azure-storage/azurite:latest"
+    ports:
+      - "10000:10000"
+      - "10001:10001"
+      - "10002:10002"
+
+volumes:
+  mongo_data:
