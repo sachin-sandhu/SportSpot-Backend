@@ -1,7 +1,5 @@
 ﻿using Microsoft.AspNetCore.Identity;
-using SportSpot.Exceptions.User;
-using SportSpot.V1.User.Dtos.Auth;
-using SportSpot.V1.User.Services;
+using SportSpot.V1.Exceptions.User;
 
 namespace SportSpot.V1.User
 {

@@ -1,4 +1,4 @@
-﻿namespace SportSpot.V1.User.Mapper
+﻿namespace SportSpot.V1.User
 {
     public static class AddressMapper
     {

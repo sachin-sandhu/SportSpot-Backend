@@ -1,6 +1,4 @@
-﻿using SportSpot.V1.User.Dtos.Auth;
-
-namespace SportSpot.V1.User
+﻿namespace SportSpot.V1.User
 {
     public interface IAuthService
     {

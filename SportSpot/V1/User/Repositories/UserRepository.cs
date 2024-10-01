@@ -1,7 +1,4 @@
-﻿
-using SportSpot.V1.User.Context;
-
-namespace SportSpot.V1.User.Repositories
+﻿namespace SportSpot.V1.User
 {
     public class UserRepository(DatabaseContext _context) : IUserRepository
     {

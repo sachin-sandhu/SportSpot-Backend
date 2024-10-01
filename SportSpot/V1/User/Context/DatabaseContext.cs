@@ -1,18 +1,18 @@
 ﻿using Microsoft.EntityFrameworkCore;
 
-namespace SportSpot.V1.User.Context
+namespace SportSpot.V1.User
 {
     public class DatabaseContext(DbContextOptions<DatabaseContext> options) : DbContext(options)
     {
         public DbSet<ClubEntity> Clubs { get; set; }
         public DbSet<UserEntity> User { get; set; }
 
-        protected override void OnModelCreating(ModelBuilder builder)
+        protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
-            builder.Entity<ClubEntity>()
+            modelBuilder.Entity<ClubEntity>()
                 .HasNoDiscriminator()
                 .HasKey(u => u.Id);
-            builder.Entity<UserEntity>()
+            modelBuilder.Entity<UserEntity>()
                 .HasNoDiscriminator()
                 .HasKey(u => u.Id);
         }

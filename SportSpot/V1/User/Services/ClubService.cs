@@ -1,9 +1,6 @@
-﻿
-using SportSpot.Exceptions.User;
-using SportSpot.V1.User.Mapper;
-using SportSpot.V1.User.Repositories;
+﻿using SportSpot.V1.Exceptions.User;
 
-namespace SportSpot.V1.User.Services
+namespace SportSpot.V1.User
 {
     public class ClubService(IClubRepositoriy _clubRepositoriy) : IClubService
     {

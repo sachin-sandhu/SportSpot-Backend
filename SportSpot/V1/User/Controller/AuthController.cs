@@ -1,8 +1,6 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
-using SportSpot.V1.User.Dtos.Auth;
-using SportSpot.V1.User.Extensions;
 
 namespace SportSpot.V1.User
 {
