@@ -1,11 +1,9 @@
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
+using SportSpot.ExceptionHandling;
 using SportSpot.Swagger;
 using SportSpot.V1.User;
-using SportSpot.V1.User.Context;
-using SportSpot.V1.User.Repositories;
-using SportSpot.V1.User.Services;
 using System.Text;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -82,5 +80,7 @@ app.UseHttpsRedirection();
 app.UseAuthentication();
 app.UseAuthorization();
 app.MapControllers();
+
+app.UseMiddleware<ExceptionHandlingMiddleware>();
 
 await app.RunAsync();

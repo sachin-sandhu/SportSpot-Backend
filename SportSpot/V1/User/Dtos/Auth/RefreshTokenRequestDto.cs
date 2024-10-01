@@ -1,4 +1,4 @@
-﻿namespace SportSpot.V1.User.Dtos.Auth
+﻿namespace SportSpot.V1.User
 {
     public record RefreshTokenRequestDto
     {

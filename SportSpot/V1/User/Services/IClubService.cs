@@ -1,4 +1,4 @@
-﻿namespace SportSpot.V1.User.Services
+﻿namespace SportSpot.V1.User
 {
     public interface IClubService
     {

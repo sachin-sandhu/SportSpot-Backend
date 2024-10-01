@@ -1,4 +1,4 @@
-﻿namespace SportSpot.V1.User.Repositories
+﻿namespace SportSpot.V1.User
 {
     public interface IUserRepository
     {
