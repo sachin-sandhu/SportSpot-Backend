@@ -1,6 +1,6 @@
 ﻿namespace SportSpot.V1.User
 {
-    public interface IClubRepositoriy
+    public interface IClubRepository
     {
         Task<ClubEntity?> GetClubById(Guid id);
         Task<ClubEntity> CreateClub(ClubEntity club);

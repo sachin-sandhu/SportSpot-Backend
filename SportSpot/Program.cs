@@ -36,8 +36,9 @@ JwtConfiguration jwtConfiguration = new()
 };
 
 builder.Services.AddSingleton(jwtConfiguration);
+builder.Services.AddSingleton<IEventService, EventService>();
 
-builder.Services.AddTransient<IClubRepositoriy, ClubRepository>();
+builder.Services.AddTransient<IClubRepository, ClubRepository>();
 builder.Services.AddTransient<IUserRepository, UserRepository>();
 
 builder.Services.AddTransient<IClubService, ClubService>();
