@@ -12,12 +12,12 @@ namespace SportSpot.ExceptionHandling
             }
             catch (AbstractSportSpotException ex)
             {
-                _logger.LogError(ex, ex.Message);
+                _logger.LogError(ex, "An error occurred: {ErrorMessage}", ex.Message);
                 await ex.WriteToResponse(context.Response);
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, ex.Message);
+                _logger.LogError(ex, "An error occurred: {ErrorMessage}", ex.Message);
                 await new InternalServerErrorException().WriteToResponse(context.Response);
             }
         }
