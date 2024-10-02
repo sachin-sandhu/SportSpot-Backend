@@ -1,6 +1,7 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
+using SportSpot.V1.Exceptions;
 
 namespace SportSpot.V1.User
 {
@@ -11,7 +12,7 @@ namespace SportSpot.V1.User
         [AllowAnonymous]
         [HttpPost("register/club")]
         [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(AuthTokenDto))]
-        [ProducesResponseType(StatusCodes.Status400BadRequest, Type = typeof(List<IdentityError>))]
+        [ProducesResponseType(StatusCodes.Status400BadRequest, Type = typeof(List<ErrorResult>))]
         public async Task<IActionResult> Register([FromBody] ClubRegisterRequestDto request)
         {
             return Ok(await _authService.Register(request));
@@ -20,7 +21,7 @@ namespace SportSpot.V1.User
         [AllowAnonymous]
         [HttpPost("register/user")]
         [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(AuthTokenDto))]
-        [ProducesResponseType(StatusCodes.Status400BadRequest, Type = typeof(List<IdentityError>))]
+        [ProducesResponseType(StatusCodes.Status400BadRequest, Type = typeof(List<ErrorResult>))]
         public async Task<IActionResult> Register([FromBody] UserRegisterRequestDto request)
         {
             return Ok(await _authService.Register(request));
@@ -39,7 +40,7 @@ namespace SportSpot.V1.User
         [HttpPost("token")]
         [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(AuthTokenDto))]
         [ProducesResponseType(StatusCodes.Status401Unauthorized)]
-        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest, Type = typeof(List<ErrorResult>))]
         public async Task<IActionResult> Refresh([FromBody] RefreshTokenRequestDto request)
         {
             return Ok(await _authService.RefreshAccessToken(await User.GetAuthUser(_userManager), request));

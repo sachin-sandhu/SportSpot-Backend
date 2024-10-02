@@ -6,7 +6,7 @@ namespace SportSpot.V1.Exceptions.User
     {
         public override List<ErrorResult> GetErrors()
         {
-            return _error.Select(x => new ErrorResult { Code = x.Code, Message = x.Description }).ToList();
+            return _error.Select(x => new ErrorResult { Code = $"User.{x.Code}", Message = x.Description }).ToList();
         }
     }
 }
