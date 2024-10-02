@@ -5,7 +5,7 @@ namespace SportSpot.Events
     public class EventService : IEventService
     {
 
-        private static readonly List<EventPriority> _sortedPriorites = [.. Enum.GetValues(typeof(EventPriority)).Cast<EventPriority>().OrderBy(p => p)];
+        private static readonly List<EventPriority> _sortedPriorities = [.. Enum.GetValues(typeof(EventPriority)).Cast<EventPriority>().OrderBy(p => p)];
 
         private readonly List<RegisteredListener> _listener = [];
 
@@ -24,7 +24,7 @@ namespace SportSpot.Events
                 }
             });
 
-            foreach (EventPriority priority in _sortedPriorites)
+            foreach (EventPriority priority in _sortedPriorities)
             {
                 if (!registeredEventHandler.TryGetValue(priority, out List<RegisteredEventHandler>? value)) continue;
                 foreach (RegisteredEventHandler handler in value)
@@ -47,7 +47,6 @@ namespace SportSpot.Events
 
                 List<ParameterInfo> eventArgs = method.GetParameters().Where(x => x.ParameterType.GetInterfaces().Contains(typeof(IEvent))).ToList();
                 if (eventArgs.Count == 0) throw new InvalidOperationException("Event method has no IEvent Parameter");
-                if (eventArgs.Count > 1) throw new InvalidOperationException("Event method can only have one parameter of type IEvent");
                 Type eventType = eventArgs[0].ParameterType;
 
                 if(!registeredListener.Events.ContainsKey(eventType))
