@@ -1,6 +1,6 @@
 ﻿namespace SportSpot.V1.User
 {
-    public class ClubRepository(DatabaseContext _context) : IClubRepositoriy
+    public class ClubRepository(DatabaseContext _context) : IClubRepository
     {
         public async Task<ClubEntity> CreateClub(ClubEntity club)
         {

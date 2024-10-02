@@ -2,7 +2,7 @@
 
 namespace SportSpot.V1.User
 {
-    public class ClubService(IClubRepositoriy _clubRepositoriy) : IClubService
+    public class ClubService(IClubRepository _clubRepositoriy) : IClubService
     {
         public async Task<ClubEntity> CreateClub(Guid id, ClubRegisterRequestDto request)
         {
