@@ -1,6 +1,7 @@
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
+using SportSpot.Events.Extensions;
 using SportSpot.ExceptionHandling;
 using SportSpot.Swagger;
 using SportSpot.V1.User;
@@ -36,6 +37,7 @@ JwtConfiguration jwtConfiguration = new()
 };
 
 builder.Services.AddSingleton(jwtConfiguration);
+
 builder.Services.AddSingleton<IEventService, EventService>();
 
 builder.Services.AddTransient<IClubRepository, ClubRepository>();
@@ -46,6 +48,8 @@ builder.Services.AddTransient<IUserService, UserService>();
 
 builder.Services.AddTransient<ITokenService, TokenService>();
 builder.Services.AddTransient<IAuthService, AuthService>();
+
+builder.Services.RegisterEvents();
 
 builder.Services.AddAuthentication(options =>
 {
@@ -68,6 +72,8 @@ builder.Services.AddAuthentication(options =>
 });
 
 var app = builder.Build();
+
+app.Services.RegisterEvents();
 
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())
