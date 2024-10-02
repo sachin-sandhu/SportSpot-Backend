@@ -1,6 +1,6 @@
 ﻿using SportSpot.Listener;
 
-namespace SportSpot.Events.Extensions
+namespace SportSpot.Events
 {
     public static class EventExtension
     {

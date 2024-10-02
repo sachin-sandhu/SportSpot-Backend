@@ -1,7 +1,6 @@
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
-using SportSpot.Events.Extensions;
 using SportSpot.ExceptionHandling;
 using SportSpot.Swagger;
 using SportSpot.V1.User;
