@@ -1,10 +1,8 @@
-﻿using AspNetCore.Identity.MongoDbCore.Models;
-using MongoDbGenericRepository.Attributes;
+﻿using Microsoft.AspNetCore.Identity;
 
 namespace SportSpot.V1.User
 {
-    [CollectionName("col_role")]
-    public class AuthRoleEntity : MongoIdentityRole<Guid>
+    public class AuthRoleEntity : IdentityRole<Guid>
     {
     }
 }

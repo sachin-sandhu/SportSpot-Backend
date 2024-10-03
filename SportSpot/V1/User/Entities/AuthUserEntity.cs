@@ -1,10 +1,8 @@
-﻿using AspNetCore.Identity.MongoDbCore.Models;
-using MongoDbGenericRepository.Attributes;
+﻿using Microsoft.AspNetCore.Identity;
 
 namespace SportSpot.V1.User
 {
-    [CollectionName("AuthUser")]
-    public class AuthUserEntity : MongoIdentityUser<Guid>
+    public class AuthUserEntity : IdentityUser<Guid>
     {
         public ProfileType ProfileType { get; set; }
         public string? RefreshToken { get; set; }
