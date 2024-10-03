@@ -6,6 +6,8 @@ services:
     depends_on:
       mongodb:
         condition: service_healthy
+      mariadb:
+        condition: service_healthy
       azurestorageemulator:
         condition: service_started
     build:
@@ -33,6 +35,22 @@ services:
       timeout: 5s
       retries: 60
 
+  mariadb:
+    image: mariadb:latest
+    hostname: "mariadb"
+    environment:
+      - MARIADB_DATABASE=Auth
+      - MYSQL_ROOT_PASSWORD=secret
+    ports:
+      - "3306:3306"
+    volumes:
+      - maria_data:/data/db
+    healthcheck:
+      test: [ "CMD", "healthcheck.sh", "--connect", "--innodb_initialized" ]
+      interval: 5s
+      timeout: 5s
+      retries: 60
+
   azurestorageemulator:
     image: "mcr.microsoft.com/azure-storage/azurite:latest"
     ports:
@@ -42,3 +60,4 @@ services:
 
 volumes:
   mongo_data:
+  maria_data:

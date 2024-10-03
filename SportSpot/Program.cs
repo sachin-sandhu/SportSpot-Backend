@@ -1,14 +1,15 @@
 using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
+using Pomelo.EntityFrameworkCore.MySql.Infrastructure;
 using SportSpot.ExceptionHandling;
 using SportSpot.Swagger;
 using SportSpot.V1.User;
+using SportSpot.V1.User.Context;
 using System.Text;
 
 var builder = WebApplication.CreateBuilder(args);
-
-// Add services to the container.
 
 builder.Services.AddControllers();
 
@@ -17,15 +18,23 @@ builder.Services.ConfigureFullSwaggerConfig();
 string mongoDbConnection = builder.Configuration.GetValue<string>("MongoDBConnection") ?? throw new InvalidOperationException("MongoDBConnection is not set!");
 string mongoDbDatabase = builder.Configuration.GetValue<string>("MongoDBDatabase") ?? throw new InvalidOperationException("MongoDBDatabase is not set!");
 
+string sqlConnection = builder.Configuration.GetValue<string>("MariaDBConnection") ?? throw new InvalidOperationException("SQLDBConnection is not set!");
+ServerVersion sqlVersion = ServerVersion.Create(new Version(10, 5, 4), ServerType.MariaDb);
+
+if (builder.Configuration.GetValue("MariaDBCheckSchema", true))
+{
+    DbContextOptionsBuilder<AuthContext> contextBuilder = new();
+    contextBuilder.UseMySql(sqlConnection, sqlVersion);
+    using AuthContext dbContext = new(contextBuilder.Options);
+    await dbContext.Database.EnsureCreatedAsync();
+    await dbContext.Database.MigrateAsync();
+}
+
+builder.Services.AddDbContextFactory<DatabaseContext>(optionsBuilder => optionsBuilder.UseMongoDB(mongoDbConnection, mongoDbDatabase));
+builder.Services.AddDbContextFactory<AuthContext>(options => options.UseMySql(sqlConnection, sqlVersion));
+
 builder.Services.AddIdentity<AuthUserEntity, AuthRoleEntity>()
-    .AddMongoDbStores<AuthUserEntity, AuthRoleEntity, Guid>(mongoDbConnection, mongoDbDatabase);
-
-
-builder.Services.AddDbContextFactory<DatabaseContext>(optionsBuilder =>
-  optionsBuilder
-    .UseMongoDB(
-      connectionString: mongoDbConnection,
-      databaseName: mongoDbDatabase));
+    .AddEntityFrameworkStores<AuthContext>().AddDefaultTokenProviders();
 
 JwtConfiguration jwtConfiguration = new()
 {

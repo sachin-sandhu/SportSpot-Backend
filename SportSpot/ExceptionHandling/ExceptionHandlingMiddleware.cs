@@ -12,7 +12,6 @@ namespace SportSpot.ExceptionHandling
             }
             catch (AbstractSportSpotException ex)
             {
-                _logger.LogError(ex, "An error occurred: {ErrorMessage}", ex.Message);
                 await ex.WriteToResponse(context.Response);
             }
             catch (Exception ex)
