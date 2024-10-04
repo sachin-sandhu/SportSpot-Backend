@@ -9,30 +9,31 @@ namespace SportSpot.Events
 
         private readonly List<RegisteredListener> _listener = [];
 
-        public Task FireEvent(IEvent @event)
+        public async Task FireEvent(IEvent @event)
         {
             Type type = @event.GetType();
             Dictionary<EventPriority, List<RegisteredEventHandler>> registeredEventHandler = [];
-            _listener.ForEach(x =>
+
+            foreach (RegisteredListener listener in _listener)
             {
-                if (!x.Events.TryGetValue(type, out List<RegisteredEventHandler>? value)) return;
-                foreach (RegisteredEventHandler handler in value)
+                if (!listener.Events.TryGetValue(type, out List<RegisteredEventHandler>? handlers)) continue;
+                foreach (RegisteredEventHandler handler in handlers)
                 {
                     if (!registeredEventHandler.ContainsKey(handler.Attribute.Priority))
                         registeredEventHandler.Add(handler.Attribute.Priority, []);
                     registeredEventHandler[handler.Attribute.Priority].Add(handler);
                 }
-            });
+            }
 
             foreach (EventPriority priority in _sortedPriorities)
             {
-                if (!registeredEventHandler.TryGetValue(priority, out List<RegisteredEventHandler>? value)) continue;
-                foreach (RegisteredEventHandler handler in value)
+                if (!registeredEventHandler.TryGetValue(priority, out List<RegisteredEventHandler>? handlers)) continue;
+                foreach (RegisteredEventHandler handler in handlers)
                 {
-                    handler.Method.Invoke(handler.Listener, [@event]);
+                    if (handler.Method.Invoke(handler.Listener, [@event]) is Task task)
+                        await task;
                 }
             }
-            return Task.CompletedTask;
         }
 
         public void RegisterListener(IListener listener)
@@ -49,7 +50,7 @@ namespace SportSpot.Events
                 if (eventArgs.Count == 0) throw new InvalidOperationException("Event method has no IEvent Parameter");
                 Type eventType = eventArgs[0].ParameterType;
 
-                if(!registeredListener.Events.ContainsKey(eventType))
+                if (!registeredListener.Events.ContainsKey(eventType))
                     registeredListener.Events.Add(eventType, []);
 
                 registeredListener.Events[eventType].Add(new RegisteredEventHandler { Attribute = attribute, Method = method, Listener = listener });
