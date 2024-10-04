@@ -5,6 +5,7 @@
         Task<AuthTokenDto> Register(ClubRegisterRequestDto request);
         Task<AuthTokenDto> Register(UserRegisterRequestDto request);
         Task<AuthTokenDto> Login(AuthUserLoginRequestDto request);
+        Task Delete(AuthUserEntity authUser);
         Task<AuthTokenDto> RefreshAccessToken(AuthUserEntity user, RefreshTokenRequestDto request);
         Task RevokeRefreshToken(AuthUserEntity authUserEntity);
     }

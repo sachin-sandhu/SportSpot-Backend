@@ -5,6 +5,15 @@ namespace SportSpot.V1.User
 {
     public class AuthService(IEventService _eventService, UserManager<AuthUserEntity> _userManager, ITokenService _tokenService) : IAuthService
     {
+        public async Task Delete(AuthUserEntity authUser)
+        {
+            if (await _eventService.FireEvent(new AuthUserDeleteEvent { AuthUser = authUser })) return;
+
+            await _userManager.DeleteAsync(authUser);
+
+            await _eventService.FireEvent(new AuthUserDeletedEvent { AuthUser = authUser });
+        }
+
         public async Task<AuthTokenDto> Login(AuthUserLoginRequestDto request)
         {
             AuthUserEntity? user = await _userManager.FindByEmailAsync(request.Email);
