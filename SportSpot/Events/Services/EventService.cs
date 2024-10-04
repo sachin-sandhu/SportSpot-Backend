@@ -41,7 +41,7 @@ namespace SportSpot.Events
 
         public void RegisterListener(IListener listener)
         {
-            if (_listener.Select(x => x.Listener == listener).Any()) return;
+            if (_listener.Exists(x => x.Listener == listener)) return;
             RegisteredListener registeredListener = new() { Listener = listener };
             listener.GetType().GetMethods().ToList().ForEach(method =>
             {
