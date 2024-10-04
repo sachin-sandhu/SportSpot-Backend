@@ -2,6 +2,6 @@
 {
     public enum ProfileType
     {
-        USER, CLUB
+        USER, CLUB, NONE
     }
 }

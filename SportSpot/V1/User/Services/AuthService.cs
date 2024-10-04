@@ -3,7 +3,7 @@ using SportSpot.V1.Exceptions.User;
 
 namespace SportSpot.V1.User
 {
-    public class AuthService(IEventService _eventService, UserManager<AuthUserEntity> _userManager, ITokenService _tokenService, IUserService _userService, IClubService _clubService) : IAuthService
+    public class AuthService(IEventService _eventService, UserManager<AuthUserEntity> _userManager, ITokenService _tokenService) : IAuthService
     {
         public async Task<AuthTokenDto> Login(AuthUserLoginRequestDto request)
         {
@@ -27,31 +27,31 @@ namespace SportSpot.V1.User
 
         public async Task<AuthTokenDto> Register(ClubRegisterRequestDto request)
         {
-            AuthUserEntity authUser = new()
+            ClubEntity authUser = new()
             {
                 UserName = request.Username,
                 Email = request.Email,
                 PhoneNumber = request.PhoneNumber,
-                ProfileType = ProfileType.CLUB
+                ProfileType = ProfileType.CLUB,
+                Address = request.Address?.Convert(),
             };
             IdentityResult result = await _userManager.CreateAsync(authUser, request.Password);
             if (!result.Succeeded)
                 throw new UserRegisterException(result.Errors);
 
             await _eventService.FireEvent(new AuthUserCreatedEvent { AuthUserEntity = authUser });
-
-            AuthTokenDto token = await _userManager.GenerateToken(authUser, _tokenService);
-            await _clubService.CreateClub(authUser.Id, request);
-            return token;
+            return await _userManager.GenerateToken(authUser, _tokenService);
         }
 
         public async Task<AuthTokenDto> Register(UserRegisterRequestDto request)
         {
-            AuthUserEntity authUser = new()
+            UserEntity authUser = new()
             {
                 UserName = request.Username,
                 Email = request.Email,
-                ProfileType = ProfileType.USER
+                ProfileType = ProfileType.USER,
+                FirstName = request.FirstName,
+                LastName = request.LastName
             };
             IdentityResult result = await _userManager.CreateAsync(authUser, request.Password);
             if (!result.Succeeded)
@@ -59,9 +59,7 @@ namespace SportSpot.V1.User
 
             await _eventService.FireEvent(new AuthUserCreatedEvent { AuthUserEntity = authUser });
 
-            AuthTokenDto token = await _userManager.GenerateToken(authUser, _tokenService);
-            await _userService.CreateUser(authUser.Id, request);
-            return token;
+            return await _userManager.GenerateToken(authUser, _tokenService);
         }
 
         public async Task RevokeRefreshToken(AuthUserEntity authUserEntity)
