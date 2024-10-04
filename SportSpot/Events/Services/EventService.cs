@@ -1,15 +1,15 @@
-﻿using System.Reflection;
+﻿using MongoDB.Driver;
+using System.Reflection;
 
 namespace SportSpot.Events
 {
     public class EventService : IEventService
     {
-
         private static readonly List<EventPriority> _sortedPriorities = [.. Enum.GetValues(typeof(EventPriority)).Cast<EventPriority>().OrderBy(p => p)];
 
         private readonly List<RegisteredListener> _listener = [];
 
-        public async Task FireEvent(IEvent @event)
+        public async Task<bool> FireEvent(IEvent @event)
         {
             Type type = @event.GetType();
             Dictionary<EventPriority, List<RegisteredEventHandler>> registeredEventHandler = [];
@@ -34,6 +34,9 @@ namespace SportSpot.Events
                         await task;
                 }
             }
+            bool isCancellable = @event.GetType().GetInterfaces().ToList().Exists(x => x == typeof(ICancellable));
+            if (!isCancellable) return false;
+            return ((ICancellable)@event).IsCancelled();
         }
 
         public void RegisterListener(IListener listener)

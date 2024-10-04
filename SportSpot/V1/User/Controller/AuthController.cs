@@ -37,6 +37,16 @@ namespace SportSpot.V1.User
         }
 
         [Authorize]
+        [HttpDelete("")]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+        public async Task<IActionResult> Delete()
+        {
+            await _authService.Delete(await User.GetAuthUser(_userManager));
+            return Ok();
+        }
+
+        [Authorize]
         [HttpPost("token")]
         [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(AuthTokenDto))]
         [ProducesResponseType(StatusCodes.Status401Unauthorized)]

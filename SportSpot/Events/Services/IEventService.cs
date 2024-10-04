@@ -2,7 +2,7 @@
 {
     public interface IEventService
     {
-        Task FireEvent(IEvent @event);
+        Task<bool> FireEvent(IEvent @event);
         void RegisterListener(IListener listener);
         void UnRegisterListener(IListener listener);
         List<IListener> GetRegisteredListeners();
