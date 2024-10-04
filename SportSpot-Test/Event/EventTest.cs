@@ -111,5 +111,57 @@ namespace SportSpot_Test.Event
             Assert.AreEqual(2, eventListener.Count, "The event listener count should be 2");
             Assert.AreEqual("Second", eventListener.Data, "The event listener data should be 'Second', representing the latest event");
         }
+
+        [TestMethod()]
+        public async Task TestUnRegisterEventCall()
+        {
+            // Given: An EventService and multiple listeners (AsyncEventListener, PrioEventListener, TestEventListener)
+            // We register multiple listeners that handle the same event in different ways: one asynchronously, one by priority, and one simply.
+            EventService eventService = new();
+            AsyncEventListener eventListener = new();
+            PrioEventListener prioEventListener = new();
+            TestEventListener testEventListener = new();
+            eventService.RegisterListener(eventListener);
+            eventService.RegisterListener(prioEventListener);
+            eventService.RegisterListener(testEventListener);
+
+            // Then: Assert that all listeners are registered
+            // We check if the EventService correctly holds all three registered listeners.
+            Assert.AreEqual(3, eventService.GetRegisteredListeners().Count, "There should be 3 registered listeners");
+            Assert.IsTrue(eventService.GetRegisteredListeners().Contains(eventListener), "The async event listener should be registered");
+            Assert.IsTrue(eventService.GetRegisteredListeners().Contains(prioEventListener), "The priority event listener should be registered");
+            Assert.IsTrue(eventService.GetRegisteredListeners().Contains(testEventListener), "The test event listener should be registered");
+
+            // When: We unregister the TestEventListener and PrioEventListener
+            // We unregister both the TestEventListener and PrioEventListener from the EventService.
+            eventService.UnRegisterListener(testEventListener);
+            eventService.UnRegisterListener(prioEventListener);
+
+            // Then: Assert that only AsyncEventListener remains registered
+            // After unregistering, we check that only one listener (AsyncEventListener) remains registered.
+            Assert.AreEqual(1, eventService.GetRegisteredListeners().Count, "There should be 1 registered listener");
+            Assert.IsFalse(eventService.GetRegisteredListeners().Contains(testEventListener), "The test event listener should not be registered anymore");
+            Assert.IsFalse(eventService.GetRegisteredListeners().Contains(prioEventListener), "The priority event listener should not be registered anymore");
+            Assert.IsTrue(eventService.GetRegisteredListeners().Contains(eventListener), "The async event listener should still be registered");
+
+            // Given: Register all listeners again
+            // We re-register all listeners to ensure they will be triggered in the next event firing.
+            eventService.RegisterListener(prioEventListener);
+            eventService.RegisterListener(testEventListener);
+
+            // When: An event of type OnTestEvent is fired with data "Test"
+            // The event is triggered, and each listener should handle the event based on its own implementation.
+            await eventService.FireEvent(new OnTestEvent { Data = "Test" });
+
+            // Then: Each listener should have processed the event appropriately
+            // We verify that the asynchronous listener and the simple listener captured the correct data.
+            Assert.AreEqual("Test", eventListener.Data, "The async event listener data should be 'Test'");
+            Assert.AreEqual("Test", testEventListener.Data, "The test event listener data should be 'Test'");
+
+            // We also verify that the priority-based listener processed the event in the correct priority order.
+            Assert.AreEqual(EventPriority.HIGH, prioEventListener.PrioritiesCallStack[0], "The first priority in the call stack should be HIGH");
+            Assert.AreEqual(EventPriority.MEDIUM, prioEventListener.PrioritiesCallStack[1], "The second priority in the call stack should be MEDIUM");
+            Assert.AreEqual(EventPriority.LOW, prioEventListener.PrioritiesCallStack[2], "The third priority in the call stack should be LOW");
+        }
     }
 }
