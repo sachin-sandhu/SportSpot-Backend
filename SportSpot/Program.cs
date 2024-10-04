@@ -6,7 +6,6 @@ using Pomelo.EntityFrameworkCore.MySql.Infrastructure;
 using SportSpot.ExceptionHandling;
 using SportSpot.Swagger;
 using SportSpot.V1.User;
-using SportSpot.V1.User.Context;
 using System.Text;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -33,8 +32,10 @@ if (builder.Configuration.GetValue("MariaDBCheckSchema", true))
 builder.Services.AddDbContextFactory<DatabaseContext>(optionsBuilder => optionsBuilder.UseMongoDB(mongoDbConnection, mongoDbDatabase));
 builder.Services.AddDbContextFactory<AuthContext>(options => options.UseMySql(sqlConnection, sqlVersion));
 
-builder.Services.AddIdentity<AuthUserEntity, AuthRoleEntity>()
-    .AddEntityFrameworkStores<AuthContext>().AddDefaultTokenProviders();
+builder.Services.AddIdentity<AuthUserEntity, AuthRoleEntity>(options =>
+{
+    options.User.RequireUniqueEmail = true;
+}).AddEntityFrameworkStores<AuthContext>().AddDefaultTokenProviders();
 
 JwtConfiguration jwtConfiguration = new()
 {
@@ -47,12 +48,6 @@ JwtConfiguration jwtConfiguration = new()
 builder.Services.AddSingleton(jwtConfiguration);
 
 builder.Services.AddSingleton<IEventService, EventService>();
-
-builder.Services.AddTransient<IClubRepository, ClubRepository>();
-builder.Services.AddTransient<IUserRepository, UserRepository>();
-
-builder.Services.AddTransient<IClubService, ClubService>();
-builder.Services.AddTransient<IUserService, UserService>();
 
 builder.Services.AddTransient<ITokenService, TokenService>();
 builder.Services.AddTransient<IAuthService, AuthService>();
