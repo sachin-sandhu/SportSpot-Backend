@@ -7,6 +7,7 @@ using Microsoft.IdentityModel.Tokens;
 using Pomelo.EntityFrameworkCore.MySql.Infrastructure;
 using SportSpot.ExceptionHandling;
 using SportSpot.Swagger;
+using SportSpot.V1.Context;
 using SportSpot.V1.Storage;
 using SportSpot.V1.User;
 using System.Text;
