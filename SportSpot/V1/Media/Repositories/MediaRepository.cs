@@ -1,7 +1,6 @@
 ﻿using SportSpot.V1.Context;
-using SportSpot.V1.Media.Entities;
 
-namespace SportSpot.V1.Media.Repositories
+namespace SportSpot.V1.Media
 {
     public class MediaRepository(DatabaseContext _context) : IMediaRepository
     {

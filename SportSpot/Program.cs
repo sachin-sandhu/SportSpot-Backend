@@ -8,6 +8,8 @@ using Pomelo.EntityFrameworkCore.MySql.Infrastructure;
 using SportSpot.ExceptionHandling;
 using SportSpot.Swagger;
 using SportSpot.V1.Context;
+using SportSpot.V1.Media;
+using SportSpot.V1.Request;
 using SportSpot.V1.Storage;
 using SportSpot.V1.User;
 using System.Text;
@@ -65,9 +67,20 @@ builder.Services.AddSingleton(provider =>
     return blobContainerClient;
 });
 
-builder.Services.AddSingleton<IEventService, EventService>();
+builder.Services.AddSingleton(new OAuthConfiguration
+{
+    GoogleUserInformationEndpoint = builder.Configuration.GetValue<string>("OAUTH_GOOGLE_USER_INFORMATION_ENDPOINT") ?? throw new InvalidOperationException("OAUTH_GOOGLE_USER_INFORMATION_ENDPOINT is not set!")
+});
 
+builder.Services.AddHttpClient();
+builder.Services.AddSingleton<IEventService, EventService>();
+builder.Services.AddSingleton<IRequest, Request>();
+
+builder.Services.AddTransient<IOAuthFactory, DefaultOAuthFactory>();
 builder.Services.AddTransient<IBlobClient, AzureStorageClient>();
+builder.Services.AddTransient<IBlurHashFactory, DefaultBlurHashFactory>();
+builder.Services.AddTransient<IMediaRepository, MediaRepository>();
+builder.Services.AddTransient<IMediaService, MediaService>();
 builder.Services.AddTransient<ITokenService, TokenService>();
 builder.Services.AddTransient<IAuthService, AuthService>();
 

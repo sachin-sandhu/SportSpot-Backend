@@ -1,11 +1,9 @@
-﻿using SportSpot.V1.Exceptions.Media;
-using SportSpot.V1.Media.BlurHash;
-using SportSpot.V1.Media.Entities;
-using SportSpot.V1.Media.Repositories;
+﻿using Azure.Storage.Sas;
+using SportSpot.V1.Exceptions.Media;
 using SportSpot.V1.Storage;
 using SportSpot.V1.User;
 
-namespace SportSpot.V1.Media.Services
+namespace SportSpot.V1.Media
 {
     public class MediaService(IBlobClient _blobClient, IBlurHashFactory _blurHashFactory, IMediaRepository _mediaRepository) : IMediaService
     {
@@ -37,7 +35,7 @@ namespace SportSpot.V1.Media.Services
                 Blocked = false
             };
             mediaEntity.BlurHash = await GenerateBlurHash(mediaEntity, data);
-        
+
             await _blobClient.UploadData(mediaEntity.Id.ToString(), data, true);
             await _mediaRepository.Add(mediaEntity);
             return mediaEntity;
@@ -58,7 +56,7 @@ namespace SportSpot.V1.Media.Services
         public async Task<MediaEntity> CreateOrUpdateMedia(Guid id, string filename, byte[] data, AuthUserEntity user)
         {
             MediaEntity? mediaEntity = await _mediaRepository.Get(id);
-            if(mediaEntity is null)
+            if (mediaEntity is null)
                 return await CreateMedia(filename, data, user);
             return await UpdateMedia(mediaEntity, filename, data, user);
         }
@@ -90,10 +88,24 @@ namespace SportSpot.V1.Media.Services
             {
                 return await _blurHashFactory.GetBlurHashGenerator(mediaEntity).GenerateBlurHash(data);
             }
-            catch(Exception)
+            catch (Exception)
             {
                 return null;
             }
+        }
+
+        public async Task<byte[]> GetMediaAsBytes(MediaEntity media)
+        {
+            if (media.Blocked)
+                return []; //TODO: return placeholder image
+            return await _blobClient.DownloadData(media.Id.ToString());
+        }
+
+        public string GenerateSaSUri(MediaEntity media)
+        {
+            if (media.Blocked)
+                return string.Empty; //TODO: return placeholder image
+            return _blobClient.GenerateSaSUri(media.Id.ToString(), BlobContainerSasPermissions.Read).ToString();
         }
     }
 }

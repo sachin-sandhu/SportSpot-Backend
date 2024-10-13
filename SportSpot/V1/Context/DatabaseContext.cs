@@ -1,5 +1,5 @@
 ﻿using Microsoft.EntityFrameworkCore;
-using SportSpot.V1.Media.Entities;
+using SportSpot.V1.Media;
 
 namespace SportSpot.V1.Context
 {
@@ -8,5 +8,11 @@ namespace SportSpot.V1.Context
 
         public DbSet<MediaEntity> Media { get; set; }
 
+        protected override void OnModelCreating(ModelBuilder modelBuilder)
+        {
+            modelBuilder.Entity<MediaEntity>()
+                .HasNoDiscriminator()
+                .HasKey(x => x.Id);
+        }
     }
 }

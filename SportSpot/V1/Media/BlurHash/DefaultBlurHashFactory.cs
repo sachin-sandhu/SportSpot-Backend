@@ -1,6 +1,4 @@
-﻿using SportSpot.V1.Media.Entities;
-
-namespace SportSpot.V1.Media.BlurHash
+﻿namespace SportSpot.V1.Media
 {
     public class DefaultBlurHashFactory : IBlurHashFactory
     {

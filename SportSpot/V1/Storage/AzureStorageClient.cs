@@ -12,6 +12,12 @@ namespace SportSpot.V1.Storage
             return result.Value.Content.ToArray();
         }
 
+        public async Task<byte[]> DownloadData(string fileName)
+        {
+            var result = await _blobContainerClient.GetBlobClient(fileName).DownloadContentAsync();
+            return result.Value.Content.ToArray();
+        }
+
         public async Task UploadData(string fileName, byte[] data, bool overwrite = false)
         {
             using MemoryStream stream = new(data);
