@@ -1,5 +1,5 @@
 ﻿using Microsoft.IdentityModel.Tokens;
-using SportSpot.V1.Exceptions.User;
+using SportSpot.V1.Exceptions;
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Security.Cryptography;
@@ -7,7 +7,7 @@ using System.Text;
 
 namespace SportSpot.V1.User
 {
-    public class TokenService(JwtConfiguration _configuration) : ITokenService
+    public class TokenService(JwtConfigurationDto _configuration) : ITokenService
     {
         public AccessTokenDto GenerateAccessToken(IEnumerable<Claim> claims)
         {

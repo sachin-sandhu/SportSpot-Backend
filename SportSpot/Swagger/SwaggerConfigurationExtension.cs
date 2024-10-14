@@ -1,6 +1,8 @@
 ﻿using Asp.Versioning;
 using Asp.Versioning.Conventions;
+using Microsoft.OpenApi.Any;
 using Microsoft.OpenApi.Models;
+using System.Reflection;
 
 namespace SportSpot.Swagger
 {
@@ -31,6 +33,17 @@ namespace SportSpot.Swagger
 
             col.AddSwaggerGen(option =>
             {
+
+                foreach (Type? type in Assembly.GetExecutingAssembly().GetTypes().Where(x => x.IsEnum && x.IsPublic).ToList())
+                {
+                    if (type is null) continue;
+                    option.MapType(type, () => new OpenApiSchema
+                    {
+                        Type = "string",
+                        Enum = Enum.GetNames(type).Select(x => new OpenApiString(x)).ToList<IOpenApiAny>()
+                    });
+                }
+
                 option.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme
                 {
                     In = ParameterLocation.Header,

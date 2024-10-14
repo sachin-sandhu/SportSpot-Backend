@@ -1,4 +1,4 @@
-﻿namespace SportSpot.V1.Exceptions.User
+﻿namespace SportSpot.V1.Exceptions
 {
     public class UserNotFoundException : AbstractSportSpotException
     {

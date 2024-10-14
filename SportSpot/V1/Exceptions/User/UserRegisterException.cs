@@ -1,6 +1,6 @@
 ﻿using Microsoft.AspNetCore.Identity;
 
-namespace SportSpot.V1.Exceptions.User
+namespace SportSpot.V1.Exceptions
 {
     public class UserRegisterException(IEnumerable<IdentityError> _error) : AbstractSportSpotException("", "Error while register User", StatusCodes.Status400BadRequest)
     {

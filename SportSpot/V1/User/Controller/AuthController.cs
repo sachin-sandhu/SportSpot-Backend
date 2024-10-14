@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Authorization;
+﻿using Microsoft.AspNetCore.Authentication;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using SportSpot.V1.Exceptions;
@@ -28,6 +29,15 @@ namespace SportSpot.V1.User
         }
 
         [AllowAnonymous]
+        [HttpPost("oauth")]
+        [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(AuthTokenDto))]
+        [ProducesResponseType(StatusCodes.Status400BadRequest, Type = typeof(List<ErrorResult>))]
+        public async Task<IActionResult> OAuth([FromBody] OAuthUserRequestDto request)
+        {
+            return Ok(await _authService.OAuth(request));
+        }
+
+        [AllowAnonymous]
         [HttpPost("login")]
         [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(AuthTokenDto))]
         [ProducesResponseType(StatusCodes.Status401Unauthorized)]
@@ -53,7 +63,7 @@ namespace SportSpot.V1.User
         [ProducesResponseType(StatusCodes.Status400BadRequest, Type = typeof(List<ErrorResult>))]
         public async Task<IActionResult> Refresh([FromBody] RefreshTokenRequestDto request)
         {
-            return Ok(await _authService.RefreshAccessToken(await User.GetAuthUser(_userManager), request));
+            return Ok(await _authService.RefreshAccessToken(await User.GetAuthUser(_userManager), await HttpContext.GetTokenAsync("Bearer", "Access_Token") ?? throw new UnauthorizedException(), request));
         }
 
         [Authorize]

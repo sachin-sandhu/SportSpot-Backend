@@ -145,6 +145,8 @@ _NCrunch*
 *.userosscache
 *.sln.docstates
 
+Subscription.env
+
 # User-specific files (MonoDevelop/Xamarin Studio)
 *.userprefs
 
