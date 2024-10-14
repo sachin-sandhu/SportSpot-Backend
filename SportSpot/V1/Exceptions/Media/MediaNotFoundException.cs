@@ -1,4 +1,4 @@
-﻿namespace SportSpot.V1.Exceptions.Media
+﻿namespace SportSpot.V1.Exceptions
 {
     public class MediaNotFoundException : AbstractSportSpotException
     {

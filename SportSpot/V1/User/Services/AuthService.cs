@@ -1,6 +1,5 @@
 ﻿using Microsoft.AspNetCore.Identity;
 using SportSpot.V1.Exceptions;
-using SportSpot.V1.Exceptions.User;
 using SportSpot.V1.Extensions;
 using SportSpot.V1.Media;
 

@@ -1,5 +1,5 @@
 ﻿using Azure.Storage.Sas;
-using SportSpot.V1.Exceptions.Media;
+using SportSpot.V1.Exceptions;
 using SportSpot.V1.Storage;
 using SportSpot.V1.User;
 
