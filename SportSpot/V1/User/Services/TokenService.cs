@@ -7,7 +7,7 @@ using System.Text;
 
 namespace SportSpot.V1.User
 {
-    public class TokenService(JwtConfiguration _configuration) : ITokenService
+    public class TokenService(JwtConfigurationDto _configuration) : ITokenService
     {
         public AccessTokenDto GenerateAccessToken(IEnumerable<Claim> claims)
         {

@@ -3,7 +3,7 @@ using SportSpot.V1.Request;
 
 namespace SportSpot.V1.User
 {
-    public class GoogleOAuthProvider(OAuthConfiguration _config, IRequest _request) : IOAuthProvider
+    public class GoogleOAuthProvider(OAuthConfigurationDto _config, IRequest _request) : IOAuthProvider
     {
         public async Task<OAuthUserDataDto> GetUserDataDto(string accessToken)
         {

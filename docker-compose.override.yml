@@ -8,6 +8,8 @@ services:
         condition: service_healthy
       mariadb:
         condition: service_healthy
+      cache:
+        condition: service_healthy
       azurestorageemulator:
         condition: service_started
     build:
@@ -17,6 +19,7 @@ services:
       - "8080:8080"
     env_file:
       - ./Development.env
+      - ./Subscription.env
 
   mongodb:
     restart: always
@@ -58,6 +61,24 @@ services:
       - "10001:10001"
       - "10002:10002"
 
+  cache:
+    image: redis:latest
+    restart: always
+    ports:
+      - "6379:6379"
+    environment:
+      - REDIS_PASSWORD=my-password
+      - REDIS_PORT=6379
+      - REDIS_DATABASES=16
+    healthcheck:
+      test: redis-cli ping
+      interval: 5s
+      timeout: 5s
+      retries: 60
+    volumes:
+      - cache_data:/data/db
+
 volumes:
   mongo_data:
   maria_data:
+  cache_data:

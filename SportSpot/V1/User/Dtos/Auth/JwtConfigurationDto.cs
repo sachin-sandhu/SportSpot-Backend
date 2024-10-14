@@ -1,6 +1,6 @@
 ﻿namespace SportSpot.V1.User
 {
-    public record JwtConfiguration
+    public record JwtConfigurationDto
     {
         public required string Secret { get; init; }
         public required string ValidIsUser { get; init; }

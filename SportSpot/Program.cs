@@ -8,6 +8,7 @@ using Pomelo.EntityFrameworkCore.MySql.Infrastructure;
 using SportSpot.ExceptionHandling;
 using SportSpot.Swagger;
 using SportSpot.V1.Context;
+using SportSpot.V1.Location;
 using SportSpot.V1.Media;
 using SportSpot.V1.Request;
 using SportSpot.V1.Storage;
@@ -38,12 +39,18 @@ if (builder.Configuration.GetValue("MariaDBCheckSchema", true))
 builder.Services.AddDbContextFactory<DatabaseContext>(optionsBuilder => optionsBuilder.UseMongoDB(mongoDbConnection, mongoDbDatabase));
 builder.Services.AddDbContextFactory<AuthContext>(options => options.UseMySql(sqlConnection, sqlVersion));
 
+builder.Services.AddStackExchangeRedisCache(options =>
+{
+    options.Configuration = builder.Configuration.GetValue<string>($"Location_Cache_DB_Connection") ?? throw new InvalidOperationException("Location_Cache_DB_Connection is not set!");
+    options.InstanceName = builder.Configuration.GetValue<string>($"Location_Cache_DB_Name") ?? throw new InvalidOperationException("Location_Cache_DB_Name is not set!");
+});
+
 builder.Services.AddIdentity<AuthUserEntity, AuthRoleEntity>(options =>
 {
     options.User.RequireUniqueEmail = true;
 }).AddEntityFrameworkStores<AuthContext>().AddDefaultTokenProviders();
 
-JwtConfiguration jwtConfiguration = new()
+JwtConfigurationDto jwtConfiguration = new()
 {
     Secret = builder.Configuration.GetValue<string>("JWT_Secret") ?? throw new InvalidOperationException("JWT_Secret is not set!"),
     ValidAudience = builder.Configuration.GetValue<string>("JWT_ValidAudience") ?? throw new InvalidOperationException("JWT_ValidAudience is not set!"),
@@ -67,14 +74,24 @@ builder.Services.AddSingleton(provider =>
     return blobContainerClient;
 });
 
-builder.Services.AddSingleton(new OAuthConfiguration
+builder.Services.AddSingleton(new OAuthConfigurationDto
 {
     GoogleUserInformationEndpoint = builder.Configuration.GetValue<string>("OAUTH_GOOGLE_USER_INFORMATION_ENDPOINT") ?? throw new InvalidOperationException("OAUTH_GOOGLE_USER_INFORMATION_ENDPOINT is not set!")
+});
+
+builder.Services.AddSingleton(new LocationConfigDto
+{
+    AzureMapsReverseLocationEndpoint = builder.Configuration.GetValue<string>("AZURE_MAPS_REVERSE_LOCATION_ENDPOINT") ?? throw new InvalidOperationException("AZURE_MAPS_REVERSE_LOCATION_ENDPOINT is not set!"),
+    AzureMapsSearchEndpoint = builder.Configuration.GetValue<string>("AZURE_MAPS_SEARCH_ENDPOINT") ?? throw new InvalidOperationException("AZURE_MAPS_SEARCH_ENDPOINT is not set!"),
+    AzureMapsSubscriptionKey = builder.Configuration.GetValue<string>("AZURE_MAPS_SUBSCRIPTION_KEY") ?? throw new InvalidOperationException("AZURE_MAPS_SUBSCRIPTION_KEY is not set!")
 });
 
 builder.Services.AddHttpClient();
 builder.Services.AddSingleton<IEventService, EventService>();
 builder.Services.AddSingleton<IRequest, Request>();
+
+builder.Services.AddTransient<ILocationCacheService, LocationCacheService>();
+builder.Services.AddTransient<ILocationService, LocationService>();
 
 builder.Services.AddTransient<IOAuthFactory, DefaultOAuthFactory>();
 builder.Services.AddTransient<IBlobClient, AzureStorageClient>();
