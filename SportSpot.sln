@@ -9,6 +9,8 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SportSpot-Test", "SportSpot
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Integration-Test", "Integration-Test\Integration-Test.csproj", "{C292F9B9-98C3-4514-8D73-592CD205A9F9}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AzureLocation-Emulator", "AzureLocation-Emulator\AzureLocation-Emulator.csproj", "{7161B474-A49B-45A6-BE9C-5B51852747B3}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -27,6 +29,10 @@ Global
 		{C292F9B9-98C3-4514-8D73-592CD205A9F9}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{C292F9B9-98C3-4514-8D73-592CD205A9F9}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{C292F9B9-98C3-4514-8D73-592CD205A9F9}.Release|Any CPU.Build.0 = Release|Any CPU
+		{7161B474-A49B-45A6-BE9C-5B51852747B3}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{7161B474-A49B-45A6-BE9C-5B51852747B3}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{7161B474-A49B-45A6-BE9C-5B51852747B3}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{7161B474-A49B-45A6-BE9C-5B51852747B3}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
