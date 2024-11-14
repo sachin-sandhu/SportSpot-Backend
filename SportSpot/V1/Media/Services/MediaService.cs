@@ -32,16 +32,14 @@ namespace SportSpot.V1.Media.Services
         {
             MediaEntity mediaEntity = new()
             {
-                Id = await GetFreeId(),
                 FileName = filename,
                 CreatedBy = creator.Id,
                 CreatedAt = DateTime.UtcNow,
                 Blocked = false
             };
             mediaEntity.BlurHash = await GenerateBlurHash(mediaEntity, data);
-
-            await _blobClient.UploadData(mediaEntity.Id.ToString(), data, true);
             await _mediaRepository.Add(mediaEntity);
+            await _blobClient.UploadData(mediaEntity.Id.ToString(), data, true);
             return mediaEntity;
         }
 
@@ -73,17 +71,6 @@ namespace SportSpot.V1.Media.Services
         public async Task DeleteMedia(Guid id)
         {
             await DeleteMedia(await GetMedia(id));
-        }
-
-
-        private async Task<Guid> GetFreeId()
-        {
-            Guid id;
-            do
-            {
-                id = Guid.NewGuid();
-            } while (await _mediaRepository.Get(id) is not null);
-            return id;
         }
 
         private async Task<string?> GenerateBlurHash(MediaEntity mediaEntity, byte[] data)
