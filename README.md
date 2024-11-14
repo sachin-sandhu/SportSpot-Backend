@@ -20,9 +20,12 @@ Eine kurze Beschreibung des Projekts und seiner Funktionalität.
 
 3. Öffne deinen Browser und gehe zu `http://localhost:8080/swagger`
 
-## Docker Compose Datei
+## Datenbanken
 
-Hier ist ein Beispiel für eine `docker-compose.yml`-Datei:
+1. MongoDB:
+  - Dev-UI: http://localhost:8081
+2. MariaDB:
+  - Dev-UI: http://localhost:8082 (Username: root & Password: secret)
 
 ## Tests ausführen
 
