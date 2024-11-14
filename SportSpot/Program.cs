@@ -114,6 +114,7 @@ builder.Services.AddTransient<IMediaRepository, MediaRepository>();
 builder.Services.AddTransient<IMediaService, MediaService>();
 builder.Services.AddTransient<ITokenService, TokenService>();
 builder.Services.AddTransient<IAuthService, AuthService>();
+builder.Services.AddTransient<IUserService, UserService>();
 
 builder.Services.RegisterEvents();
 
