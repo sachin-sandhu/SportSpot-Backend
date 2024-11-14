@@ -1,4 +1,4 @@
-﻿namespace SportSpot.V1.Location
+﻿namespace SportSpot.V1.Location.Enums
 {
     public enum AzureGeographicEntityType
     {

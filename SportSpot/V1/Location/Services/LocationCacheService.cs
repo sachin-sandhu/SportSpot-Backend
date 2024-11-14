@@ -1,6 +1,9 @@
 ﻿using Microsoft.Extensions.Caching.Distributed;
+using SportSpot.V1.Location.Dtos;
+using SportSpot.V1.Location.Enums;
+using SportSpot.V1.Location.Services;
 
-namespace SportSpot.V1.Location
+namespace SportSpot.V1.Location.Services
 {
     public class LocationCacheService(IDistributedCache _distributedCache) : ILocationCacheService
     {

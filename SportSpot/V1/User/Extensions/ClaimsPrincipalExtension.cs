@@ -1,8 +1,9 @@
 ﻿using Microsoft.AspNetCore.Identity;
 using SportSpot.V1.Exceptions;
+using SportSpot.V1.User.Entities;
 using System.Security.Claims;
 
-namespace SportSpot.V1.User
+namespace SportSpot.V1.User.Extensions
 {
     public static class ClaimsPrincipalExtension
     {

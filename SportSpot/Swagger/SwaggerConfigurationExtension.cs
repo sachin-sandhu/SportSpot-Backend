@@ -33,17 +33,6 @@ namespace SportSpot.Swagger
 
             col.AddSwaggerGen(option =>
             {
-
-                foreach (Type? type in Assembly.GetExecutingAssembly().GetTypes().Where(x => x.IsEnum && x.IsPublic).ToList())
-                {
-                    if (type is null) continue;
-                    option.MapType(type, () => new OpenApiSchema
-                    {
-                        Type = "string",
-                        Enum = Enum.GetNames(type).Select(x => new OpenApiString(x)).ToList<IOpenApiAny>()
-                    });
-                }
-
                 option.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme
                 {
                     In = ParameterLocation.Header,
@@ -53,8 +42,9 @@ namespace SportSpot.Swagger
                     BearerFormat = "JWT",
                     Scheme = "Bearer"
                 });
+
                 option.AddSecurityRequirement(new OpenApiSecurityRequirement
-               {
+                {
                     {
                         new OpenApiSecurityScheme
                         {

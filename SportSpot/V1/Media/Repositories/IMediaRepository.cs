@@ -1,4 +1,6 @@
-﻿namespace SportSpot.V1.Media
+﻿using SportSpot.V1.Media.Entities;
+
+namespace SportSpot.V1.Media.Repositories
 {
     public interface IMediaRepository
     {

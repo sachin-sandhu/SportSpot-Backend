@@ -1,7 +1,7 @@
 ﻿using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 
-namespace SportSpot.V1.User
+namespace SportSpot.V1.User.Entities
 {
     public class AddressEntity
     {

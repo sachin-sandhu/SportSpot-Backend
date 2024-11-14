@@ -1,4 +1,7 @@
-﻿namespace SportSpot.V1.Location
+﻿using SportSpot.V1.Location.Dtos;
+using SportSpot.V1.Location.Enums;
+
+namespace SportSpot.V1.Location.Services
 {
     public interface ILocationService
     {

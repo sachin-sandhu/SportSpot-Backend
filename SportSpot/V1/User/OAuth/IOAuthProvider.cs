@@ -1,4 +1,6 @@
-﻿namespace SportSpot.V1.User
+﻿using SportSpot.V1.User.Dtos.Auth;
+
+namespace SportSpot.V1.User.OAuth
 {
     public interface IOAuthProvider
     {

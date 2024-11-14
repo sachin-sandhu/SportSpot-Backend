@@ -5,19 +5,33 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Azure;
 using Microsoft.IdentityModel.Tokens;
 using Pomelo.EntityFrameworkCore.MySql.Infrastructure;
+using SportSpot.Events.Extensions;
+using SportSpot.Events.Services;
 using SportSpot.ExceptionHandling;
 using SportSpot.Swagger;
 using SportSpot.V1.Context;
-using SportSpot.V1.Location;
-using SportSpot.V1.Media;
+using SportSpot.V1.Location.Dtos;
+using SportSpot.V1.Location.Services;
+using SportSpot.V1.Media.BlurHash;
+using SportSpot.V1.Media.Repositories;
+using SportSpot.V1.Media.Services;
 using SportSpot.V1.Request;
 using SportSpot.V1.Storage;
-using SportSpot.V1.User;
+using SportSpot.V1.User.Context;
+using SportSpot.V1.User.Dtos.Auth;
+using SportSpot.V1.User.Dtos.Auth.OAuth;
+using SportSpot.V1.User.Entities;
+using SportSpot.V1.User.OAuth;
+using SportSpot.V1.User.Services;
 using System.Text;
+using System.Text.Json.Serialization;
 
 var builder = WebApplication.CreateBuilder(args);
 
-builder.Services.AddControllers();
+builder.Services.AddControllers().AddJsonOptions(x =>
+{
+    x.JsonSerializerOptions.Converters.Add(new JsonStringEnumConverter());
+});
 
 builder.Services.ConfigureFullSwaggerConfig();
 
@@ -127,7 +141,6 @@ var app = builder.Build();
 
 app.Services.RegisterEvents();
 
-// Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())
 {
     app.UseCors(builder => builder.AllowAnyOrigin().AllowAnyMethod().AllowAnyHeader());

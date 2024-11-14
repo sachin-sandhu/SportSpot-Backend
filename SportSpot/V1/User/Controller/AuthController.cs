@@ -3,27 +3,23 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using SportSpot.V1.Exceptions;
+using SportSpot.V1.User.Dtos.Auth;
+using SportSpot.V1.User.Dtos.Auth.OAuth;
+using SportSpot.V1.User.Entities;
+using SportSpot.V1.User.Extensions;
+using SportSpot.V1.User.Services;
 
-namespace SportSpot.V1.User
+namespace SportSpot.V1.User.Controller
 {
     [Route("api/v{version:apiVersion}/[controller]")]
     [ApiController]
     public class AuthController(IAuthService _authService, UserManager<AuthUserEntity> _userManager) : ControllerBase
     {
         [AllowAnonymous]
-        [HttpPost("register/club")]
+        [HttpPost("register")]
         [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(AuthTokenDto))]
         [ProducesResponseType(StatusCodes.Status400BadRequest, Type = typeof(List<ErrorResult>))]
-        public async Task<IActionResult> Register([FromBody] ClubRegisterRequestDto request)
-        {
-            return Ok(await _authService.Register(request));
-        }
-
-        [AllowAnonymous]
-        [HttpPost("register/user")]
-        [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(AuthTokenDto))]
-        [ProducesResponseType(StatusCodes.Status400BadRequest, Type = typeof(List<ErrorResult>))]
-        public async Task<IActionResult> Register([FromBody] UserRegisterRequestDto request)
+        public async Task<IActionResult> Register([FromBody] AuthUserRegisterRequestDto request)
         {
             return Ok(await _authService.Register(request));
         }

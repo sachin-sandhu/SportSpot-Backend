@@ -1,6 +1,6 @@
 ﻿using SportSpot.Events;
 
-namespace SportSpot_Test.Event
+namespace SportSpot_Test.Event.Listener
 {
     internal class TestEventListener : IListener
     {
