@@ -18,18 +18,7 @@ builder.Services.AddSingleton<ReverseModeService>();
 builder.Services.AddSingleton<IModeFactory, DefaultModeFactory>();
 
 builder.Services.AddEndpointsApiExplorer();
-builder.Services.AddSwaggerGen(options =>
-{
-    foreach (Type? type in Assembly.GetExecutingAssembly().GetTypes().Where(x => x.IsEnum && x.IsPublic).ToList())
-    {
-        if (type is null) continue;
-        options.MapType(type, () => new OpenApiSchema
-        {
-            Type = "string",
-            Enum = Enum.GetNames(type).Select(x => new OpenApiString(x)).ToList<IOpenApiAny>()
-        });
-    }
-});
+builder.Services.AddSwaggerGen();
 
 var app = builder.Build();
 
