@@ -1,11 +1,14 @@
 ﻿using Microsoft.IdentityModel.Tokens;
 using SportSpot.V1.Exceptions;
+using SportSpot.V1.Exceptions.User;
+using SportSpot.V1.User.Dtos;
+using SportSpot.V1.User.Dtos.Auth;
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Security.Cryptography;
 using System.Text;
 
-namespace SportSpot.V1.User
+namespace SportSpot.V1.User.Services
 {
     public class TokenService(JwtConfigurationDto _configuration) : ITokenService
     {

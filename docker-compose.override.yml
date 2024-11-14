@@ -55,7 +55,7 @@ services:
       retries: 60
 
   azurestorageemulator:
-    image: "mcr.microsoft.com/azure-storage/azurite@sha256:47a392f1c93a6b639999fc505dcae348e350183b47f2a7526c765ddd7fa56e0e"
+    image: "mcr.microsoft.com/azure-storage/azurite@sha256:2628ee10a72833cc344b9d194cd8b245543892b307d16cf26a2cf55a15b816af"
     ports:
       - "10000:10000"
       - "10001:10001"

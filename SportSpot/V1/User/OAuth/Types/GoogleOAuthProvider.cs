@@ -1,7 +1,10 @@
-﻿using SportSpot.V1.Exceptions;
+﻿using SportSpot.V1.Exceptions.User;
 using SportSpot.V1.Request;
+using SportSpot.V1.User.Dtos.Auth;
+using SportSpot.V1.User.Dtos.Auth.OAuth;
+using SportSpot.V1.User.OAuth;
 
-namespace SportSpot.V1.User
+namespace SportSpot.V1.User.OAuth.Types
 {
     public class GoogleOAuthProvider(OAuthConfigurationDto _config, IRequest _request) : IOAuthProvider
     {

@@ -1,4 +1,4 @@
-﻿namespace SportSpot.V1.Exceptions
+﻿namespace SportSpot.V1.Exceptions.User
 {
     public class UserLoginException : AbstractSportSpotException
     {

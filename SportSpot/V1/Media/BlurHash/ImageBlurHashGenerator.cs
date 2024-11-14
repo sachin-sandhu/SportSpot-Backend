@@ -2,7 +2,7 @@
 using SixLabors.ImageSharp;
 using SixLabors.ImageSharp.PixelFormats;
 
-namespace SportSpot.V1.Media
+namespace SportSpot.V1.Media.BlurHash
 {
     public class ImageBlurHashGenerator : IBlurHashGenerator
     {

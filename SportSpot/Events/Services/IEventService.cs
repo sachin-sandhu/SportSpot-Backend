@@ -1,4 +1,4 @@
-﻿namespace SportSpot.Events
+﻿namespace SportSpot.Events.Services
 {
     public interface IEventService
     {

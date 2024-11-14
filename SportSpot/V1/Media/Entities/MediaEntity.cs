@@ -1,6 +1,6 @@
 ﻿using System.ComponentModel.DataAnnotations;
 
-namespace SportSpot.V1.Media
+namespace SportSpot.V1.Media.Entities
 {
     public record MediaEntity
     {

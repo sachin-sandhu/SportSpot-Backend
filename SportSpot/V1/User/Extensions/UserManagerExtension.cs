@@ -1,8 +1,12 @@
 ﻿using Microsoft.AspNetCore.Identity;
+using SportSpot.V1.User.Dtos;
+using SportSpot.V1.User.Dtos.Auth;
+using SportSpot.V1.User.Entities;
+using SportSpot.V1.User.Services;
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 
-namespace SportSpot.V1.User
+namespace SportSpot.V1.User.Extensions
 {
     public static class UserManagerExtension
     {

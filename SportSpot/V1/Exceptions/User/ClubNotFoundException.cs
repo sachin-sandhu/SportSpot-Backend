@@ -1,9 +1,8 @@
-﻿namespace SportSpot.V1.Exceptions
+﻿namespace SportSpot.V1.Exceptions.User;
+
+public class ClubNotFoundException : AbstractSportSpotException
 {
-    public class ClubNotFoundException : AbstractSportSpotException
+    public ClubNotFoundException() : base("User.ClubNotFound", "Club not found", StatusCodes.Status404NotFound)
     {
-        public ClubNotFoundException() : base("User.ClubNotFound", "Club not found", StatusCodes.Status404NotFound)
-        {
-        }
     }
 }

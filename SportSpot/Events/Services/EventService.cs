@@ -1,7 +1,7 @@
 ﻿using MongoDB.Driver;
 using System.Reflection;
 
-namespace SportSpot.Events
+namespace SportSpot.Events.Services
 {
     public class EventService : IEventService
     {

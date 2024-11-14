@@ -1,4 +1,5 @@
 ﻿using SportSpot.Events;
+using SportSpot.Events.Services;
 using SportSpot_Test.Event.Listener;
 
 namespace SportSpot_Test.Event
