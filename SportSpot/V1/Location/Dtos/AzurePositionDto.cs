@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace SportSpot.V1.Location
+namespace SportSpot.V1.Location.Dtos
 {
     public class AzurePositionDto
     {

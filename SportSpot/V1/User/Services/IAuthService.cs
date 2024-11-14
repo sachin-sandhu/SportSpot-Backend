@@ -1,9 +1,12 @@
-﻿namespace SportSpot.V1.User
+﻿using SportSpot.V1.User.Dtos.Auth;
+using SportSpot.V1.User.Dtos.Auth.OAuth;
+using SportSpot.V1.User.Entities;
+
+namespace SportSpot.V1.User.Services
 {
     public interface IAuthService
     {
-        Task<AuthTokenDto> Register(ClubRegisterRequestDto request);
-        Task<AuthTokenDto> Register(UserRegisterRequestDto request);
+        Task<AuthTokenDto> Register(AuthUserRegisterRequestDto request);
         Task<AuthTokenDto> Login(AuthUserLoginRequestDto request);
         Task<AuthTokenDto> OAuth(OAuthUserRequestDto request);
         Task Delete(AuthUserEntity authUser);

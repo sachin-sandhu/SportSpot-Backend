@@ -1,12 +1,12 @@
 ﻿using Microsoft.EntityFrameworkCore;
-using SportSpot.V1.Media;
+using SportSpot.V1.Media.Entities;
 
 namespace SportSpot.V1.Context
 {
     public class DatabaseContext(DbContextOptions<DatabaseContext> options) : DbContext(options)
     {
 
-        public DbSet<MediaEntity> Media { get; set; }
+        public DbSet<MediaEntity> Media { get; set; } = null!;
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {

@@ -1,6 +1,7 @@
-﻿using SportSpot.V1.User;
+﻿using SportSpot.V1.Media.Entities;
+using SportSpot.V1.User.Entities;
 
-namespace SportSpot.V1.Media
+namespace SportSpot.V1.Media.Services
 {
     public interface IMediaService
     {

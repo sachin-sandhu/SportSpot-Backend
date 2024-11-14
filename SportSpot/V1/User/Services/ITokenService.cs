@@ -1,6 +1,7 @@
-﻿using System.Security.Claims;
+﻿using SportSpot.V1.User.Dtos;
+using System.Security.Claims;
 
-namespace SportSpot.V1.User
+namespace SportSpot.V1.User.Services
 {
     public interface ITokenService
     {

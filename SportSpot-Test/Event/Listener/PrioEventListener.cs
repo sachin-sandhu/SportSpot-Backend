@@ -1,29 +1,27 @@
 ﻿using SportSpot.Events;
 
-namespace SportSpot_Test.Event
+namespace SportSpot_Test.Event.Listener
 {
     internal class PrioEventListener : IListener
     {
         public List<EventPriority> PrioritiesCallStack { get; private set; } = [];
 
         [EventHandler(EventPriority.LOW)]
-#pragma warning disable IDE0060
-        public void OnTestEventLow(OnTestEvent @event)
+        public void OnTestEventLow(OnTestEvent _)
         {
             PrioritiesCallStack.Add(EventPriority.LOW);
         }
 
         [EventHandler(EventPriority.HIGH)]
-        public void OnTestEventHigh(OnTestEvent @event)
+        public void OnTestEventHigh(OnTestEvent _)
         {
             PrioritiesCallStack.Add(EventPriority.HIGH);
         }
 
         [EventHandler(EventPriority.MEDIUM)]
-        public void OnTestEventMEDIUM(OnTestEvent @event)
+        public void OnTestEventMEDIUM(OnTestEvent _)
         {
             PrioritiesCallStack.Add(EventPriority.MEDIUM);
         }
-#pragma warning restore IDE0060
     }
 }

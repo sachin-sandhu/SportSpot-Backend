@@ -1,6 +1,7 @@
-﻿using SportSpot.Listener;
+﻿using SportSpot.Events.Services;
+using SportSpot.Listener;
 
-namespace SportSpot.Events
+namespace SportSpot.Events.Extensions
 {
     public static class EventExtension
     {

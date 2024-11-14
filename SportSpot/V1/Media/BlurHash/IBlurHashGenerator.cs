@@ -1,4 +1,4 @@
-﻿namespace SportSpot.V1.Media
+﻿namespace SportSpot.V1.Media.BlurHash
 {
     public interface IBlurHashGenerator
     {

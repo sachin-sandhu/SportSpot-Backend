@@ -1,4 +1,4 @@
-﻿using SportSpot.V1.User;
+﻿using SportSpot.V1.User.Events;
 
 namespace SportSpot.Listener
 {

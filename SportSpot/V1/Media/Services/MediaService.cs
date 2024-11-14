@@ -1,9 +1,13 @@
 ﻿using Azure.Storage.Sas;
 using SportSpot.V1.Exceptions;
+using SportSpot.V1.Exceptions.Media;
+using SportSpot.V1.Media.BlurHash;
+using SportSpot.V1.Media.Entities;
+using SportSpot.V1.Media.Repositories;
 using SportSpot.V1.Storage;
-using SportSpot.V1.User;
+using SportSpot.V1.User.Entities;
 
-namespace SportSpot.V1.Media
+namespace SportSpot.V1.Media.Services
 {
     public class MediaService(IBlobClient _blobClient, IBlurHashFactory _blurHashFactory, IMediaRepository _mediaRepository) : IMediaService
     {

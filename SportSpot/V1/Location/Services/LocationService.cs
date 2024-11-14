@@ -1,7 +1,10 @@
 ﻿using SportSpot.V1.Exceptions;
+using SportSpot.V1.Exceptions.Location;
+using SportSpot.V1.Location.Dtos;
+using SportSpot.V1.Location.Enums;
 using SportSpot.V1.Request;
 
-namespace SportSpot.V1.Location
+namespace SportSpot.V1.Location.Services
 {
     public class LocationService(IRequest _request, ILocationCacheService _cache, LocationConfigDto _config) : ILocationService
     {
