@@ -29,7 +29,30 @@ Eine kurze Beschreibung des Projekts und seiner Funktionalität.
 
 ## Tests ausführen
 
-In Work
+### Requirements
+1. DotNet 8
+2. Docker
+
+### Unit-Test
+**Commands:**
+1. dotnet test SportSpot-Test/SportSpot-Test.csproj -v d
+
+### Integration-Test
+
+**All commands must be executed with Powershell.**
+
+### With OAuth
+**Commands:**
+1. Set-Content -Path Subscription.env -Value AZURE_MAPS_SUBSCRIPTION_KEY=Dummy
+2. (Get-Content Development.env) -replace '^OAUTH_GOOGLE_USER_INFORMATION_ENDPOINT=.*', 'OAUTH_GOOGLE_USER_INFORMATION_ENDPOINT=http://restemulator:8083/oauth' | Set-Content Development.env
+2. docker compose up --build -d
+3. ($env:RUN_OAUTH_TEST="true") | dotnet test Integration-Test/Integration-Test.csproj -v d
+
+#### Without OAuth
+**Commands:**
+1. Set-Content -Path Subscription.env -Value AZURE_MAPS_SUBSCRIPTION_KEY=Dummy
+2. docker compose up --build -d
+3. dotnet test Integration-Test/Integration-Test.csproj -v d
 
 ## Lizenz
 
