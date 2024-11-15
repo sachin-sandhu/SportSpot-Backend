@@ -15,5 +15,6 @@ namespace SportSpot.V1.Media.Services
         Task UnblockMedia(MediaEntity media);
         Task DeleteMedia(MediaEntity media);
         Task DeleteMedia(Guid id);
+        Task DeleteAllMedia();
     }
 }

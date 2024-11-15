@@ -1,5 +1,7 @@
-﻿using System.Net.Http.Headers;
+﻿using Integration_Test.Properties;
+using System.Net.Http.Headers;
 using System.Text.Json.Nodes;
+using static System.Net.Mime.MediaTypeNames;
 
 namespace Integration_Test.V1.Libs
 {
@@ -15,7 +17,7 @@ namespace Integration_Test.V1.Libs
             };
         }
 
-        public async Task<HttpResponseMessage> RegisterUser(string username, string email, string password, string firstname, string lastname, byte[] avatar = null)
+        public async Task<HttpResponseMessage> RegisterUser(string username, string email, string password, string firstname, string lastname, string avatarAsBase64 = null)
         {
             JsonObject registerRequest = new()
             {
@@ -25,15 +27,38 @@ namespace Integration_Test.V1.Libs
                 { "firstname", firstname },
                 { "lastname", lastname }
             };
-            if (avatar != null)
+            if (avatarAsBase64 != null)
             {
-                string avatarAsBase64 = Convert.ToBase64String(avatar);
-                registerRequest.Add("avatar", avatarAsBase64);
+                registerRequest.Add("avatarAsBase64", avatarAsBase64);
             }
 
             StringContent content = new(registerRequest.ToJsonString(), MediaTypeHeaderValue.Parse("application/json"));
             HttpResponseMessage response = await _client.PostAsync("auth/register", content);
             return response;
+        }
+
+        public async Task<HttpResponseMessage> LoginUser(string usernameOrMail, string password)
+        {
+            JsonObject loginRequest = new()
+            {
+                { "email", usernameOrMail },
+                { "password", password }
+            };
+
+            StringContent content = new(loginRequest.ToJsonString(), MediaTypeHeaderValue.Parse("application/json"));
+            HttpResponseMessage response = await _client.PostAsync("auth/login", content);
+            return response;
+        }
+
+
+        public string GetDefaultPictureAsBase64()
+        {
+            return Resources.TestImage;
+        }
+
+        public byte[] GetDefaultPicture()
+        {
+            return Convert.FromBase64String(Resources.TestImage);
         }
 
     }

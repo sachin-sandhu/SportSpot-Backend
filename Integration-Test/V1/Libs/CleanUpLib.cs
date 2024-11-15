@@ -1,13 +1,22 @@
 ﻿namespace Integration_Test.V1.Libs
 {
-    public static class CleanUpLib
+    public class CleanUpLib
     {
 
-        public static void CleanUp()
+        private readonly HttpClient _client;
+
+        public CleanUpLib(string baseUrl)
         {
+            _client = new HttpClient
+            {
+                BaseAddress = new Uri(baseUrl)
+            };
+        }
 
-            // Clean up database
-
+        public async Task CleanUp()
+        {
+            HttpResponseMessage response = await _client.DeleteAsync("admin/seed-data");
+            response.EnsureSuccessStatusCode();
         }
     }
 }
