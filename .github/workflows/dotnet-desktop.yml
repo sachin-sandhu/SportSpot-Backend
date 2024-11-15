@@ -8,6 +8,7 @@ on:
 
 jobs:
   build:
+    name: Build & Unit Test
     runs-on: ubuntu-latest
     steps:
     - name: Checkout
@@ -27,8 +28,9 @@ jobs:
       run: dotnet build SportSpot/SportSpot.csproj -c Release
 
     - name: Exceute Unit Tests
-      run: dotnet test SportSpot-Test/SportSpot-Test.csproj -v d
+      run: dotnet test SportSpot-Test/SportSpot-Test.csproj -v n
   integration:
+    name: Integration Test
     runs-on: ubuntu-latest
     env:
       RUN_OAUTH_TEST: true
@@ -64,4 +66,4 @@ jobs:
       run: dotnet restore SportSpot.sln
     
     - name: Exceute Integration Tests
-      run: dotnet test Integration-Test/Integration-Test.csproj -v d
+      run: dotnet test Integration-Test/Integration-Test.csproj -v n
