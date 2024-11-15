@@ -32,18 +32,24 @@ jobs:
     runs-on: ubuntu-latest
     env:
       RUN_OAUTH_TEST: true
+      AZURE_MAPS_SUBSCRIPTION_KEY: ${{ secrets.AZURE_MAPS_SUBSCRIPTION_KEY }}
     steps:
     - name: Checkout
       uses: actions/checkout@v4
       with:
         fetch-depth: 0
     
-    - name: Update .env variable
+    - name: Update Development.env
       run: |
         echo "Updating Development.env"
         sed -i 's|^OAUTH_GOOGLE_USER_INFORMATION_ENDPOINT=.*|OAUTH_GOOGLE_USER_INFORMATION_ENDPOINT=http://restemulator:8083/oauth|' Development.env
-        cat Development.env # Optional: Zur Überprüfung der Änderung
+        cat Development.env
     
+    - name: Create Subscription.env
+      run: |
+        echo "Creating Subscription.env"
+        echo "AZURE_MAPS_SUBSCRIPTION_KEY=${{ secrets.AZURE_MAPS_SUBSCRIPTION_KEY }}" > Subscription.env
+
     - name: Run Services
       uses: hoverkraft-tech/compose-action@v2.0.2
       with:
