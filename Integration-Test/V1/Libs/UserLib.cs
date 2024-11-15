@@ -120,5 +120,20 @@ namespace Integration_Test.V1.Libs
             return Convert.FromBase64String(Resources.TestImage);
         }
 
+        public async Task<JsonObject> CreateDefaultUser()
+        {
+            string username = "TestUser";
+            string email = "max.musterman@gmail.com";
+            string password = "password1.G.222";
+            string firstname = "Max";
+            string lastname = "Musterman";
+
+            HttpResponseMessage response = await RegisterUser(username, email, password, firstname, lastname);
+            response.EnsureSuccessStatusCode();
+
+            string json = await response.Content.ReadAsStringAsync();
+            return JsonSerializer.Deserialize<JsonObject>(json);
+        }
+
     }
 }

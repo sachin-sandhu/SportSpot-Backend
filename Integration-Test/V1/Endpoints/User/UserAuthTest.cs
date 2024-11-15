@@ -548,17 +548,7 @@ namespace Integration_Test.V1.Endpoints.User
         public async Task DeleteRegisterdUser()
         {
             // Arrange
-            string username = "TestUser";
-            string email = "max.musterman@gmail.com";
-            string password = "password1.G.222";
-            string firstname = "Max";
-            string lastname = "Musterman";
-
-            HttpResponseMessage response = await _userLib.RegisterUser(username, email, password, firstname, lastname);
-            response.EnsureSuccessStatusCode();
-
-            string responseContent = await response.Content.ReadAsStringAsync();
-            JsonObject authToken = JsonSerializer.Deserialize<JsonObject>(responseContent);
+            JsonObject authToken = await _userLib.CreateDefaultUser();
 
             string accessToken = authToken["accessToken"].Value<string>();
 
@@ -566,26 +556,14 @@ namespace Integration_Test.V1.Endpoints.User
             await _userLib.DeleteUser(accessToken);
 
             // Assert
-            HttpResponseMessage response2 = await _userLib.RegisterUser(username, email, password, firstname, lastname);
-
-            Assert.AreEqual(HttpStatusCode.Created, response2.StatusCode);
+            Assert.IsNotNull(await _userLib.CreateDefaultUser());
         }
 
         [TestMethod]
         public async Task RefreshAccessToken()
         {
             // Arrange
-            string username = "TestUser";
-            string email = "max.musterman@gmail.com";
-            string password = "password1.G.222";
-            string firstname = "Max";
-            string lastname = "Musterman";
-
-            HttpResponseMessage response = await _userLib.RegisterUser(username, email, password, firstname, lastname);
-            response.EnsureSuccessStatusCode();
-
-            string responseContent = await response.Content.ReadAsStringAsync();
-            JsonObject authToken = JsonSerializer.Deserialize<JsonObject>(responseContent);
+            JsonObject authToken = await _userLib.CreateDefaultUser();
 
             string accessToken = authToken["accessToken"].Value<string>();
             DateTime accessTokenExpire = authToken["accessExpire"].Value<DateTime>();
@@ -609,17 +587,7 @@ namespace Integration_Test.V1.Endpoints.User
         public async Task RevokeRefreshToken()
         {
             // Arrange
-            string username = "TestUser";
-            string email = "max.musterman@gmail.com";
-            string password = "password1.G.222";
-            string firstname = "Max";
-            string lastname = "Musterman";
-
-            HttpResponseMessage response = await _userLib.RegisterUser(username, email, password, firstname, lastname);
-            response.EnsureSuccessStatusCode();
-
-            string responseContent = await response.Content.ReadAsStringAsync();
-            JsonObject authToken = JsonSerializer.Deserialize<JsonObject>(responseContent);
+            JsonObject authToken = await _userLib.CreateDefaultUser();
 
             string accessToken = authToken["accessToken"].Value<string>();
             string refreshToken = authToken["refreshToken"].Value<string>();
