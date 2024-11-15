@@ -393,7 +393,7 @@ namespace Integration_Test.V1.Endpoints.User
         public async Task LoginAndRegisterViaOAuth()
         {
             //Only run if the emulator is running
-            if (RunOAuthTest())
+            if (!RunOAuthTest())
             {
                 Assert.Inconclusive($"Emulator is not running");
             }

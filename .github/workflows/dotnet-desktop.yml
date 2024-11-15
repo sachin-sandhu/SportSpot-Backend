@@ -1,4 +1,4 @@
-name: .NET Core Desktop
+name: CI/CD
 
 on:
   push:
@@ -8,14 +8,8 @@ on:
 
 jobs:
   build:
-    strategy:
-      matrix:
-        configuration: [Release]
-    runs-on: windows-latest  # For a list of available runner types, refer to
-                             # https://help.github.com/en/actions/reference/workflow-syntax-for-github-actions#jobsjob_idruns-on
-    env:
-      Solution_Name: SportSpot.sln                         # Replace with your solution name, i.e. MyWpfApp.sln.
-      Test_Project_Path: SportSpot-Test\SportSpot-Test.csproj                 # Replace with the path to your test project, i.e. MyWpfApp.Tests\MyWpfApp.Tests.csproj.
+    name: Build & Unit Test
+    runs-on: ubuntu-latest
     steps:
     - name: Checkout
       uses: actions/checkout@v4
@@ -27,8 +21,49 @@ jobs:
       with:
         dotnet-version: 8.0.x
 
-    - name: Setup MSBuild.exe
-      uses: microsoft/setup-msbuild@v2
+    - name: Install dependencies
+      run: dotnet restore SportSpot.sln
 
-    - name: Execute unit tests
-      run: dotnet test
+    - name: Build Backend
+      run: dotnet build SportSpot/SportSpot.csproj -c Release
+
+    - name: Exceute Unit Tests
+      run: dotnet test SportSpot-Test/SportSpot-Test.csproj -v n
+  integration:
+    name: Integration Test
+    runs-on: ubuntu-latest
+    env:
+      RUN_OAUTH_TEST: true
+      AZURE_MAPS_SUBSCRIPTION_KEY: ${{ secrets.AZURE_MAPS_SUBSCRIPTION_KEY }}
+    steps:
+    - name: Checkout
+      uses: actions/checkout@v4
+      with:
+        fetch-depth: 0
+    
+    - name: Update Development.env
+      run: |
+        echo "Updating Development.env"
+        sed -i 's|^OAUTH_GOOGLE_USER_INFORMATION_ENDPOINT=.*|OAUTH_GOOGLE_USER_INFORMATION_ENDPOINT=http://restemulator:8083/oauth|' Development.env
+        cat Development.env
+    
+    - name: Create Subscription.env
+      run: |
+        echo "Creating Subscription.env"
+        echo "AZURE_MAPS_SUBSCRIPTION_KEY=${{ secrets.AZURE_MAPS_SUBSCRIPTION_KEY }}" > Subscription.env
+
+    - name: Run Services
+      uses: hoverkraft-tech/compose-action@v2.0.2
+      with:
+        compose-file: "docker-compose.override.yml"
+      
+    - name: Install .NET Core
+      uses: actions/setup-dotnet@v4
+      with:
+        dotnet-version: 8.0.x
+    
+    - name: Install dependencies
+      run: dotnet restore SportSpot.sln
+    
+    - name: Exceute Integration Tests
+      run: dotnet test Integration-Test/Integration-Test.csproj -v n
