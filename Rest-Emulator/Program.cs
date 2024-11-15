@@ -1,5 +1,5 @@
-using AzureLocation_Emulator.Factories;
-using AzureLocation_Emulator.Services;
+using Rest_Emulator.Factories;
+using Rest_Emulator.Services;
 using Microsoft.OpenApi.Any;
 using Microsoft.OpenApi.Models;
 using System.Reflection;
@@ -15,6 +15,7 @@ builder.Services.AddControllers().AddJsonOptions(x =>
 
 builder.Services.AddSingleton<SearchModeService>();
 builder.Services.AddSingleton<ReverseModeService>();
+builder.Services.AddSingleton<GoogleOAuthModeService>();
 builder.Services.AddSingleton<IModeFactory, DefaultModeFactory>();
 
 builder.Services.AddEndpointsApiExplorer();

@@ -1,7 +1,7 @@
-﻿using AzureLocation_Emulator.Enums;
+﻿using Rest_Emulator.Enums;
 using System.ComponentModel.DataAnnotations;
 
-namespace AzureLocation_Emulator.Dtos
+namespace Rest_Emulator.Dtos
 {
     public record SetModeDto
     {

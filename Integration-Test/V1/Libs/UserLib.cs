@@ -1,7 +1,8 @@
 ﻿using Integration_Test.Properties;
+using Integration_Test.V1.Exceptions;
+using System.Net;
 using System.Net.Http.Headers;
 using System.Text.Json.Nodes;
-using static System.Net.Mime.MediaTypeNames;
 
 namespace Integration_Test.V1.Libs
 {
@@ -50,13 +51,40 @@ namespace Integration_Test.V1.Libs
             return response;
         }
 
+        public async Task<HttpResponseMessage> OAuthGoogle(string accesstoken)
+        {
+            JsonObject loginRequest = new()
+            {
+                { "accessToken", accesstoken },
+                { "provider", "GOOGLE" }
+            };
 
-        public string GetDefaultPictureAsBase64()
+            StringContent content = new(loginRequest.ToJsonString(), MediaTypeHeaderValue.Parse("application/json"));
+            HttpResponseMessage response = await _client.PostAsync("auth/oauth", content);
+            return response;
+        }
+
+        public async Task<JsonObject> GetUserById(Guid id, string accessToken)
+        {
+            HttpRequestMessage httpRequestMessage = new(HttpMethod.Get, $"user/{id}");
+            httpRequestMessage.Headers.Authorization = new AuthenticationHeaderValue("Bearer", accessToken);
+
+            HttpResponseMessage response = await _client.SendAsync(httpRequestMessage);
+            if (response.StatusCode == HttpStatusCode.NotFound)
+                throw new NotFoundException();
+            if (response.StatusCode == HttpStatusCode.Unauthorized)
+                throw new UnauthorizedException();
+            response.EnsureSuccessStatusCode();
+            string json = await response.Content.ReadAsStringAsync();
+            return JsonSerializer.Deserialize<JsonObject>(json);
+        }
+
+        public static string GetDefaultPictureAsBase64()
         {
             return Resources.TestImage;
         }
 
-        public byte[] GetDefaultPicture()
+        public static byte[] GetDefaultPicture()
         {
             return Convert.FromBase64String(Resources.TestImage);
         }

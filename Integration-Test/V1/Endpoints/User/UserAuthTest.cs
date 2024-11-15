@@ -1,5 +1,7 @@
 ﻿using Integration_Test.Extensions;
+using Integration_Test.V1.Exceptions;
 using Integration_Test.V1.Libs;
+using Rest_Emulator.Enums;
 using System.Net;
 using System.Text.Json.Nodes;
 
@@ -10,13 +12,16 @@ namespace Integration_Test.V1.Endpoints.User
     {
 
         private readonly string baseUri = "http://localhost:8080/api/v1/";
+        private readonly string emulatorUri = "http://localhost:8083/";
         private readonly UserLib _userLib;
         private readonly CleanUpLib _cleanUpLib;
+        private readonly RestEmulatorLib _emulatorLib;
 
         public UserAuthTest()
         {
             _userLib = new(baseUri);
             _cleanUpLib = new(baseUri);
+            _emulatorLib = new(emulatorUri);
         }
 
 
@@ -57,7 +62,7 @@ namespace Integration_Test.V1.Endpoints.User
             string firstname = "Max";
             string lastname = "Musterman";
 
-            string avatar = _userLib.GetDefaultPictureAsBase64();
+            string avatar = UserLib.GetDefaultPictureAsBase64();
             
             // Act
             HttpResponseMessage response = await _userLib.RegisterUser(username, email, password, firstname, lastname, avatar);
@@ -95,7 +100,7 @@ namespace Integration_Test.V1.Endpoints.User
             // Retry
 
             // Arrange
-            avatar = _userLib.GetDefaultPictureAsBase64();
+            avatar = UserLib.GetDefaultPictureAsBase64();
 
             // Act
             response = await _userLib.RegisterUser(username, email, password, firstname, lastname, avatar);
@@ -119,7 +124,7 @@ namespace Integration_Test.V1.Endpoints.User
             string firstname = "Max";
             string lastname = "Musterman";
 
-            string avatar = _userLib.GetDefaultPictureAsBase64();
+            string avatar = UserLib.GetDefaultPictureAsBase64();
 
             //User Two
             string username2 = "TestUser2";
@@ -128,7 +133,7 @@ namespace Integration_Test.V1.Endpoints.User
             string firstname2 = "Max";
             string lastname2 = "Musterman";
 
-            string avatar2 = _userLib.GetDefaultPictureAsBase64();
+            string avatar2 = UserLib.GetDefaultPictureAsBase64();
 
             // Act
 
@@ -221,7 +226,7 @@ namespace Integration_Test.V1.Endpoints.User
             string firstname = "Max";
             string lastname = "Musterman";
 
-            string avatar = _userLib.GetDefaultPictureAsBase64();
+            string avatar = UserLib.GetDefaultPictureAsBase64();
 
             //User Two
             string username2 = "TestUser2";
@@ -230,7 +235,7 @@ namespace Integration_Test.V1.Endpoints.User
             string firstname2 = "Max";
             string lastname2 = "Musterman";
 
-            string avatar2 = _userLib.GetDefaultPictureAsBase64();
+            string avatar2 = UserLib.GetDefaultPictureAsBase64();
 
             // Act
             //User One
@@ -265,7 +270,7 @@ namespace Integration_Test.V1.Endpoints.User
             string firstname = "Max";
             string lastname = "Musterman";
 
-            string avatar = _userLib.GetDefaultPictureAsBase64();
+            string avatar = UserLib.GetDefaultPictureAsBase64();
 
             //User Two
             string username2 = "TestUser";
@@ -274,7 +279,7 @@ namespace Integration_Test.V1.Endpoints.User
             string firstname2 = "Max";
             string lastname2 = "Musterman";
 
-            string avatar2 = _userLib.GetDefaultPictureAsBase64();
+            string avatar2 = UserLib.GetDefaultPictureAsBase64();
 
             // Act
             //User One
@@ -306,7 +311,7 @@ namespace Integration_Test.V1.Endpoints.User
             string password = "password1.G.222";
             string firstname = "Max";
             string lastname = "Musterman";
-            string avatar = _userLib.GetDefaultPictureAsBase64();
+            string avatar = UserLib.GetDefaultPictureAsBase64();
 
             HttpResponseMessage response = await _userLib.RegisterUser(username, email, password, firstname, lastname, avatar);
             response.EnsureSuccessStatusCode();
@@ -343,7 +348,7 @@ namespace Integration_Test.V1.Endpoints.User
             string password = "password1.G.222";
             string firstname = "Max";
             string lastname = "Musterman";
-            string avatar = _userLib.GetDefaultPictureAsBase64();
+            string avatar = UserLib.GetDefaultPictureAsBase64();
 
             HttpResponseMessage response = await _userLib.RegisterUser(username, email, password, firstname, lastname, avatar);
             response.EnsureSuccessStatusCode();
@@ -368,7 +373,7 @@ namespace Integration_Test.V1.Endpoints.User
             string password = "password1.G.222";
             string firstname = "Max";
             string lastname = "Musterman";
-            string avatar = _userLib.GetDefaultPictureAsBase64();
+            string avatar = UserLib.GetDefaultPictureAsBase64();
 
             HttpResponseMessage response = await _userLib.RegisterUser(username, email, password, firstname, lastname, avatar);
             response.EnsureSuccessStatusCode();
@@ -384,14 +389,174 @@ namespace Integration_Test.V1.Endpoints.User
             Assert.AreEqual("User.Login", errorInformation[0].AsObject()["Code"].Value<string>());
         }
 
-        private static void ValidateToken(JsonObject authToken)
+        [TestMethod]
+        public async Task LoginAndRegisterViaOAuth()
+        {
+            //Only run if the emulator is running
+            if (RunOAuthTest())
+            {
+                Assert.Inconclusive($"Emulator is not running");
+            }
+
+            //Register User
+
+            //Arrange
+            JsonObject googleResponse = new()
+            {
+                { "sub", "1234567890" },
+                { "name", "Max Musterman" },
+                { "given_name", "Max" },
+                { "family_name", "Musterman" },
+                { "picture", "https://lh3.googleusercontent.com/a/ACg8ocIPR9CpoHOlpda4UqxIyEjg0qXJu__I83NwFqIEga0Y-5si6ik=s96-c" },
+                { "email", "max.musterman@gmail.com" },
+                { "email_verified", true }
+            };
+            await _emulatorLib.SetMode(ModeType.GoogleOAuth, true, googleResponse.ToJsonString());
+
+            //Act
+            HttpResponseMessage response = await _userLib.OAuthGoogle("1234567890");
+            response.EnsureSuccessStatusCode();
+
+            string responseContent = await response.Content.ReadAsStringAsync();
+            JsonObject authToken = JsonSerializer.Deserialize<JsonObject>(responseContent);
+
+            // Assert
+            ValidateToken(authToken);
+
+            //Login User
+
+            //Act
+            HttpResponseMessage response2 = await _userLib.OAuthGoogle("1234567890");
+            response2.EnsureSuccessStatusCode();
+
+            string responseContent2 = await response.Content.ReadAsStringAsync();
+            JsonObject authToken2 = JsonSerializer.Deserialize<JsonObject>(responseContent2);
+
+            // Assert
+            ValidateToken(authToken2);
+        }
+
+
+        [TestMethod]
+        public async Task RegisterViaOAuthAndLoginWithPasswordAndRegisterWithSameName()
+        {
+            //Only run if the emulator is running
+            if (!RunOAuthTest())
+            {
+                Assert.Inconclusive($"Emulator is not running");
+            }
+
+            //Register User
+
+            //Arrange
+
+            string mail = "max.musterman@gmail.com";
+
+            JsonObject googleResponse = new()
+            {
+                { "sub", "1234567890" },
+                { "name", "Max Musterman" },
+                { "given_name", "Max" },
+                { "family_name", "Musterman" },
+                { "picture", "https://lh3.googleusercontent.com/a/ACg8ocIPR9CpoHOlpda4UqxIyEjg0qXJu__I83NwFqIEga0Y-5si6ik=s96-c" },
+                { "email", mail },
+                { "email_verified", true }
+            };
+            await _emulatorLib.SetMode(ModeType.GoogleOAuth, true, googleResponse.ToJsonString());
+
+            //Act
+            HttpResponseMessage response = await _userLib.OAuthGoogle("1234567890");
+            response.EnsureSuccessStatusCode();
+
+            string responseContent = await response.Content.ReadAsStringAsync();
+            JsonObject authToken = JsonSerializer.Deserialize<JsonObject>(responseContent);
+
+            // Assert
+            ValidateToken(authToken);
+
+            //Login User
+
+            //Act
+            HttpResponseMessage loginRepsonse = await _userLib.LoginUser(mail, "FakePasswod");
+            string loginResponseContent = await loginRepsonse.Content.ReadAsStringAsync();
+            JsonArray errorInformationLogin = JsonSerializer.Deserialize<JsonArray>(loginResponseContent);
+
+            // Assert
+            Assert.AreEqual(HttpStatusCode.Unauthorized, loginRepsonse.StatusCode);
+            Assert.AreEqual("User.Login", errorInformationLogin[0].AsObject()["Code"].Value<string>());
+
+            //Register User with same Mail
+
+            //Act
+            HttpResponseMessage registerResponse = await _userLib.RegisterUser("TestUser", mail, "password1.G.222", "Max", "Musterman");
+            string registerResponseContent = await registerResponse.Content.ReadAsStringAsync();
+            JsonArray errorInformationRegister = JsonSerializer.Deserialize<JsonArray>(registerResponseContent);
+
+            // Assert
+            Assert.AreEqual(HttpStatusCode.BadRequest, registerResponse.StatusCode);
+            Assert.AreEqual("User.DuplicateEmail", errorInformationRegister[0].AsObject()["Code"].Value<string>());
+        }
+
+        [TestMethod]
+        public async Task RegisterNormalThenLoginViaOAuth()
+        {
+            //Only run if the emulator is running
+            if (!RunOAuthTest())
+            {
+                Assert.Inconclusive($"Emulator is not running");
+            }
+            //Register User
+
+            // Arrange
+
+            // User
+
+            string username = "TestUser";
+            string email = "max.musterman@gmail.com";
+            string password = "password1.G.222";
+            string firstname = "Max";
+            string lastname = "Musterman";
+
+            HttpResponseMessage registerResponse = await _userLib.RegisterUser(username, email, password, firstname, lastname);
+            registerResponse.EnsureSuccessStatusCode();
+
+            //OAuth
+
+            JsonObject googleResponse = new()
+            {
+                { "sub", "1234567890" },
+                { "name", $"{firstname} {lastname}" },
+                { "given_name", firstname },
+                { "family_name", lastname },
+                { "picture", "https://lh3.googleusercontent.com/a/ACg8ocIPR9CpoHOlpda4UqxIyEjg0qXJu__I83NwFqIEga0Y-5si6ik=s96-c" },
+                { "email", email },
+                { "email_verified", true }
+            };
+            await _emulatorLib.SetMode(ModeType.GoogleOAuth, true, googleResponse.ToJsonString());
+
+            //Act
+            HttpResponseMessage oauthResponse = await _userLib.OAuthGoogle("1234567890");
+            string oauthContent = await oauthResponse.Content.ReadAsStringAsync();
+            JsonArray errorInformation = JsonSerializer.Deserialize<JsonArray>(oauthContent);
+
+            // Assert
+            Assert.AreEqual(HttpStatusCode.Unauthorized, oauthResponse.StatusCode);
+            Assert.AreEqual("User.Login", errorInformation[0].AsObject()["Code"].Value<string>());
+        }
+
+
+        private void ValidateToken(JsonObject authToken)
         {
             Assert.IsNotNull(authToken, "Authentication token should not be null.");
             Assert.IsFalse(string.IsNullOrEmpty(authToken["accessToken"].Value<string>()), "Access token should not be empty or null.");
             Assert.IsTrue(authToken["accessExpire"].Value<DateTime>() > DateTime.Now, "Access token should expire in the future.");
             Assert.IsFalse(string.IsNullOrEmpty(authToken["refreshToken"].Value<string>()), "Refresh token should not be empty or null.");
             Assert.IsTrue(authToken["refreshExpire"].Value<DateTime>() > DateTime.Now, "Refresh token should expire in the future.");
+
+            Assert.ThrowsExceptionAsync<NotFoundException>(async () => await _userLib.GetUserById(Guid.NewGuid(), authToken["accessToken"].Value<string>()));
         }
+
+        public static bool RunOAuthTest() => !string.IsNullOrEmpty(Environment.GetEnvironmentVariable("RUN_OAUTH_TEST"));
 
     }
 }
