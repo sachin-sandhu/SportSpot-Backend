@@ -49,7 +49,7 @@ namespace Integration_Test.V1.Endpoints.User
             JsonObject authToken = JsonSerializer.Deserialize<JsonObject>(responseContent);
 
             // Assert
-            ValidateToken(authToken);
+            await ValidateToken(authToken);
         }
 
         [TestMethod]
@@ -63,7 +63,7 @@ namespace Integration_Test.V1.Endpoints.User
             string lastname = "Musterman";
 
             string avatar = UserLib.GetDefaultPictureAsBase64();
-            
+
             // Act
             HttpResponseMessage response = await _userLib.RegisterUser(username, email, password, firstname, lastname, avatar);
             response.EnsureSuccessStatusCode();
@@ -72,7 +72,7 @@ namespace Integration_Test.V1.Endpoints.User
             JsonObject authToken = JsonSerializer.Deserialize<JsonObject>(responseContent);
 
             // Assert
-            ValidateToken(authToken);
+            await ValidateToken(authToken);
         }
 
         [TestMethod]
@@ -92,7 +92,7 @@ namespace Integration_Test.V1.Endpoints.User
 
             string responseContent = await response.Content.ReadAsStringAsync();
             JsonArray errorInformation = JsonSerializer.Deserialize<JsonArray>(responseContent);
-            
+
             // Assert
             Assert.AreEqual(HttpStatusCode.BadRequest, response.StatusCode);
             Assert.AreEqual("Invalid Base64 string", errorInformation[0].AsObject()["Message"].Value<string>());
@@ -109,7 +109,7 @@ namespace Integration_Test.V1.Endpoints.User
             JsonObject authToken = JsonSerializer.Deserialize<JsonObject>(responseContent);
 
             // Assert
-            ValidateToken(authToken);
+            await ValidateToken(authToken);
         }
 
         [TestMethod]
@@ -152,8 +152,8 @@ namespace Integration_Test.V1.Endpoints.User
             JsonObject authToken2 = JsonSerializer.Deserialize<JsonObject>(responseContent2);
 
             // Assert
-            ValidateToken(authToken);
-            ValidateToken(authToken2);
+            await ValidateToken(authToken);
+            await ValidateToken(authToken2);
         }
 
         [TestMethod]
@@ -254,7 +254,7 @@ namespace Integration_Test.V1.Endpoints.User
             JsonArray errorInformation = JsonSerializer.Deserialize<JsonArray>(responseContent2);
 
             // Assert
-            ValidateToken(authToken);
+            await ValidateToken(authToken);
             Assert.AreEqual("User.DuplicateEmail", errorInformation[0].AsObject()["Code"].Value<string>());
         }
 
@@ -298,7 +298,7 @@ namespace Integration_Test.V1.Endpoints.User
             JsonArray errorInformation = JsonSerializer.Deserialize<JsonArray>(responseContent2);
 
             // Assert
-            ValidateToken(authToken);
+            await ValidateToken(authToken);
             Assert.AreEqual("User.DuplicateUserName", errorInformation[0].AsObject()["Code"].Value<string>());
         }
 
@@ -325,7 +325,7 @@ namespace Integration_Test.V1.Endpoints.User
             JsonObject loginAuthToken = JsonSerializer.Deserialize<JsonObject>(loginResponseContent);
 
             // Assert
-            ValidateToken(loginAuthToken);
+            await ValidateToken(loginAuthToken);
 
             // Act Login with Mail
             HttpResponseMessage loginResponse2 = await _userLib.LoginUser(email, password);
@@ -336,7 +336,7 @@ namespace Integration_Test.V1.Endpoints.User
             JsonObject loginAuthToken2 = JsonSerializer.Deserialize<JsonObject>(loginResponseContent2);
 
             // Assert
-            ValidateToken(loginAuthToken2);
+            await ValidateToken(loginAuthToken2);
         }
 
         [TestMethod]
@@ -421,7 +421,7 @@ namespace Integration_Test.V1.Endpoints.User
             JsonObject authToken = JsonSerializer.Deserialize<JsonObject>(responseContent);
 
             // Assert
-            ValidateToken(authToken);
+            await ValidateToken(authToken);
 
             //Login User
 
@@ -433,7 +433,7 @@ namespace Integration_Test.V1.Endpoints.User
             JsonObject authToken2 = JsonSerializer.Deserialize<JsonObject>(responseContent2);
 
             // Assert
-            ValidateToken(authToken2);
+            await ValidateToken(authToken2);
         }
 
 
@@ -472,7 +472,7 @@ namespace Integration_Test.V1.Endpoints.User
             JsonObject authToken = JsonSerializer.Deserialize<JsonObject>(responseContent);
 
             // Assert
-            ValidateToken(authToken);
+            await ValidateToken(authToken);
 
             //Login User
 
@@ -544,8 +544,68 @@ namespace Integration_Test.V1.Endpoints.User
             Assert.AreEqual("User.Login", errorInformation[0].AsObject()["Code"].Value<string>());
         }
 
+        [TestMethod]
+        public async Task DeleteRegisterdUser()
+        {
+            // Arrange
+            JsonObject authToken = await _userLib.CreateDefaultUser();
 
-        private void ValidateToken(JsonObject authToken)
+            string accessToken = authToken["accessToken"].Value<string>();
+
+            // Act
+            await _userLib.DeleteUser(accessToken);
+
+            // Assert
+            Assert.IsNotNull(await _userLib.CreateDefaultUser());
+        }
+
+        [TestMethod]
+        public async Task RefreshAccessToken()
+        {
+            // Arrange
+            JsonObject authToken = await _userLib.CreateDefaultUser();
+
+            string accessToken = authToken["accessToken"].Value<string>();
+            DateTime accessTokenExpire = authToken["accessExpire"].Value<DateTime>();
+            string refreshToken = authToken["refreshToken"].Value<string>();
+            DateTime refreshExpire = authToken["refreshExpire"].Value<DateTime>();
+
+            // Act
+            HttpResponseMessage refreshResponse = await _userLib.RefreshAccessToken(accessToken, refreshToken);
+            refreshResponse.EnsureSuccessStatusCode();
+
+            string refreshResponseContent = await refreshResponse.Content.ReadAsStringAsync();
+            JsonObject newAuthToken = JsonSerializer.Deserialize<JsonObject>(refreshResponseContent);
+
+            Assert.IsTrue(accessTokenExpire < newAuthToken["accessExpire"].Value<DateTime>(), "The new Access-Expire Date must be greater!");
+            Assert.IsTrue(refreshExpire < newAuthToken["refreshExpire"].Value<DateTime>(), "The new Refresh-Expire Date must be greater!");
+            Assert.AreNotEqual(accessToken, newAuthToken["accessToken"].Value<string>(), "The new Access-Token must be different!");
+            Assert.AreNotEqual(refreshToken, newAuthToken["refreshToken"].Value<string>(), "The new Refresh-Token must be different!");
+        }
+
+        [TestMethod]
+        public async Task RevokeRefreshToken()
+        {
+            // Arrange
+            JsonObject authToken = await _userLib.CreateDefaultUser();
+
+            string accessToken = authToken["accessToken"].Value<string>();
+            string refreshToken = authToken["refreshToken"].Value<string>();
+
+            // Act
+            await _userLib.RevokeAccessToken(accessToken);
+
+            // Assert
+            HttpResponseMessage refreshResponse = await _userLib.RefreshAccessToken(accessToken, refreshToken);
+
+            string refreshResponseContent = await refreshResponse.Content.ReadAsStringAsync();
+            JsonArray errorInformation = JsonSerializer.Deserialize<JsonArray>(refreshResponseContent);
+
+            Assert.AreEqual(HttpStatusCode.Unauthorized, refreshResponse.StatusCode);
+            Assert.AreEqual("User.InvalidToken", errorInformation[0].AsObject()["Code"].Value<string>());
+        }
+
+        private async Task ValidateToken(JsonObject authToken)
         {
             Assert.IsNotNull(authToken, "Authentication token should not be null.");
             Assert.IsFalse(string.IsNullOrEmpty(authToken["accessToken"].Value<string>()), "Access token should not be empty or null.");
@@ -553,10 +613,9 @@ namespace Integration_Test.V1.Endpoints.User
             Assert.IsFalse(string.IsNullOrEmpty(authToken["refreshToken"].Value<string>()), "Refresh token should not be empty or null.");
             Assert.IsTrue(authToken["refreshExpire"].Value<DateTime>() > DateTime.Now, "Refresh token should expire in the future.");
 
-            Assert.ThrowsExceptionAsync<NotFoundException>(async () => await _userLib.GetUserById(Guid.NewGuid(), authToken["accessToken"].Value<string>()));
+            await Assert.ThrowsExceptionAsync<NotFoundException>(async () => await _userLib.GetUserById(Guid.NewGuid(), authToken["accessToken"].Value<string>()));
         }
 
         public static bool RunOAuthTest() => !string.IsNullOrEmpty(Environment.GetEnvironmentVariable("RUN_OAUTH_TEST"));
-
     }
 }

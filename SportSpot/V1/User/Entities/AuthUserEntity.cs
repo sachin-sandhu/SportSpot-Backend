@@ -11,7 +11,6 @@ namespace SportSpot.V1.User.Entities
         public string Biography { get; set; } = string.Empty;
         public string? RefreshToken { get; set; }
         public DateTime? RefreshTokenExpiryTime { get; set; }
-        public string? AvatarName { get; set; }
         public Guid? AvatarId { get; set; }
         public bool IsOAuth { get; set; }
         public OAuthProviderType OAuthProviderType { get; set; }
