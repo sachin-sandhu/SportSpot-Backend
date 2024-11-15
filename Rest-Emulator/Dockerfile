@@ -8,17 +8,17 @@ FROM mcr.microsoft.com/dotnet/sdk:8.0@sha256:df188b6cb642450d83d3d857a992bbbef24
 WORKDIR /src
 
 # copy csproj and restore as distinct layers
-COPY *.csproj ./AzureLocation-Emulator/
-RUN dotnet restore AzureLocation-Emulator/AzureLocation-Emulator.csproj
+COPY *.csproj ./Rest-Emulator/
+RUN dotnet restore Rest-Emulator/Rest-Emulator.csproj
 
 # copy everything else and build app
-COPY . ./AzureLocation-Emulator/
-WORKDIR /src/AzureLocation-Emulator
+COPY . ./Rest-Emulator/
+WORKDIR /src/Rest-Emulator
 RUN dotnet publish -c Release -o /app
 
 # final stage
 FROM base AS final
 WORKDIR /app
 COPY --from=build /app .
-ENTRYPOINT ["dotnet", "AzureLocation-Emulator.dll"]
+ENTRYPOINT ["dotnet", "Rest-Emulator.dll"]
 USER 1000

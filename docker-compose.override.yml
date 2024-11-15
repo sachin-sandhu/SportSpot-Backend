@@ -103,6 +103,18 @@ services:
       mariadb: 
         condition: service_healthy
 
+  restemulator:
+    build:
+      context: ./Rest-Emulator
+      dockerfile: Dockerfile
+    ports:
+      - "8083:8083"
+    env_file:
+      - ./Development.env
+    environment:
+      - ASPNETCORE_HTTP_PORTS=8083
+
+
 volumes:
   mongo_data:
   maria_data:

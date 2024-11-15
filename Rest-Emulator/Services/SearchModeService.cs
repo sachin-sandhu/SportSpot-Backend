@@ -1,10 +1,11 @@
 ﻿using Microsoft.AspNetCore.Mvc;
+using Rest_Emulator.Services;
 
-namespace AzureLocation_Emulator.Services
+namespace Rest_Emulator.Services
 {
-    public class ReverseModeService : IModeService
+    public class SearchModeService : IModeService
     {
-        public bool Success { get; set; }
+        public bool Success { get ; set ; }
         private string? _response;
         public string Response { get => _response ?? throw new InvalidDataException("Response can not be null!"); set => _response = value; }
 

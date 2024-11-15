@@ -6,5 +6,6 @@ namespace SportSpot.V1.User.Services
     {
         Task<AuthUserEntity> GetUser(Guid userId);
         Task<byte[]> GetAvatar(AuthUserEntity user);
+        Task DeleteAllUser();
     }
 }

@@ -1,4 +1,5 @@
-﻿using SportSpot.V1.Context;
+﻿using Microsoft.EntityFrameworkCore;
+using SportSpot.V1.Context;
 using SportSpot.V1.Media.Entities;
 
 namespace SportSpot.V1.Media.Repositories
@@ -26,6 +27,11 @@ namespace SportSpot.V1.Media.Repositories
         public async Task<MediaEntity?> Get(Guid id)
         {
             return await _context.Media.FindAsync(id);
+        }
+
+        public Task<List<MediaEntity>> GetAll()
+        {
+            return _context.Media.ToListAsync();
         }
     }
 }

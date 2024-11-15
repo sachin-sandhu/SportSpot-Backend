@@ -1,9 +1,9 @@
-using AzureLocation_Emulator.Dtos;
-using AzureLocation_Emulator.Factories;
-using AzureLocation_Emulator.Services;
+using Rest_Emulator.Dtos;
+using Rest_Emulator.Factories;
 using Microsoft.AspNetCore.Mvc;
+using Rest_Emulator.Services;
 
-namespace AzureLocation_Emulator.Controllers
+namespace Rest_Emulator.Controllers
 {
     [ApiController]
     [Route("[controller]")]

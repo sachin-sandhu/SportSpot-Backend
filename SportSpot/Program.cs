@@ -3,6 +3,8 @@ using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Azure;
+using Microsoft.Extensions.Caching.Distributed;
+using Microsoft.Extensions.Caching.StackExchangeRedis;
 using Microsoft.IdentityModel.Tokens;
 using Pomelo.EntityFrameworkCore.MySql.Infrastructure;
 using SportSpot.Events.Extensions;
@@ -23,6 +25,7 @@ using SportSpot.V1.User.Dtos.Auth.OAuth;
 using SportSpot.V1.User.Entities;
 using SportSpot.V1.User.OAuth;
 using SportSpot.V1.User.Services;
+using StackExchange.Redis;
 using System.Text;
 using System.Text.Json.Serialization;
 
@@ -39,7 +42,7 @@ string mongoDbConnection = builder.Configuration.GetValue<string>("MongoDBConnec
 string mongoDbDatabase = builder.Configuration.GetValue<string>("MongoDBDatabase") ?? throw new InvalidOperationException("MongoDBDatabase is not set!");
 
 string sqlConnection = builder.Configuration.GetValue<string>("MariaDBConnection") ?? throw new InvalidOperationException("MariaDBConnection is not set!");
-ServerVersion sqlVersion = ServerVersion.Create(new Version(10, 5, 4), ServerType.MariaDb);
+ServerVersion sqlVersion = ServerVersion.Create(new Version(10, 5, 4), Pomelo.EntityFrameworkCore.MySql.Infrastructure.ServerType.MariaDb);
 
 if (builder.Configuration.GetValue("MariaDBCheckSchema", true))
 {
@@ -53,10 +56,21 @@ if (builder.Configuration.GetValue("MariaDBCheckSchema", true))
 builder.Services.AddDbContextFactory<DatabaseContext>(optionsBuilder => optionsBuilder.UseMongoDB(mongoDbConnection, mongoDbDatabase));
 builder.Services.AddDbContextFactory<AuthContext>(options => options.UseMySql(sqlConnection, sqlVersion));
 
-builder.Services.AddStackExchangeRedisCache(options =>
+builder.Services.AddSingleton<IConnectionMultiplexer>(sp =>
 {
-    options.Configuration = builder.Configuration.GetValue<string>($"Location_Cache_DB_Connection") ?? throw new InvalidOperationException("Location_Cache_DB_Connection is not set!");
-    options.InstanceName = builder.Configuration.GetValue<string>($"Location_Cache_DB_Name") ?? throw new InvalidOperationException("Location_Cache_DB_Name is not set!");
+    string configuration = builder.Configuration.GetValue<string>("Location_Cache_DB_Connection") ?? throw new InvalidOperationException("Location_Cache_DB_Connection is not set!");
+    return ConnectionMultiplexer.Connect(configuration);
+});
+
+builder.Services.AddSingleton<IDistributedCache>(sp =>
+{
+    IConnectionMultiplexer multiplexer = sp.GetRequiredService<IConnectionMultiplexer>();
+    var options = new RedisCacheOptions
+    {
+        ConnectionMultiplexerFactory = () => Task.FromResult(multiplexer),
+        InstanceName = builder.Configuration.GetValue<string>("Location_Cache_DB_Name") ?? throw new InvalidOperationException("Location_Cache_DB_Name is not set!")
+    };
+    return new RedisCache(options);
 });
 
 builder.Services.AddIdentity<AuthUserEntity, AuthRoleEntity>(options =>

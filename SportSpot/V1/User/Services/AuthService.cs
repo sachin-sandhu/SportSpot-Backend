@@ -74,7 +74,9 @@ namespace SportSpot.V1.User.Services
             }
 
             await _eventService.FireEvent(new AuthUserCreatedEvent { AuthUserEntity = authUser });
-            return await _userManager.GenerateToken(authUser, _tokenService);
+            AuthTokenDto token = await _userManager.GenerateToken(authUser, _tokenService);
+            await transaction.CommitAsync();
+            return token;
         }
 
         public async Task<AuthTokenDto> RefreshAccessToken(AuthUserEntity user, string accessToken, RefreshTokenRequestDto request)

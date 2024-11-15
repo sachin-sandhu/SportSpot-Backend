@@ -98,5 +98,21 @@ namespace SportSpot.V1.Media.Services
                 return string.Empty; //TODO: return placeholder image
             return _blobClient.GenerateSaSUri(media.Id.ToString(), BlobContainerSasPermissions.Read).ToString();
         }
+
+        public async Task DeleteAllMedia()
+        {
+            foreach (MediaEntity media in await _mediaRepository.GetAll())
+            {
+                try
+                {
+                    await _blobClient.DeleteBlob(media.Id.ToString());
+                }
+                catch (Exception)
+                {
+                    //Ignore
+                }
+                await DeleteMedia(media);
+            }
+        }
     }
 }

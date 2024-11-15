@@ -8,7 +8,7 @@ using SportSpot.V1.User.Extensions;
 using SportSpot.V1.User.Mapper;
 using SportSpot.V1.User.Services;
 
-namespace SportSpot.V1.User.Context
+namespace SportSpot.V1.User.Controller
 {
     [Route("api/v{version:apiVersion}/[controller]")]
     [ApiController]
@@ -23,7 +23,7 @@ namespace SportSpot.V1.User.Context
         {
             return Ok((await _userService.GetUser(userId)).ConvertToDto(await User.GetAuthUser(_userManager)));
         }
-        
+
         [HttpGet("{userId}/avatar")]
         [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(byte[]))]
         [ProducesResponseType(StatusCodes.Status400BadRequest, Type = typeof(List<ErrorResult>))]
