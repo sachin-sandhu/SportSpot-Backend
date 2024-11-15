@@ -2,6 +2,7 @@
 using Integration_Test.V1.Exceptions;
 using System.Net;
 using System.Net.Http.Headers;
+using System.Text;
 using System.Text.Json.Nodes;
 
 namespace Integration_Test.V1.Libs
@@ -77,6 +78,36 @@ namespace Integration_Test.V1.Libs
             response.EnsureSuccessStatusCode();
             string json = await response.Content.ReadAsStringAsync();
             return JsonSerializer.Deserialize<JsonObject>(json);
+        }
+
+        public async Task DeleteUser(string accessToken)
+        {
+            HttpRequestMessage httpRequestMessage = new(HttpMethod.Delete, "auth");
+            httpRequestMessage.Headers.Authorization = new AuthenticationHeaderValue("Bearer", accessToken);
+
+            HttpResponseMessage response = await _client.SendAsync(httpRequestMessage);
+            response.EnsureSuccessStatusCode();
+        }
+
+        public async Task<HttpResponseMessage> RefreshAccessToken(string accessToken, string refreshToken)
+        {
+            JsonObject requestObj = new()
+            {
+                { "refreshToken", refreshToken }
+            };
+            HttpRequestMessage httpRequestMessage = new(HttpMethod.Post, "auth/token");
+            httpRequestMessage.Headers.Authorization = new AuthenticationHeaderValue("Bearer", accessToken);
+            httpRequestMessage.Content = new StringContent(requestObj.ToJsonString(), Encoding.UTF8, "application/json");
+            HttpResponseMessage response = await _client.SendAsync(httpRequestMessage);
+            return response;
+        }
+
+        public async Task RevokeAccessToken(string accessToken)
+        {
+            HttpRequestMessage httpRequestMessage = new(HttpMethod.Delete, "auth/token");
+            httpRequestMessage.Headers.Authorization = new AuthenticationHeaderValue("Bearer", accessToken);
+            HttpResponseMessage response = await _client.SendAsync(httpRequestMessage);
+            response.EnsureSuccessStatusCode();
         }
 
         public static string GetDefaultPictureAsBase64()

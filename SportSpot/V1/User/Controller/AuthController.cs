@@ -1,5 +1,4 @@
-﻿using Microsoft.AspNetCore.Authentication;
-using Microsoft.AspNetCore.Authorization;
+﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using SportSpot.V1.Exceptions;
@@ -21,7 +20,10 @@ namespace SportSpot.V1.User.Controller
         [ProducesResponseType(StatusCodes.Status400BadRequest, Type = typeof(List<ErrorResult>))]
         public async Task<IActionResult> Register([FromBody] AuthUserRegisterRequestDto request)
         {
-            return Ok(await _authService.Register(request));
+            return new ObjectResult(await _authService.Register(request))
+            {
+                StatusCode = StatusCodes.Status201Created
+            };
         }
 
         [AllowAnonymous]
@@ -57,9 +59,10 @@ namespace SportSpot.V1.User.Controller
         [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(AuthTokenDto))]
         [ProducesResponseType(StatusCodes.Status401Unauthorized)]
         [ProducesResponseType(StatusCodes.Status400BadRequest, Type = typeof(List<ErrorResult>))]
-        public async Task<IActionResult> Refresh([FromBody] RefreshTokenRequestDto request)
+        public async Task<IActionResult> Refresh([FromBody] RefreshTokenRequestDto request, [FromHeader(Name = "Authorization")] string authorizationToken)
         {
-            return Ok(await _authService.RefreshAccessToken(await User.GetAuthUser(_userManager), await HttpContext.GetTokenAsync("Bearer", "Access_Token") ?? throw new UnauthorizedException(), request));
+            authorizationToken = authorizationToken.Replace("Bearer ", "");
+            return Ok(await _authService.RefreshAccessToken(await User.GetAuthUser(_userManager), authorizationToken, request));
         }
 
         [Authorize]
