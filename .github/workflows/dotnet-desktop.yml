@@ -27,7 +27,7 @@ jobs:
       run: dotnet build SportSpot/SportSpot.csproj -c Release
 
     - name: Exceute Unit Tests
-      run: dotnet test SportSpot-Test/SportSpot-Test.csproj -v d
+      run: dotnet test SportSpot-Test/SportSpot-Test.csproj -v n
   integration:
     runs-on: ubuntu-latest
     env:
@@ -47,7 +47,7 @@ jobs:
     - name: Run Services
       uses: hoverkraft-tech/compose-action@v2.0.2
       with:
-        compose-file: "./docker-compose.override.yml"
+        compose-file: "docker-compose.override.yml"
       
     - name: Install .NET Core
       uses: actions/setup-dotnet@v4
@@ -58,4 +58,4 @@ jobs:
       run: dotnet restore SportSpot.sln
     
     - name: Exceute Integration Tests
-      run: dotnet test Integration-Test/Integration-Test.csproj -v d
+      run: dotnet test Integration-Test/Integration-Test.csproj -v n
