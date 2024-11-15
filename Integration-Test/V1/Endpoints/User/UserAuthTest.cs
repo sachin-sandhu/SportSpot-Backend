@@ -359,6 +359,31 @@ namespace Integration_Test.V1.Endpoints.User
             Assert.AreEqual("User.Login", errorInformation[0].AsObject()["Code"].Value<string>());
         }
 
+        [TestMethod]
+        public async Task LoginUserInvalidUsername()
+        {
+            // Arrange User
+            string username = "TestUser";
+            string email = "max.musterman@gmail.com";
+            string password = "password1.G.222";
+            string firstname = "Max";
+            string lastname = "Musterman";
+            string avatar = _userLib.GetDefaultPictureAsBase64();
+
+            HttpResponseMessage response = await _userLib.RegisterUser(username, email, password, firstname, lastname, avatar);
+            response.EnsureSuccessStatusCode();
+
+            // Act Login with wrong Password
+            HttpResponseMessage loginResponse = await _userLib.LoginUser(username + "fake", password);
+
+            string loginResponseContent = await loginResponse.Content.ReadAsStringAsync();
+            JsonArray errorInformation = JsonSerializer.Deserialize<JsonArray>(loginResponseContent);
+
+            // Assert
+            Assert.AreEqual(HttpStatusCode.Unauthorized, loginResponse.StatusCode);
+            Assert.AreEqual("User.Login", errorInformation[0].AsObject()["Code"].Value<string>());
+        }
+
         private static void ValidateToken(JsonObject authToken)
         {
             Assert.IsNotNull(authToken, "Authentication token should not be null.");
