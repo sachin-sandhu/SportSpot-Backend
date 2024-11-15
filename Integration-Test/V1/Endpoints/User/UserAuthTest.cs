@@ -332,7 +332,7 @@ namespace Integration_Test.V1.Endpoints.User
 
             loginResponse2.EnsureSuccessStatusCode();
 
-            string loginResponseContent2 = await loginResponse.Content.ReadAsStringAsync();
+            string loginResponseContent2 = await loginResponse2.Content.ReadAsStringAsync();
             JsonObject loginAuthToken2 = JsonSerializer.Deserialize<JsonObject>(loginResponseContent2);
 
             // Assert
