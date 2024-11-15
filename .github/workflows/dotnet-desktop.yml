@@ -1,4 +1,4 @@
-name: .NET Core Desktop
+name: CI/CD
 
 on:
   push:
@@ -27,7 +27,7 @@ jobs:
       run: dotnet build SportSpot/SportSpot.csproj -c Release
 
     - name: Exceute Unit Tests
-      run: dotnet test SportSpot-Test/SportSpot-Test.csproj -v n
+      run: dotnet test SportSpot-Test/SportSpot-Test.csproj
   integration:
     runs-on: ubuntu-latest
     env:
@@ -64,4 +64,4 @@ jobs:
       run: dotnet restore SportSpot.sln
     
     - name: Exceute Integration Tests
-      run: dotnet test Integration-Test/Integration-Test.csproj -v n
+      run: dotnet test Integration-Test/Integration-Test.csproj
