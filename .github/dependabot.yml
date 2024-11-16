@@ -11,6 +11,11 @@ updates:
       interval: "daily"
 
   - package-ecosystem: "docker"
-    directory: "/"
+    directory: "/SportSpot"
+    schedule:
+      interval: "daily"
+
+  - package-ecosystem: "docker"
+    directory: "/Rest-Emulator"
     schedule:
       interval: "daily"
