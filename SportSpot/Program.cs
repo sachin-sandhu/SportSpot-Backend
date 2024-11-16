@@ -6,7 +6,6 @@ using Microsoft.Extensions.Azure;
 using Microsoft.Extensions.Caching.Distributed;
 using Microsoft.Extensions.Caching.StackExchangeRedis;
 using Microsoft.IdentityModel.Tokens;
-using Pomelo.EntityFrameworkCore.MySql.Infrastructure;
 using SportSpot.Events.Extensions;
 using SportSpot.Events.Services;
 using SportSpot.ExceptionHandling;
