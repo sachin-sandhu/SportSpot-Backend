@@ -1,5 +1,4 @@
 ﻿using Azure.Storage.Sas;
-using SportSpot.V1.Exceptions;
 using SportSpot.V1.Exceptions.Media;
 using SportSpot.V1.Media.BlurHash;
 using SportSpot.V1.Media.Entities;
@@ -65,6 +64,14 @@ namespace SportSpot.V1.Media.Services
 
         public async Task DeleteMedia(MediaEntity media)
         {
+            try
+            {
+                await _blobClient.DeleteBlob(media.Id.ToString());
+            }
+            catch (Exception)
+            {
+                //Ignore
+            }
             await _mediaRepository.Delete(media);
         }
 
@@ -103,14 +110,6 @@ namespace SportSpot.V1.Media.Services
         {
             foreach (MediaEntity media in await _mediaRepository.GetAll())
             {
-                try
-                {
-                    await _blobClient.DeleteBlob(media.Id.ToString());
-                }
-                catch (Exception)
-                {
-                    //Ignore
-                }
                 await DeleteMedia(media);
             }
         }

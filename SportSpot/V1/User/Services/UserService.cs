@@ -1,24 +1,13 @@
 ﻿using Microsoft.AspNetCore.Identity;
-using Microsoft.EntityFrameworkCore;
 using SportSpot.V1.Exceptions.User;
 using SportSpot.V1.Media.Entities;
 using SportSpot.V1.Media.Services;
-using SportSpot.V1.User.Context;
 using SportSpot.V1.User.Entities;
 
 namespace SportSpot.V1.User.Services
 {
-    public class UserService(UserManager<AuthUserEntity> _userManager, AuthContext _context, IMediaService _mediaService) : IUserService
+    public class UserService(UserManager<AuthUserEntity> _userManager, IMediaService _mediaService) : IUserService
     {
-        public async Task DeleteAllUser()
-        {
-            List<AuthUserEntity> users = await _context.Users.ToListAsync();
-            foreach (AuthUserEntity user in users)
-            {
-                await _userManager.DeleteAsync(user);
-            }
-        }
-
         public async Task<byte[]> GetAvatar(AuthUserEntity user)
         {
             if (user.AvatarId == null)
