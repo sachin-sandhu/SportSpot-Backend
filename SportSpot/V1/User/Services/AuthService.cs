@@ -1,4 +1,5 @@
 ﻿using Microsoft.AspNetCore.Identity;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Storage;
 using SportSpot.Events.Services;
 using SportSpot.V1.Exceptions.User;
@@ -24,6 +25,16 @@ namespace SportSpot.V1.User.Services
             await _userManager.DeleteAsync(authUser);
 
             await _eventService.FireEvent(new AuthUserDeletedEvent { AuthUser = authUser });
+        }
+
+        public async Task DeleteAllUser()
+        {
+            List<AuthUserEntity> users = await _dbContext.Users.ToListAsync();
+            foreach (AuthUserEntity user in users)
+            {
+
+                await Delete(user);
+            }
         }
 
         public async Task<AuthTokenDto> Login(AuthUserLoginRequestDto request)
