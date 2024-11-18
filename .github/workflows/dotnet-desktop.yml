@@ -103,5 +103,9 @@ jobs:
             cd /home/backend
             echo ${{ secrets.CONTAINER_REGISTRY_PASSWORD }} | docker login ${{ secrets.CONTAINER_REGISTRY_URL }} -u ${{ secrets.CONTAINER_REGISTRY_USERNAME }} --password-stdin
             docker pull ${{ secrets.CONTAINER_REGISTRY_URL }}/sportspot:latest
+
+            export CERT_FULLCHAIN=$(cat /etc/letsencrypt/live/api.sportspots.tech/fullchain.pem)
+            export CERT_PRIVKEY=$(cat /etc/letsencrypt/live/api.sportspots.tech/privkey.pem)
+
             screen -S backend -X quit
-            screen -dmS backend docker run -v /etc/letsencrypt:/etc/letsencrypt:ro --network sportspot_default -p 8080:8080 --env-file /etc/environment ${{ secrets.CONTAINER_REGISTRY_URL }}/sportspot:latest
+            screen -dmS backend docker run -v /etc/letsencrypt:/etc/letsencrypt:ro --network sportspot_default -p 8080:8080 --env-file /etc/environment -e CERT_FILE="$CERT_FULLCHAIN" -e CERT_KEY_FILE="$CERT_PRIVKEY"  ${{ secrets.CONTAINER_REGISTRY_URL }}/sportspot:latest

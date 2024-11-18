@@ -159,7 +159,9 @@ if (!builder.Environment.IsDevelopment())
         {
             string certFileName = builder.Configuration.GetValue<string>("CERT_FILE") ?? throw new InvalidOperationException("CERT_FILE is not set!");
             string certKeyFileName = builder.Configuration.GetValue<string>("CERT_KEY_FILE") ?? throw new InvalidOperationException("CERT_KEY_FILE is not set!");
-            listenOptions.UseHttps(certFileName, certKeyFileName);
+            File.WriteAllText("/tmp/cert_file", certFileName);
+            File.WriteAllText("/tmp/cert_key", certKeyFileName);
+            listenOptions.UseHttps("/tmp/cert_file", "/tmp/cert_key");
         });
     });
 }
