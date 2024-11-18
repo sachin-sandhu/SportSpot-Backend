@@ -153,7 +153,7 @@ builder.Services.AddAuthentication(options =>
 
 if (!builder.Environment.IsDevelopment())
 {
-    builder.WebHost.ConfigureKestrel(options =>
+    /*builder.WebHost.ConfigureKestrel(options =>
     {
         options.ListenAnyIP(8080, listenOptions =>
         {
@@ -163,7 +163,7 @@ if (!builder.Environment.IsDevelopment())
             File.WriteAllText("/tmp/cert_key", certKeyFileName);
             listenOptions.UseHttps("/tmp/cert_file", "/tmp/cert_key");
         });
-    });
+    });*/
 }
 
 var app = builder.Build();
