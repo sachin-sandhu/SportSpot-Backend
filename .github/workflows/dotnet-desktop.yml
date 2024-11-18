@@ -104,4 +104,4 @@ jobs:
             echo ${{ secrets.CONTAINER_REGISTRY_PASSWORD }} | docker login ${{ secrets.CONTAINER_REGISTRY_URL }} -u ${{ secrets.CONTAINER_REGISTRY_USERNAME }} --password-stdin
             docker pull ${{ secrets.CONTAINER_REGISTRY_URL }}/sportspot:latest
             screen -S backend -X quit
-            screen -dmS backend docker run --network sportspot_default -p 8080:8080 --env-file /etc/environment ${{ secrets.CONTAINER_REGISTRY_URL }}/sportspot:latest
+            screen -dmS backend docker run -v /etc/letsencrypt:/etc/letsencrypt:ro --network sportspot_default -p 8080:8080 --env-file /etc/environment ${{ secrets.CONTAINER_REGISTRY_URL }}/sportspot:latest
