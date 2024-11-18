@@ -151,6 +151,19 @@ builder.Services.AddAuthentication(options =>
     };
 });
 
+if (!builder.Environment.IsDevelopment())
+{
+    builder.WebHost.ConfigureKestrel(options =>
+    {
+        options.ListenAnyIP(8080, listenOptions =>
+        {
+            string certFileName = builder.Configuration.GetValue<string>("CERT_FILE") ?? throw new InvalidOperationException("CERT_FILE is not set!");
+            string certKeyFileName = builder.Configuration.GetValue<string>("CERT_KEY_FILE") ?? throw new InvalidOperationException("CERT_KEY_FILE is not set!");
+            listenOptions.UseHttps(certFileName, certKeyFileName);
+        });
+    });
+}
+
 var app = builder.Build();
 
 app.Services.RegisterEvents();
@@ -163,7 +176,10 @@ if (app.Environment.IsDevelopment())
 app.UseSwagger();
 app.UseSwaggerUI();
 
-app.UseHttpsRedirection();
+if (!app.Environment.IsDevelopment())
+{
+    app.UseHttpsRedirection();
+}
 
 app.UseAuthentication();
 app.UseAuthorization();
