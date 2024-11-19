@@ -25,6 +25,7 @@ using SportSpot.V1.User.Entities;
 using SportSpot.V1.User.OAuth;
 using SportSpot.V1.User.Services;
 using StackExchange.Redis;
+using System.Security.Cryptography.X509Certificates;
 using System.Text;
 using System.Text.Json.Serialization;
 
@@ -159,7 +160,8 @@ if (!builder.Environment.IsDevelopment())
         {
             string certFileName = builder.Configuration.GetValue<string>("CERT_FILE") ?? throw new InvalidOperationException("CERT_FILE is not set!");
             string certKeyFileName = builder.Configuration.GetValue<string>("CERT_KEY_FILE") ?? throw new InvalidOperationException("CERT_KEY_FILE is not set!");
-            listenOptions.UseHttps(certFileName, certKeyFileName);
+            X509Certificate2 certificate = X509Certificate2.CreateFromPemFile(certFileName, certKeyFileName);
+            listenOptions.UseHttps(certificate);
         });
     });
 }
