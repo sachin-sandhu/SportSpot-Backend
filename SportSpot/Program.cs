@@ -25,6 +25,7 @@ using SportSpot.V1.User.Entities;
 using SportSpot.V1.User.OAuth;
 using SportSpot.V1.User.Services;
 using StackExchange.Redis;
+using System.Security.Cryptography.X509Certificates;
 using System.Text;
 using System.Text.Json.Serialization;
 
@@ -151,6 +152,20 @@ builder.Services.AddAuthentication(options =>
     };
 });
 
+if (!builder.Environment.IsDevelopment())
+{
+    builder.WebHost.ConfigureKestrel(options =>
+    {
+        options.ListenAnyIP(8080, listenOptions =>
+        {
+            string certFileName = builder.Configuration.GetValue<string>("CERT_FILE") ?? throw new InvalidOperationException("CERT_FILE is not set!");
+            string certKeyFileName = builder.Configuration.GetValue<string>("CERT_KEY_FILE") ?? throw new InvalidOperationException("CERT_KEY_FILE is not set!");
+            X509Certificate2 certificate = X509Certificate2.CreateFromPemFile(certFileName, certKeyFileName);
+            listenOptions.UseHttps(certificate);
+        });
+    });
+}
+
 var app = builder.Build();
 
 app.Services.RegisterEvents();
@@ -158,11 +173,15 @@ app.Services.RegisterEvents();
 if (app.Environment.IsDevelopment())
 {
     app.UseCors(builder => builder.AllowAnyOrigin().AllowAnyMethod().AllowAnyHeader());
-    app.UseSwagger();
-    app.UseSwaggerUI();
 }
 
-app.UseHttpsRedirection();
+app.UseSwagger();
+app.UseSwaggerUI();
+
+if (!app.Environment.IsDevelopment())
+{
+    app.UseHttpsRedirection();
+}
 
 app.UseAuthentication();
 app.UseAuthorization();
