@@ -1,7 +1,6 @@
 ﻿using Microsoft.Extensions.Caching.Distributed;
 using SportSpot.V1.Location.Dtos;
 using SportSpot.V1.Location.Enums;
-using SportSpot.V1.Location.Services;
 using StackExchange.Redis;
 
 namespace SportSpot.V1.Location.Services
@@ -34,13 +33,16 @@ namespace SportSpot.V1.Location.Services
             await _distributedCache.SetStringAsync(BuildLocationKey(searchText, country, language, entityType), JsonSerializer.Serialize(locations));
         }
 
-        public void FlushCache()
+        public async Task FlushCache()
         {
-            IServer cacheServer = _connectionMultiplexer.GetServers().First();
-            cacheServer.Keys(pattern: "*").ToList().ForEach(key =>
+            foreach (IServer cacheServer in _connectionMultiplexer.GetServers())
             {
-                _distributedCache.Remove(key.ToString());
-            });
+                IDatabase db = _connectionMultiplexer.GetDatabase();
+                await foreach (RedisKey key in cacheServer.KeysAsync(pattern: "*"))
+                {
+                    await db.KeyDeleteAsync(key);
+                }
+            }
         }
 
         private static string BuildReverseKey(string language, double lat, double lng) => $"reverse_{language}_{lat}_{lng}";

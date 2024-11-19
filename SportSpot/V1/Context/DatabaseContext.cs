@@ -1,5 +1,5 @@
 ﻿using Microsoft.EntityFrameworkCore;
-using SportSpot.V1.Activitie.Entities;
+using SportSpot.V1.Session.Entities;
 using SportSpot.V1.Media.Entities;
 
 namespace SportSpot.V1.Context
@@ -8,7 +8,7 @@ namespace SportSpot.V1.Context
     {
 
         public DbSet<MediaEntity> Media { get; set; } = null!;
-        public DbSet<ActivityEntity> Activity { get; set; } = null!;
+        public DbSet<SessionEntity> Session { get; set; } = null!;
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
@@ -16,7 +16,7 @@ namespace SportSpot.V1.Context
                 .HasNoDiscriminator()
                 .HasKey(x => x.Id);
 
-            modelBuilder.Entity<ActivityEntity>()
+            modelBuilder.Entity<SessionEntity>()
                 .HasNoDiscriminator()
                 .HasKey(x => x.Id);
         }

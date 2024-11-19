@@ -13,13 +13,13 @@
 	</PropertyGroup>
 
 	<ItemGroup>
-	  <Compile Remove="V1\Activity\NewFolder1\**" />
+	  <Compile Remove="V1\Session\NewFolder1\**" />
 	  <Compile Remove="V1\Media\Dtos\**" />
-	  <Content Remove="V1\Activity\NewFolder1\**" />
+	  <Content Remove="V1\Session\NewFolder1\**" />
 	  <Content Remove="V1\Media\Dtos\**" />
-	  <EmbeddedResource Remove="V1\Activity\NewFolder1\**" />
+	  <EmbeddedResource Remove="V1\Session\NewFolder1\**" />
 	  <EmbeddedResource Remove="V1\Media\Dtos\**" />
-	  <None Remove="V1\Activity\NewFolder1\**" />
+	  <None Remove="V1\Session\NewFolder1\**" />
 	  <None Remove="V1\Media\Dtos\**" />
 	</ItemGroup>
 

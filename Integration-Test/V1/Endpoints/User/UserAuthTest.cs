@@ -1,5 +1,4 @@
 ﻿using Integration_Test.Extensions;
-using Integration_Test.V1.Exceptions;
 using Integration_Test.V1.Libs;
 using Rest_Emulator.Enums;
 using System.Net;
@@ -608,12 +607,13 @@ namespace Integration_Test.V1.Endpoints.User
         private async Task ValidateToken(JsonObject authToken)
         {
             Assert.IsNotNull(authToken, "Authentication token should not be null.");
+            Assert.IsNotNull(authToken["userId"].Value<Guid>());
             Assert.IsFalse(string.IsNullOrEmpty(authToken["accessToken"].Value<string>()), "Access token should not be empty or null.");
             Assert.IsTrue(authToken["accessExpire"].Value<DateTime>() > DateTime.Now, "Access token should expire in the future.");
             Assert.IsFalse(string.IsNullOrEmpty(authToken["refreshToken"].Value<string>()), "Refresh token should not be empty or null.");
             Assert.IsTrue(authToken["refreshExpire"].Value<DateTime>() > DateTime.Now, "Refresh token should expire in the future.");
 
-            await Assert.ThrowsExceptionAsync<NotFoundException>(async () => await _userLib.GetUserById(Guid.NewGuid(), authToken["accessToken"].Value<string>()));
+            await _userLib.GetUserById(authToken["userId"].Value<Guid>(), authToken["accessToken"].Value<string>());
         }
 
         public static bool RunOAuthTest() => !string.IsNullOrEmpty(Environment.GetEnvironmentVariable("RUN_OAUTH_TEST"));
