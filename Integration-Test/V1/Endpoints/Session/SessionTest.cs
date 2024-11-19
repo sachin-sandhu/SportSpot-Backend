@@ -1,4 +1,5 @@
 ﻿using Integration_Test.Extensions;
+using Integration_Test.V1.Exceptions;
 using Integration_Test.V1.Libs;
 using Rest_Emulator.Enums;
 using System.Text.Json.Nodes;
@@ -30,7 +31,7 @@ namespace Integration_Test.V1.Endpoints.Session
         }
 
         [TestMethod]
-        public async Task CreateDefaultSession()
+        public async Task TestCreateDefaultSession()
         {
             if (!RunLocationTest())
             {
@@ -82,6 +83,110 @@ namespace Integration_Test.V1.Endpoints.Session
             Assert.AreEqual(maxParticipants, session["maxParticipants"].Value<int>());
             Assert.AreEqual(string.Join(' ', tags), string.Join(' ', session["tags"].AsArray().Select(x => x.Value<string>()).ToList()));
             Assert.AreEqual(1, session["participants"].AsArray().Count);
+        }
+
+        [TestMethod]
+        public async Task TestJoinSession()
+        {
+            // Arrange
+            await _emulatorLib.SetMode(ModeType.ReverseLocation, true, LocationLib.GetDefaultReverseResponse().ToJsonString());
+
+            JsonObject createUser = await _userLib.CreateDefaultUser();
+            string createUserToken = createUser["accessToken"].Value<string>();
+
+            JsonObject session = await _sessionLib.CreateDefaultSession(createUserToken);
+            Guid sessionId = session["id"].Value<Guid>();
+
+            JsonObject joinUser = await _userLib.CreateDefaultUser(true);
+            string joinUserToken = joinUser["accessToken"].Value<string>();
+            Guid joinUserId = joinUser["userId"].Value<Guid>();
+
+            // Act
+            HttpResponseMessage response = await _sessionLib.JoinSession(sessionId, joinUserToken);
+            response.EnsureSuccessStatusCode();
+
+            // Assert
+            JsonObject sessionAfterJoin = await _sessionLib.GetSession(sessionId, createUserToken);
+            Assert.AreEqual(2, sessionAfterJoin["participants"].AsArray().Count);
+            Assert.IsTrue(sessionAfterJoin["participants"].AsArray().Any(x => x.Value<Guid>() == joinUserId));
+        }
+
+        [TestMethod]
+        public async Task TestLeaveSession()
+        {
+            // Arrange
+            await _emulatorLib.SetMode(ModeType.ReverseLocation, true, LocationLib.GetDefaultReverseResponse().ToJsonString());
+
+            JsonObject createUser = await _userLib.CreateDefaultUser();
+            string createUserToken = createUser["accessToken"].Value<string>();
+
+            JsonObject session = await _sessionLib.CreateDefaultSession(createUserToken);
+            Guid sessionId = session["id"].Value<Guid>();
+
+            JsonObject leaveUser = await _userLib.CreateDefaultUser(true);
+            string leaveUserToken = leaveUser["accessToken"].Value<string>();
+            Guid leaveUserId = leaveUser["userId"].Value<Guid>();
+
+            HttpResponseMessage joinResponse = await _sessionLib.JoinSession(sessionId, leaveUserToken);
+            joinResponse.EnsureSuccessStatusCode();
+
+            // Act
+            HttpResponseMessage leaveResponse = await _sessionLib.LeaveSession(sessionId, leaveUserToken);
+            leaveResponse.EnsureSuccessStatusCode();
+
+            // Assert
+            JsonObject sessionAfterLeave = await _sessionLib.GetSession(sessionId, createUserToken);
+            Assert.AreEqual(1, sessionAfterLeave["participants"].AsArray().Count);
+            Assert.IsFalse(sessionAfterLeave["participants"].AsArray().Any(x => x.Value<Guid>() == leaveUserId));
+        }
+
+        [TestMethod]
+        public async Task TestKickUserFromSession()
+        {
+            // Arrange
+            await _emulatorLib.SetMode(ModeType.ReverseLocation, true, LocationLib.GetDefaultReverseResponse().ToJsonString());
+
+            JsonObject createUser = await _userLib.CreateDefaultUser();
+            string createUserToken = createUser["accessToken"].Value<string>();
+
+            JsonObject session = await _sessionLib.CreateDefaultSession(createUserToken);
+            Guid sessionId = session["id"].Value<Guid>();
+
+            JsonObject kickUser = await _userLib.CreateDefaultUser(true);
+            string kickUserToken = kickUser["accessToken"].Value<string>();
+            Guid kickUserId = kickUser["userId"].Value<Guid>();
+
+            HttpResponseMessage joinResponse = await _sessionLib.JoinSession(sessionId, kickUserToken);
+            joinResponse.EnsureSuccessStatusCode();
+
+            // Act
+            HttpResponseMessage kickResponse = await _sessionLib.KickUserFromSession(sessionId, kickUserId, createUserToken);
+            kickResponse.EnsureSuccessStatusCode();
+
+            // Assert
+            JsonObject sessionAfterKick = await _sessionLib.GetSession(sessionId, createUserToken);
+            Assert.AreEqual(1, sessionAfterKick["participants"].AsArray().Count);
+            Assert.IsFalse(sessionAfterKick["participants"].AsArray().Any(x => x.Value<Guid>() == kickUserId));
+        }
+
+        [TestMethod]
+        public async Task TestDeleteSession()
+        {
+            // Arrange
+            await _emulatorLib.SetMode(ModeType.ReverseLocation, true, LocationLib.GetDefaultReverseResponse().ToJsonString());
+
+            JsonObject createUser = await _userLib.CreateDefaultUser();
+            string createUserToken = createUser["accessToken"].Value<string>();
+
+            JsonObject session = await _sessionLib.CreateDefaultSession(createUserToken);
+            Guid sessionId = session["id"].Value<Guid>();
+
+            // Act
+            HttpResponseMessage deleteResponseMessage = await _sessionLib.DeleteSession(sessionId, createUserToken);
+            deleteResponseMessage.EnsureSuccessStatusCode();
+
+            // Assert
+            await Assert.ThrowsExceptionAsync<NotFoundException>(async () => await _sessionLib.GetSession(sessionId, createUserToken));
         }
 
         public static bool RunLocationTest() => !string.IsNullOrEmpty(Environment.GetEnvironmentVariable("RUN_LOCATION_TEST"));

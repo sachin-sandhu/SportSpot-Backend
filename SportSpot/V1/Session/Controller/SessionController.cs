@@ -60,7 +60,7 @@ namespace SportSpot.V1.Session.Controller
         }
 
         [Authorize]
-        [HttpPut("{sessionId}/{userId}/kick")]
+        [HttpDelete("{sessionId}/{userId}")]
         [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(SessionDto))]
         [ProducesResponseType(StatusCodes.Status400BadRequest, Type = typeof(List<ErrorResult>))]
         public async Task<IActionResult> KickUser(Guid sessionId, Guid userID)

@@ -120,13 +120,19 @@ namespace Integration_Test.V1.Libs
             return Convert.FromBase64String(Resources.TestImage);
         }
 
-        public async Task<JsonObject> CreateDefaultUser()
+        public async Task<JsonObject> CreateDefaultUser(bool jitter = false)
         {
             string username = "TestUser";
             string email = "max.musterman@gmail.com";
             string password = "password1.G.222";
             string firstname = "Max";
             string lastname = "Musterman";
+
+            if (jitter)
+            {
+                username += Guid.NewGuid().ToString();
+                email = email.Replace("@", Guid.NewGuid().ToString() + "@");
+            }
 
             HttpResponseMessage response = await RegisterUser(username, email, password, firstname, lastname);
             response.EnsureSuccessStatusCode();
