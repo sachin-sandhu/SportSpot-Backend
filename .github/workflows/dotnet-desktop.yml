@@ -126,4 +126,4 @@ jobs:
               sportspot_default:
                 external: true
             EOF
-            docker compose --build -d
+            docker compose up --build -d
