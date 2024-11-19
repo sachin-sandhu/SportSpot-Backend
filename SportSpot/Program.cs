@@ -10,6 +10,8 @@ using SportSpot.Events.Extensions;
 using SportSpot.Events.Services;
 using SportSpot.ExceptionHandling;
 using SportSpot.Swagger;
+using SportSpot.V1.Activity.Repositories;
+using SportSpot.V1.Activity.Services;
 using SportSpot.V1.Context;
 using SportSpot.V1.Location.Dtos;
 using SportSpot.V1.Location.Services;
@@ -128,6 +130,8 @@ builder.Services.AddTransient<IMediaService, MediaService>();
 builder.Services.AddTransient<ITokenService, TokenService>();
 builder.Services.AddTransient<IAuthService, AuthService>();
 builder.Services.AddTransient<IUserService, UserService>();
+builder.Services.AddTransient<IActivityRepository, ActivityRepository>();
+builder.Services.AddTransient<IActivityService, ActivityService>();
 
 builder.Services.RegisterEvents();
 
