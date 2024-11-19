@@ -153,17 +153,15 @@ builder.Services.AddAuthentication(options =>
 
 if (!builder.Environment.IsDevelopment())
 {
-    /*builder.WebHost.ConfigureKestrel(options =>
+    builder.WebHost.ConfigureKestrel(options =>
     {
         options.ListenAnyIP(8080, listenOptions =>
         {
             string certFileName = builder.Configuration.GetValue<string>("CERT_FILE") ?? throw new InvalidOperationException("CERT_FILE is not set!");
             string certKeyFileName = builder.Configuration.GetValue<string>("CERT_KEY_FILE") ?? throw new InvalidOperationException("CERT_KEY_FILE is not set!");
-            File.WriteAllText("/tmp/cert_file", certFileName);
-            File.WriteAllText("/tmp/cert_key", certKeyFileName);
-            listenOptions.UseHttps("/tmp/cert_file", "/tmp/cert_key");
+            listenOptions.UseHttps(certFileName, certKeyFileName);
         });
-    });*/
+    });
 }
 
 var app = builder.Build();
