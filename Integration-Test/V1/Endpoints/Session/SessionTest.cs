@@ -88,6 +88,11 @@ namespace Integration_Test.V1.Endpoints.Session
         [TestMethod]
         public async Task TestJoinSession()
         {
+            if (!RunLocationTest())
+            {
+                Assert.Inconclusive($"Emulator is not running");
+            }
+
             // Arrange
             await _emulatorLib.SetMode(ModeType.ReverseLocation, true, LocationLib.GetDefaultReverseResponse().ToJsonString());
 
@@ -114,6 +119,11 @@ namespace Integration_Test.V1.Endpoints.Session
         [TestMethod]
         public async Task TestLeaveSession()
         {
+            if (!RunLocationTest())
+            {
+                Assert.Inconclusive($"Emulator is not running");
+            }
+
             // Arrange
             await _emulatorLib.SetMode(ModeType.ReverseLocation, true, LocationLib.GetDefaultReverseResponse().ToJsonString());
 
@@ -143,6 +153,11 @@ namespace Integration_Test.V1.Endpoints.Session
         [TestMethod]
         public async Task TestKickUserFromSession()
         {
+            if (!RunLocationTest())
+            {
+                Assert.Inconclusive($"Emulator is not running");
+            }
+
             // Arrange
             await _emulatorLib.SetMode(ModeType.ReverseLocation, true, LocationLib.GetDefaultReverseResponse().ToJsonString());
 
@@ -172,6 +187,11 @@ namespace Integration_Test.V1.Endpoints.Session
         [TestMethod]
         public async Task TestDeleteSession()
         {
+            if (!RunLocationTest())
+            {
+                Assert.Inconclusive($"Emulator is not running");
+            }
+
             // Arrange
             await _emulatorLib.SetMode(ModeType.ReverseLocation, true, LocationLib.GetDefaultReverseResponse().ToJsonString());
 
