@@ -2,6 +2,7 @@
 using Integration_Test.V1.Exceptions;
 using Integration_Test.V1.Libs;
 using Rest_Emulator.Enums;
+using System.Net;
 using System.Text.Json.Nodes;
 
 namespace Integration_Test.V1.Endpoints.Session
@@ -86,6 +87,222 @@ namespace Integration_Test.V1.Endpoints.Session
         }
 
         [TestMethod]
+        public async Task TestCreateSessionWithoutTitle()
+        {
+            if (!RunLocationTest())
+            {
+                Assert.Inconclusive($"Emulator is not running");
+            }
+
+            // Arrange
+            JsonObject user = await _userLib.CreateDefaultUser();
+            string token = user["accessToken"].Value<string>();
+
+            string title = "";
+            string sportType = "Basketball";
+            string description = "Session Description";
+            double latitude = 51.924470285085526;
+            double longitude = 7.846992772627526;
+            DateTime date = DateTime.Now.AddDays(1);
+            int minParticipants = 5;
+            int maxParticipants = 10;
+            List<string> tags = ["tag1", "tag2"];
+
+            JsonObject defaultReverseAddress = LocationLib.GetDefaultReverseResponse();
+            await _emulatorLib.SetMode(ModeType.ReverseLocation, true, defaultReverseAddress.ToJsonString());
+
+
+            // Act
+            HttpResponseMessage responseMessage = await _sessionLib.CreateSessionAsync(accessToken: token, title: title,
+                sportType: sportType, description: description,
+                latitude: latitude, longitude: longitude,
+                date: date, minParticipants: minParticipants, maxParticipants:
+                maxParticipants, tags: tags);
+
+            // Assert
+            Assert.AreEqual(HttpStatusCode.BadRequest, responseMessage.StatusCode);
+        }
+
+        [TestMethod]
+        public async Task TestCreateSessionInvalidSportType()
+        {
+            if (!RunLocationTest())
+            {
+                Assert.Inconclusive($"Emulator is not running");
+            }
+
+            // Arrange
+            JsonObject user = await _userLib.CreateDefaultUser();
+            string token = user["accessToken"].Value<string>();
+
+            string title = "TestTitle";
+            string sportType = "coolAsSportType";
+            string description = "Session Description";
+            double latitude = 51.924470285085526;
+            double longitude = 7.846992772627526;
+            DateTime date = DateTime.Now.AddDays(1);
+            int minParticipants = 5;
+            int maxParticipants = 10;
+            List<string> tags = ["tag1", "tag2"];
+
+            JsonObject defaultReverseAddress = LocationLib.GetDefaultReverseResponse();
+            await _emulatorLib.SetMode(ModeType.ReverseLocation, true, defaultReverseAddress.ToJsonString());
+
+
+            // Act
+            HttpResponseMessage responseMessage = await _sessionLib.CreateSessionAsync(accessToken: token, title: title,
+                sportType: sportType, description: description,
+                latitude: latitude, longitude: longitude,
+                date: date, minParticipants: minParticipants, maxParticipants:
+                maxParticipants, tags: tags);
+
+            // Assert
+            Assert.AreEqual(HttpStatusCode.BadRequest, responseMessage.StatusCode);
+        }
+
+        [TestMethod]
+        [DataRow(9999, 7.846992)]
+        [DataRow(51.924470, -9999)]
+        [DataRow(-91, 0)]
+        [DataRow(0, 181)]
+        public async Task TestCreateSessionWithInvalidCoordinates(double latitude, double longitude)
+        {
+            if (!RunLocationTest())
+            {
+                Assert.Inconclusive($"Emulator is not running");
+            }
+
+            // Arrange
+            JsonObject user = await _userLib.CreateDefaultUser();
+            string token = user["accessToken"].Value<string>();
+
+            // Act
+            HttpResponseMessage responseMessage = await _sessionLib.CreateSessionAsync(
+                accessToken: token,
+                title: "TestTitle",
+                sportType: "Basketball",
+                description: "Session Description",
+                latitude: latitude,
+                longitude: longitude,
+                date: DateTime.Now.AddDays(1),
+                minParticipants: 5,
+                maxParticipants: 10,
+                tags: ["tag1", "tag2"]
+            );
+
+            // Assert
+            Assert.AreEqual(HttpStatusCode.BadRequest, responseMessage.StatusCode);
+        }
+
+        [TestMethod]
+        public async Task TestCreateSessionWithInvalidParticipantLimits()
+        {
+            if (!RunLocationTest())
+            {
+                Assert.Inconclusive($"Emulator is not running");
+            }
+
+            // Arrange
+            JsonObject user = await _userLib.CreateDefaultUser();
+            string token = user["accessToken"].Value<string>();
+
+            string title = "TestTitle";
+            string sportType = "Basketball";
+            string description = "Session Description";
+            double latitude = 51.924470285085526;
+            double longitude = 7.846992772627526;
+            DateTime date = DateTime.Now.AddDays(1);
+            int minParticipants = 10;
+            int maxParticipants = 5; // Ungültig, da min > max
+            List<string> tags = ["tag1", "tag2"];
+
+            JsonObject defaultReverseAddress = LocationLib.GetDefaultReverseResponse();
+            await _emulatorLib.SetMode(ModeType.ReverseLocation, true, defaultReverseAddress.ToJsonString());
+
+            // Act
+            HttpResponseMessage responseMessage = await _sessionLib.CreateSessionAsync(accessToken: token, title: title,
+                sportType: sportType, description: description,
+                latitude: latitude, longitude: longitude,
+                date: date, minParticipants: minParticipants, maxParticipants:
+                maxParticipants, tags: tags);
+
+            // Assert
+            Assert.AreEqual(HttpStatusCode.BadRequest, responseMessage.StatusCode);
+        }
+
+        [TestMethod]
+        public async Task TestCreateSessionWithInvalidTags()
+        {
+            if (!RunLocationTest())
+            {
+                Assert.Inconclusive($"Emulator is not running");
+            }
+
+            // Arrange
+            JsonObject user = await _userLib.CreateDefaultUser();
+            string token = user["accessToken"].Value<string>();
+
+            string title = "TestTitle";
+            string sportType = "Basketball";
+            string description = "Session Description";
+            double latitude = 51.924470285085526;
+            double longitude = 7.846992772627526;
+            DateTime date = DateTime.Now.AddDays(1);
+            int minParticipants = 5;
+            int maxParticipants = 10;
+            List<string> tags = Enumerable.Range(0, 100).Select(i => "Example Text").ToList(); // Many Tags
+
+            JsonObject defaultReverseAddress = LocationLib.GetDefaultReverseResponse();
+            await _emulatorLib.SetMode(ModeType.ReverseLocation, true, defaultReverseAddress.ToJsonString());
+
+            // Act
+            HttpResponseMessage responseMessage = await _sessionLib.CreateSessionAsync(accessToken: token, title: title,
+                sportType: sportType, description: description,
+                latitude: latitude, longitude: longitude,
+                date: date, minParticipants: minParticipants, maxParticipants:
+                maxParticipants, tags: tags);
+
+            // Assert
+            Assert.AreEqual(HttpStatusCode.BadRequest, responseMessage.StatusCode);
+        }
+
+        [TestMethod]
+        public async Task TestCreateSessionWithPastDate()
+        {
+            if (!RunLocationTest())
+            {
+                Assert.Inconclusive($"Emulator is not running");
+            }
+
+            // Arrange
+            JsonObject user = await _userLib.CreateDefaultUser();
+            string token = user["accessToken"].Value<string>();
+
+            string title = "TestTitle";
+            string sportType = "Basketball";
+            string description = "Session Description";
+            double latitude = 51.924470285085526;
+            double longitude = 7.846992772627526;
+            DateTime date = DateTime.Now.AddDays(-1); // Datum in der Vergangenheit
+            int minParticipants = 5;
+            int maxParticipants = 10;
+            List<string> tags = ["tag1", "tag2"];
+
+            JsonObject defaultReverseAddress = LocationLib.GetDefaultReverseResponse();
+            await _emulatorLib.SetMode(ModeType.ReverseLocation, true, defaultReverseAddress.ToJsonString());
+
+            // Act
+            HttpResponseMessage responseMessage = await _sessionLib.CreateSessionAsync(accessToken: token, title: title,
+                sportType: sportType, description: description,
+                latitude: latitude, longitude: longitude,
+                date: date, minParticipants: minParticipants, maxParticipants:
+                maxParticipants, tags: tags);
+
+            // Assert
+            Assert.AreEqual(HttpStatusCode.BadRequest, responseMessage.StatusCode);
+        }
+
+        [TestMethod]
         public async Task TestJoinSession()
         {
             if (!RunLocationTest())
@@ -114,6 +331,26 @@ namespace Integration_Test.V1.Endpoints.Session
             JsonObject sessionAfterJoin = await _sessionLib.GetSession(sessionId, createUserToken);
             Assert.AreEqual(2, sessionAfterJoin["participants"].AsArray().Count);
             Assert.IsTrue(sessionAfterJoin["participants"].AsArray().Any(x => x.Value<Guid>() == joinUserId));
+        }
+
+        [TestMethod]
+        public async Task TestJoinNonExistentSession()
+        {
+            if (!RunLocationTest())
+            {
+                Assert.Inconclusive($"Emulator is not running");
+            }
+
+            // Arrange
+            JsonObject joinUser = await _userLib.CreateDefaultUser(true);
+            string joinUserToken = joinUser["accessToken"].Value<string>();
+            Guid nonExistentSessionId = Guid.NewGuid();
+
+            // Act
+            HttpResponseMessage responseMessage = await _sessionLib.JoinSession(nonExistentSessionId, joinUserToken);
+
+            // Assert
+            Assert.AreEqual(HttpStatusCode.NotFound, responseMessage.StatusCode);
         }
 
         [TestMethod]
@@ -151,6 +388,25 @@ namespace Integration_Test.V1.Endpoints.Session
         }
 
         [TestMethod]
+        public async Task TestLeaveNonExistentSession()
+        {
+            if (!RunLocationTest())
+            {
+                Assert.Inconclusive($"Emulator is not running");
+            }
+
+            // Arrange
+            JsonObject leaveUser = await _userLib.CreateDefaultUser(true);
+            string leaveUserToken = leaveUser["accessToken"].Value<string>();
+
+            // Act
+            HttpResponseMessage responseMessage = await _sessionLib.LeaveSession(Guid.NewGuid(), leaveUserToken);
+
+            // Assert
+            Assert.AreEqual(HttpStatusCode.NotFound, responseMessage.StatusCode);
+        }
+
+        [TestMethod]
         public async Task TestKickUserFromSession()
         {
             if (!RunLocationTest())
@@ -185,6 +441,27 @@ namespace Integration_Test.V1.Endpoints.Session
         }
 
         [TestMethod]
+        public async Task TestKickUserFromNonExistentSession()
+        {
+            if (!RunLocationTest())
+            {
+                Assert.Inconclusive($"Emulator is not running");
+            }
+
+            // Arrange
+            JsonObject createUser = await _userLib.CreateDefaultUser();
+            string createUserToken = createUser["accessToken"].Value<string>();
+            Guid nonExistentSessionId = Guid.NewGuid();
+            Guid kickUserId = Guid.NewGuid();
+
+            // Act
+            HttpResponseMessage responseMessage = await _sessionLib.KickUserFromSession(nonExistentSessionId, kickUserId, createUserToken);
+
+            // Assert
+            Assert.AreEqual(HttpStatusCode.NotFound, responseMessage.StatusCode);
+        }
+
+        [TestMethod]
         public async Task TestDeleteSession()
         {
             if (!RunLocationTest())
@@ -209,6 +486,55 @@ namespace Integration_Test.V1.Endpoints.Session
             await Assert.ThrowsExceptionAsync<NotFoundException>(async () => await _sessionLib.GetSession(sessionId, createUserToken));
         }
 
-        public static bool RunLocationTest() => !string.IsNullOrEmpty(Environment.GetEnvironmentVariable("RUN_LOCATION_TEST"));
+        [TestMethod]
+        public async Task TestDeleteNonExistentSession()
+        {
+            if (!RunLocationTest())
+            {
+                Assert.Inconclusive($"Emulator is not running");
+            }
+
+            // Arrange
+            JsonObject createUser = await _userLib.CreateDefaultUser();
+            string createUserToken = createUser["accessToken"].Value<string>();
+            Guid nonExistentSessionId = Guid.NewGuid();
+
+            // Act
+            HttpResponseMessage responseMessage = await _sessionLib.DeleteSession(nonExistentSessionId, createUserToken);
+
+            // Assert
+            Assert.AreEqual(HttpStatusCode.NotFound, responseMessage.StatusCode);
+        }
+
+        [TestMethod]
+        public async Task TestGetSession()
+        {
+            if (!RunLocationTest())
+            {
+                Assert.Inconclusive($"Emulator is not running");
+            }
+
+            // Arrange
+            await _emulatorLib.SetMode(ModeType.ReverseLocation, true, LocationLib.GetDefaultReverseResponse().ToJsonString());
+
+            JsonObject createUser = await _userLib.CreateDefaultUser();
+            string createUserToken = createUser["accessToken"].Value<string>();
+
+            JsonObject session = await _sessionLib.CreateDefaultSession(createUserToken);
+            Guid sessionId = session["id"].Value<Guid>();
+
+            JsonObject getUser = await _userLib.CreateDefaultUser(true);
+            string getUserToken = getUser["accessToken"].Value<string>();
+
+            // Act
+            JsonObject getUserResponse = await _sessionLib.GetSession(sessionId, getUserToken);
+            JsonObject getCreateUserResponse = await _sessionLib.GetSession(sessionId, createUserToken);
+
+            // Assert
+            Assert.IsNull(getUserResponse["participants"]);
+            Assert.IsNotNull(getCreateUserResponse["participants"]);
+        }
+
+        public static bool RunLocationTest() => string.IsNullOrEmpty(Environment.GetEnvironmentVariable("RUN_LOCATION_TEST"));
     }
 }

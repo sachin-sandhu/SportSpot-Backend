@@ -16,16 +16,20 @@ namespace SportSpot.V1.Session.Services
     {
         public async Task<SessionDto> CreateSession(SessionCreateRequestDto createRequestDto, AuthUserEntity user)
         {
-            AzureAddressDto adress = await _locationService.GetAddress("de-DE", createRequestDto.Latitude, createRequestDto.Longitude);
-            if (adress.Municipality == null || adress.PostalCode == null)
-            {
-                throw new LocationNotFoundException();
-            }
+            if (createRequestDto.Latitude < -90 || createRequestDto.Latitude > 90 || createRequestDto.Longitude < -180 || createRequestDto.Longitude > 180)
+                throw new SessionInvalidLocationException();
+            
+            if (DateTime.Now >= createRequestDto.Date)
+                throw new SessionInvalidDataException();
+            
+            if (createRequestDto.MinParticipants < 0 || createRequestDto.MaxParticipants < 0)
+                throw new SessionInvalidParticipantsException();
+            
+            if (createRequestDto.MinParticipants > createRequestDto.MaxParticipants)
+                throw new SessionInvalidParticipantsException();
 
             if (createRequestDto.Tags.Count > 50)
-            {
                 throw new SessionTooManyTagsException();
-            }
 
             foreach (string tag in createRequestDto.Tags)
             {
@@ -35,8 +39,9 @@ namespace SportSpot.V1.Session.Services
                 }
             }
 
-            if (DateTime.Now >= createRequestDto.Date)
-                throw new SessionInvalidDataException();
+            AzureAddressDto adress = await _locationService.GetAddress("de-DE", createRequestDto.Latitude, createRequestDto.Longitude);
+            if (adress.Municipality == null || adress.PostalCode == null)
+                throw new LocationNotFoundException();
 
             SessionEntity sessionEntity = new()
             {
@@ -76,21 +81,17 @@ namespace SportSpot.V1.Session.Services
         public async Task Join(AuthUserEntity user, SessionEntity session)
         {
             if (session.CreatorId == user.Id)
-            {
                 throw new SessionCreatorJoinException();
-            }
+            
             if (session.Participants.Contains(user.Id))
-            {
                 throw new SessionAlreadyJoinedException();
-            }
+            
             if (session.Participants.Count + 1 >= session.MaxParticipants)
-            {
                 throw new SessionFullException();
-            }
+            
             if (DateTime.Now >= session.Date)
-            {
                 throw new SessionExpiredException();
-            }
+            
             session.Participants.Add(user.Id);
             await _sessionRepository.UpdateSession(session);
         }
@@ -98,17 +99,14 @@ namespace SportSpot.V1.Session.Services
         public async Task KickUser(AuthUserEntity target, SessionEntity session, AuthUserEntity sender)
         {
             if (target.Id == sender.Id)
-            {
                 throw new SessionKickSelfException();
-            }
+            
             if (session.CreatorId != sender.Id)
-            {
                 throw new SessionNotCreatorException();
-            }
+            
             if (!session.Participants.Contains(target.Id))
-            {
                 throw new SessionNotJoinedException();
-            }
+            
             session.Participants.Remove(target.Id);
             await _sessionRepository.UpdateSession(session);
         }
@@ -116,22 +114,19 @@ namespace SportSpot.V1.Session.Services
         public async Task Leave(AuthUserEntity user, SessionEntity session)
         {
             if (session.CreatorId == user.Id)
-            {
                 throw new SessionCreatorLeaveException();
-            }
+            
             if (!session.Participants.Contains(user.Id))
-            {
                 throw new SessionNotJoinedException();
-            }
+            
             session.Participants.Remove(user.Id);
             await _sessionRepository.UpdateSession(session);
         }
         public async Task Delete(AuthUserEntity user, SessionEntity session)
         {
             if (user.Id != session.CreatorId)
-            {
                 throw new SessionNotCreatorException();
-            }
+            
             await _sessionRepository.DeleteSession(session);
             await _eventService.FireEvent(new SessionDeletedEvent { SessionEntity = session, Executer = user });
         }
