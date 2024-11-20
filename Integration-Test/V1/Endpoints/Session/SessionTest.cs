@@ -124,6 +124,43 @@ namespace Integration_Test.V1.Endpoints.Session
         }
 
         [TestMethod]
+        public async Task TestCreateSessionInvalidDescription()
+        {
+            if (!RunLocationTest())
+            {
+                Assert.Inconclusive($"Emulator is not running");
+            }
+
+            // Arrange
+            JsonObject user = await _userLib.CreateDefaultUser();
+            string token = user["accessToken"].Value<string>();
+
+            string title = "Test Title";
+            string sportType = "Basketball";
+            string description = string.Join(' ', Enumerable.Range(0, 1000).Select(x => "x")); //Too long
+            double latitude = 51.924470285085526;
+            double longitude = 7.846992772627526;
+            DateTime date = DateTime.Now.AddDays(1);
+            int minParticipants = 5;
+            int maxParticipants = 10;
+            List<string> tags = ["tag1", "tag2"];
+
+            JsonObject defaultReverseAddress = LocationLib.GetDefaultReverseResponse();
+            await _emulatorLib.SetMode(ModeType.ReverseLocation, true, defaultReverseAddress.ToJsonString());
+
+
+            // Act
+            HttpResponseMessage responseMessage = await _sessionLib.CreateSessionAsync(accessToken: token, title: title,
+                sportType: sportType, description: description,
+                latitude: latitude, longitude: longitude,
+                date: date, minParticipants: minParticipants, maxParticipants:
+                maxParticipants, tags: tags);
+
+            // Assert
+            Assert.AreEqual(HttpStatusCode.BadRequest, responseMessage.StatusCode);
+        }
+
+        [TestMethod]
         public async Task TestCreateSessionInvalidSportType()
         {
             if (!RunLocationTest())
