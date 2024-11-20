@@ -250,7 +250,7 @@ namespace Integration_Test.V1.Endpoints.Session
             double longitude = 7.846992772627526;
             DateTime date = DateTime.Now.AddDays(1);
             int minParticipants = 10;
-            int maxParticipants = 5; // Ungültig, da min > max
+            int maxParticipants = 5; // Invalid, then min > max
             List<string> tags = ["tag1", "tag2"];
 
             JsonObject defaultReverseAddress = LocationLib.GetDefaultReverseResponse();
@@ -320,7 +320,7 @@ namespace Integration_Test.V1.Endpoints.Session
             string description = "Session Description";
             double latitude = 51.924470285085526;
             double longitude = 7.846992772627526;
-            DateTime date = DateTime.Now.AddDays(-1); // Datum in der Vergangenheit
+            DateTime date = DateTime.Now.AddDays(-1); // Date in the past
             int minParticipants = 5;
             int maxParticipants = 10;
             List<string> tags = ["tag1", "tag2"];
