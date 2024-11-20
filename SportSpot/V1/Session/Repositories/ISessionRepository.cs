@@ -9,5 +9,6 @@ namespace SportSpot.V1.Session.Repositories
         public Task DeleteSession(SessionEntity sessionEntity);
         public Task UpdateSession(SessionEntity sessionEntity);
         public Task<List<SessionEntity>> GetAll();
+        public Task<List<SessionEntity>> GetSessionsInRange(int size, int page, double lat, double lng, int maxDistance, Guid userID);
     }
 }

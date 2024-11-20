@@ -14,5 +14,6 @@ namespace SportSpot.V1.Session.Services
         Task DeleteAll();
         Task<SessionDto> GetDto(Guid sessionId, AuthUserEntity user);
         Task<SessionEntity> Get(Guid sessionId);
+        Task<List<SessionDto>> GetSessionsInRange(int maxDistanceInKilometer, double lat, double lng, int page, int size, AuthUserEntity sender);
     }
 }

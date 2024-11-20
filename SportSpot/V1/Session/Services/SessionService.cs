@@ -122,6 +122,7 @@ namespace SportSpot.V1.Session.Services
             session.Participants.Remove(user.Id);
             await _sessionRepository.UpdateSession(session);
         }
+
         public async Task Delete(AuthUserEntity user, SessionEntity session)
         {
             if (user.Id != session.CreatorId)
@@ -138,6 +139,17 @@ namespace SportSpot.V1.Session.Services
             {
                 await _sessionRepository.DeleteSession(sessionEntity);
             }
+        }
+
+        public async Task<List<SessionDto>> GetSessionsInRange(int maxDistanceInKilometer, double lat, double lng, int page, int size, AuthUserEntity sender)
+        {
+            if (page < 0 || size <= 0 || size > 1000)
+                throw new SessionInvalidPageException();
+            if (maxDistanceInKilometer < 0 || maxDistanceInKilometer > 5000)
+                throw new SessionInvalidDistanceException();
+            List<SessionEntity> sessions = await _sessionRepository.GetSessionsInRange(size, page, lat, lng, maxDistanceInKilometer, sender.Id);
+            List<SessionDto> result = sessions.Select(x => x.ToDto(false)).ToList();
+            return result;
         }
 
         private static bool IsMember(AuthUserEntity authUserEntity, SessionEntity session) => session.CreatorId == authUserEntity.Id || session.Participants.Contains(authUserEntity.Id);
