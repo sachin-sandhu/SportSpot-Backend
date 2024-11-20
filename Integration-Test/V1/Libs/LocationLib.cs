@@ -5,16 +5,6 @@ namespace Integration_Test.V1.Libs
     public class LocationLib
     {
 
-        private readonly HttpClient _client;
-
-        public LocationLib(string baseUrl)
-        {
-            _client = new()
-            {
-                BaseAddress = new Uri(baseUrl)
-            };
-        }
-
         public static JsonObject GetDefaultReverseResponse()
         {
             string response = """
