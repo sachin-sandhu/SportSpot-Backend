@@ -16,7 +16,8 @@ namespace SportSpot.V1.Database
             else if (memberMap.MemberType == typeof(Guid?))
             {
                 memberMap.SetSerializer(new NullableSerializer<Guid>(new GuidSerializer(GuidRepresentation.Standard)));
-            }else if (memberMap.MemberType == typeof(List<Guid>))
+            }
+            else if (memberMap.MemberType == typeof(List<Guid>))
             {
                 memberMap.SetSerializer(new EnumerableInterfaceImplementerSerializer<List<Guid>>(new GuidSerializer(GuidRepresentation.Standard)));
             }
