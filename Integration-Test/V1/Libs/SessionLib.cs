@@ -1,9 +1,12 @@
 ﻿using Integration_Test.Extensions;
 using Integration_Test.V1.Exceptions;
+using System;
+using System.Collections.Specialized;
 using System.Net;
 using System.Net.Http.Headers;
 using System.Text;
 using System.Text.Json.Nodes;
+using System.Web;
 using static Microsoft.ApplicationInsights.MetricDimensionNames.TelemetryContext;
 using static System.Runtime.InteropServices.JavaScript.JSType;
 
@@ -44,14 +47,14 @@ namespace Integration_Test.V1.Libs
             return await _client.SendAsync(requestMessage);
         }
 
-        public async Task<JsonObject> CreateDefaultSession(string accessToken)
+        public async Task<JsonObject> CreateDefaultSession(string accessToken, DateTime? dateTime = null, string sportType = null)
         {
             string title = "Session Title";
-            string sportType = "Basketball";
+            sportType ??= "Basketball";
             string description = "Session Description";
             double latitude = 51.924470285085526;
             double longitude = 7.846992772627526;
-            DateTime date = DateTime.Now.AddDays(1);
+            dateTime ??= DateTime.Now.AddDays(1);
             int minParticipants = 5;
             int maxParticipants = 10;
             List<string> tags = ["tag1", "tag2"];
@@ -59,7 +62,7 @@ namespace Integration_Test.V1.Libs
             HttpResponseMessage response = await CreateSessionAsync(accessToken: accessToken, title: title,
             sportType: sportType, description: description,
             latitude: latitude, longitude: longitude,
-            date: date, minParticipants: minParticipants, maxParticipants:
+            date: dateTime, minParticipants: minParticipants, maxParticipants:
             maxParticipants, tags: tags);
 
             response.EnsureSuccessStatusCode();
@@ -107,9 +110,23 @@ namespace Integration_Test.V1.Libs
             return await _client.SendAsync(requestMessage);
         }
 
-        public async Task<JsonArray> SearchSessions(string accessToken, double latitude, double longitude, double distance, int page, int size)
+        public async Task<JsonArray> SearchSessions(string accessToken, double latitude, double longitude, double distance, int page, int size, string sportType = null)
         {
-            HttpRequestMessage requestMessage = new(HttpMethod.Get, $"/api/v1/session/search?latitude={latitude}&longitude={longitude}&distance={distance}&page={page}&size={size}");
+            UriBuilder uriBuilder = new($"{_client.BaseAddress}/api/v1/session/search");
+            var query = HttpUtility.ParseQueryString(uriBuilder.Query);
+
+            query.Add("latitude", latitude.ToString());
+            query.Add("longitude", longitude.ToString());
+            query.Add("distance", distance.ToString());
+            query.Add("page", page.ToString());
+            query.Add("size", size.ToString());
+            if (sportType != null)
+                query.Add("sportType", sportType);
+
+            uriBuilder.Query = query.ToString();
+            string uri = uriBuilder.ToString()[(_client.BaseAddress.ToString().Length)..];
+            HttpRequestMessage requestMessage = new(HttpMethod.Get, uri);
+
             requestMessage.Headers.Authorization = new AuthenticationHeaderValue("Bearer", accessToken);
             HttpResponseMessage response = await _client.SendAsync(requestMessage);
             response.EnsureSuccessStatusCode();

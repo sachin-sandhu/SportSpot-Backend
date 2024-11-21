@@ -54,6 +54,8 @@ namespace SportSpot.V1.Session.Repositories
             filter.Add(filterBuilder.Gt(x => x.Date, DateTime.Now));
             filter.Add(filterBuilder.GeoWithinCenterSphere(x => x.Location.Coordinates, requestDto.Longitude, requestDto.Latitude, radiusInDegrees));
 
+            if(requestDto.SportType != null)
+                filter.Add(filterBuilder.Eq(x => x.SportType, requestDto.SportType.Value));
 
             FilterDefinition<SessionEntity> finalFilter = filterBuilder.And(filter);
             IAsyncCursor<SessionEntity> cursor = await _collection.FindAsync(finalFilter, options);

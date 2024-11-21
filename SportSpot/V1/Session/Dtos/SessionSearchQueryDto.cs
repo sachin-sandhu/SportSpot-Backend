@@ -1,4 +1,5 @@
-﻿using System.ComponentModel;
+﻿using SportSpot.V1.Session.Enums;
+using System.ComponentModel;
 using System.ComponentModel.DataAnnotations;
 
 namespace SportSpot.V1.Session.Dtos
@@ -19,5 +20,7 @@ namespace SportSpot.V1.Session.Dtos
         
         [DefaultValue(0)]
         public int Page { get; init; }
+
+        public SportType? SportType { get; init; }
     }
 }
