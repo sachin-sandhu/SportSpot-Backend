@@ -37,11 +37,6 @@ namespace Integration_Test.V1.Endpoints.Session
         [TestMethod]
         public async Task TestSearchSessionInDistance()
         {
-            if (!RunLocationTest())
-            {
-                Assert.Inconclusive($"Emulator is not running");
-            }
-
             // Arrange
             await _emulatorLib.SetMode(ModeType.ReverseLocation, true, LocationLib.GetDefaultReverseResponse().ToJsonString());
 
@@ -68,11 +63,6 @@ namespace Integration_Test.V1.Endpoints.Session
         [TestMethod]
         public async Task TestSearchSessionNotInDistance()
         {
-            if (!RunLocationTest())
-            {
-                Assert.Inconclusive($"Emulator is not running");
-            }
-
             // Arrange
             await _emulatorLib.SetMode(ModeType.ReverseLocation, true, LocationLib.GetDefaultReverseResponse().ToJsonString());
 
@@ -96,11 +86,6 @@ namespace Integration_Test.V1.Endpoints.Session
         [TestMethod]
         public async Task TestSearchSessionInDistanceAndSportType()
         {
-            if (!RunLocationTest())
-            {
-                Assert.Inconclusive($"Emulator is not running");
-            }
-
             // Arrange
             await _emulatorLib.SetMode(ModeType.ReverseLocation, true, LocationLib.GetDefaultReverseResponse().ToJsonString());
 
@@ -130,11 +115,6 @@ namespace Integration_Test.V1.Endpoints.Session
         [TestMethod]
         public async Task TestSearchSessionInDistanceButInPast()
         {
-            if (!RunLocationTest())
-            {
-                Assert.Inconclusive($"Emulator is not running");
-            }
-
             // Arrange
             await _emulatorLib.SetMode(ModeType.ReverseLocation, true, LocationLib.GetDefaultReverseResponse().ToJsonString());
 
@@ -160,11 +140,6 @@ namespace Integration_Test.V1.Endpoints.Session
         [TestMethod]
         public async Task TestSearchSessionInDistanceFromOwner()
         {
-            if (!RunLocationTest())
-            {
-                Assert.Inconclusive($"Emulator is not running");
-            }
-
             // Arrange
             await _emulatorLib.SetMode(ModeType.ReverseLocation, true, LocationLib.GetDefaultReverseResponse().ToJsonString());
 
@@ -182,6 +157,5 @@ namespace Integration_Test.V1.Endpoints.Session
             Assert.AreEqual(0, searchResults.Count);
         }
 
-        private static bool RunLocationTest() => string.IsNullOrEmpty(Environment.GetEnvironmentVariable("RUN_LOCATION_TEST"));
     }
 }

@@ -34,11 +34,6 @@ namespace Integration_Test.V1.Endpoints.Session
         [TestMethod]
         public async Task TestCreateDefaultSession()
         {
-            if (!RunLocationTest())
-            {
-                Assert.Inconclusive($"Emulator is not running");
-            }
-
             // Arrange
             JsonObject user = await _userLib.CreateDefaultUser();
             string token = user["accessToken"].Value<string>();
@@ -89,11 +84,6 @@ namespace Integration_Test.V1.Endpoints.Session
         [TestMethod]
         public async Task TestCreateSessionWithoutTitle()
         {
-            if (!RunLocationTest())
-            {
-                Assert.Inconclusive($"Emulator is not running");
-            }
-
             // Arrange
             JsonObject user = await _userLib.CreateDefaultUser();
             string token = user["accessToken"].Value<string>();
@@ -126,11 +116,6 @@ namespace Integration_Test.V1.Endpoints.Session
         [TestMethod]
         public async Task TestCreateSessionInvalidDescription()
         {
-            if (!RunLocationTest())
-            {
-                Assert.Inconclusive($"Emulator is not running");
-            }
-
             // Arrange
             JsonObject user = await _userLib.CreateDefaultUser();
             string token = user["accessToken"].Value<string>();
@@ -163,11 +148,6 @@ namespace Integration_Test.V1.Endpoints.Session
         [TestMethod]
         public async Task TestCreateSessionInvalidSportType()
         {
-            if (!RunLocationTest())
-            {
-                Assert.Inconclusive($"Emulator is not running");
-            }
-
             // Arrange
             JsonObject user = await _userLib.CreateDefaultUser();
             string token = user["accessToken"].Value<string>();
@@ -204,11 +184,6 @@ namespace Integration_Test.V1.Endpoints.Session
         [DataRow(0, 181)]
         public async Task TestCreateSessionWithInvalidCoordinates(double latitude, double longitude)
         {
-            if (!RunLocationTest())
-            {
-                Assert.Inconclusive($"Emulator is not running");
-            }
-
             // Arrange
             JsonObject user = await _userLib.CreateDefaultUser();
             string token = user["accessToken"].Value<string>();
@@ -234,11 +209,6 @@ namespace Integration_Test.V1.Endpoints.Session
         [TestMethod]
         public async Task TestCreateSessionWithInvalidParticipantLimits()
         {
-            if (!RunLocationTest())
-            {
-                Assert.Inconclusive($"Emulator is not running");
-            }
-
             // Arrange
             JsonObject user = await _userLib.CreateDefaultUser();
             string token = user["accessToken"].Value<string>();
@@ -270,11 +240,6 @@ namespace Integration_Test.V1.Endpoints.Session
         [TestMethod]
         public async Task TestCreateSessionWithInvalidTags()
         {
-            if (!RunLocationTest())
-            {
-                Assert.Inconclusive($"Emulator is not running");
-            }
-
             // Arrange
             JsonObject user = await _userLib.CreateDefaultUser();
             string token = user["accessToken"].Value<string>();
@@ -306,11 +271,6 @@ namespace Integration_Test.V1.Endpoints.Session
         [TestMethod]
         public async Task TestCreateSessionWithPastDate()
         {
-            if (!RunLocationTest())
-            {
-                Assert.Inconclusive($"Emulator is not running");
-            }
-
             // Arrange
             JsonObject user = await _userLib.CreateDefaultUser();
             string token = user["accessToken"].Value<string>();
@@ -342,11 +302,6 @@ namespace Integration_Test.V1.Endpoints.Session
         [TestMethod]
         public async Task TestJoinSession()
         {
-            if (!RunLocationTest())
-            {
-                Assert.Inconclusive($"Emulator is not running");
-            }
-
             // Arrange
             await _emulatorLib.SetMode(ModeType.ReverseLocation, true, LocationLib.GetDefaultReverseResponse().ToJsonString());
 
@@ -373,11 +328,6 @@ namespace Integration_Test.V1.Endpoints.Session
         [TestMethod]
         public async Task TestJoinNonExistentSession()
         {
-            if (!RunLocationTest())
-            {
-                Assert.Inconclusive($"Emulator is not running");
-            }
-
             // Arrange
             JsonObject joinUser = await _userLib.CreateDefaultUser(true);
             string joinUserToken = joinUser["accessToken"].Value<string>();
@@ -393,11 +343,6 @@ namespace Integration_Test.V1.Endpoints.Session
         [TestMethod]
         public async Task TestLeaveSession()
         {
-            if (!RunLocationTest())
-            {
-                Assert.Inconclusive($"Emulator is not running");
-            }
-
             // Arrange
             await _emulatorLib.SetMode(ModeType.ReverseLocation, true, LocationLib.GetDefaultReverseResponse().ToJsonString());
 
@@ -427,11 +372,6 @@ namespace Integration_Test.V1.Endpoints.Session
         [TestMethod]
         public async Task TestLeaveNonExistentSession()
         {
-            if (!RunLocationTest())
-            {
-                Assert.Inconclusive($"Emulator is not running");
-            }
-
             // Arrange
             JsonObject leaveUser = await _userLib.CreateDefaultUser(true);
             string leaveUserToken = leaveUser["accessToken"].Value<string>();
@@ -446,11 +386,6 @@ namespace Integration_Test.V1.Endpoints.Session
         [TestMethod]
         public async Task TestKickUserFromSession()
         {
-            if (!RunLocationTest())
-            {
-                Assert.Inconclusive($"Emulator is not running");
-            }
-
             // Arrange
             await _emulatorLib.SetMode(ModeType.ReverseLocation, true, LocationLib.GetDefaultReverseResponse().ToJsonString());
 
@@ -480,11 +415,6 @@ namespace Integration_Test.V1.Endpoints.Session
         [TestMethod]
         public async Task TestKickUserFromNonExistentSession()
         {
-            if (!RunLocationTest())
-            {
-                Assert.Inconclusive($"Emulator is not running");
-            }
-
             // Arrange
             JsonObject createUser = await _userLib.CreateDefaultUser();
             string createUserToken = createUser["accessToken"].Value<string>();
@@ -501,11 +431,6 @@ namespace Integration_Test.V1.Endpoints.Session
         [TestMethod]
         public async Task TestDeleteSession()
         {
-            if (!RunLocationTest())
-            {
-                Assert.Inconclusive($"Emulator is not running");
-            }
-
             // Arrange
             await _emulatorLib.SetMode(ModeType.ReverseLocation, true, LocationLib.GetDefaultReverseResponse().ToJsonString());
 
@@ -526,11 +451,6 @@ namespace Integration_Test.V1.Endpoints.Session
         [TestMethod]
         public async Task TestDeleteNonExistentSession()
         {
-            if (!RunLocationTest())
-            {
-                Assert.Inconclusive($"Emulator is not running");
-            }
-
             // Arrange
             JsonObject createUser = await _userLib.CreateDefaultUser();
             string createUserToken = createUser["accessToken"].Value<string>();
@@ -546,11 +466,6 @@ namespace Integration_Test.V1.Endpoints.Session
         [TestMethod]
         public async Task TestGetSession()
         {
-            if (!RunLocationTest())
-            {
-                Assert.Inconclusive($"Emulator is not running");
-            }
-
             // Arrange
             await _emulatorLib.SetMode(ModeType.ReverseLocation, true, LocationLib.GetDefaultReverseResponse().ToJsonString());
 
@@ -572,6 +487,5 @@ namespace Integration_Test.V1.Endpoints.Session
             Assert.IsNotNull(getCreateUserResponse["participants"]);
         }
 
-        private static bool RunLocationTest() => string.IsNullOrEmpty(Environment.GetEnvironmentVariable("RUN_LOCATION_TEST"));
     }
 }
