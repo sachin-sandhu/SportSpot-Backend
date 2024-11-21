@@ -1,12 +1,7 @@
-﻿using System.ComponentModel.DataAnnotations;
-using System.ComponentModel.DataAnnotations.Schema;
-
-namespace SportSpot.V1.Media.Entities
+﻿namespace SportSpot.V1.Media.Entities
 {
     public record MediaEntity
     {
-        [Key]
-        [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
         public Guid Id { get; set; }
         public required string FileName { get; set; }
         public required DateTime CreatedAt { get; set; }

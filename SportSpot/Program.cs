@@ -10,13 +10,15 @@ using SportSpot.Events.Extensions;
 using SportSpot.Events.Services;
 using SportSpot.ExceptionHandling;
 using SportSpot.Swagger;
-using SportSpot.V1.Context;
+using SportSpot.V1.Extensions;
 using SportSpot.V1.Location.Dtos;
 using SportSpot.V1.Location.Services;
 using SportSpot.V1.Media.BlurHash;
 using SportSpot.V1.Media.Repositories;
 using SportSpot.V1.Media.Services;
 using SportSpot.V1.Request;
+using SportSpot.V1.Session.Repositories;
+using SportSpot.V1.Session.Services;
 using SportSpot.V1.Storage;
 using SportSpot.V1.User.Context;
 using SportSpot.V1.User.Dtos.Auth;
@@ -53,7 +55,8 @@ if (builder.Configuration.GetValue("MariaDBCheckSchema", true))
     await dbContext.Database.MigrateAsync();
 }
 
-builder.Services.AddDbContextFactory<DatabaseContext>(optionsBuilder => optionsBuilder.UseMongoDB(mongoDbConnection, mongoDbDatabase));
+await builder.Services.AddMongoDb(mongoDbConnection, mongoDbDatabase);
+
 builder.Services.AddDbContextFactory<AuthContext>(options => options.UseMySql(sqlConnection, sqlVersion));
 
 builder.Services.AddSingleton<IConnectionMultiplexer>(sp =>
@@ -129,6 +132,8 @@ builder.Services.AddTransient<IMediaService, MediaService>();
 builder.Services.AddTransient<ITokenService, TokenService>();
 builder.Services.AddTransient<IAuthService, AuthService>();
 builder.Services.AddTransient<IUserService, UserService>();
+builder.Services.AddTransient<ISessionRepository, SessionRepository>();
+builder.Services.AddTransient<ISessionService, SessionService>();
 
 builder.Services.RegisterEvents();
 

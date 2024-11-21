@@ -1,37 +1,38 @@
 ﻿using Microsoft.EntityFrameworkCore;
-using SportSpot.V1.Context;
+using MongoDB.Bson;
+using MongoDB.Driver;
 using SportSpot.V1.Media.Entities;
 
 namespace SportSpot.V1.Media.Repositories
 {
-    public class MediaRepository(DatabaseContext _context) : IMediaRepository
+    public class MediaRepository(IMongoCollection<MediaEntity> _collection) : IMediaRepository
     {
         public async Task Add(MediaEntity medium)
         {
-            _context.Media.Add(medium);
-            await _context.SaveChangesAsync();
+            await _collection.InsertOneAsync(medium);
         }
 
         public async Task Delete(MediaEntity medium)
         {
-            _context.Media.Remove(medium);
-            await _context.SaveChangesAsync();
+            await _collection.DeleteOneAsync(x => x.Id == medium.Id);
         }
 
         public async Task Update(MediaEntity medium)
         {
-            _context.Media.Update(medium);
-            await _context.SaveChangesAsync();
+            await _collection.ReplaceOneAsync(x => x.Id == medium.Id, medium);
         }
 
         public async Task<MediaEntity?> Get(Guid id)
         {
-            return await _context.Media.FindAsync(id);
+            IAsyncCursor<MediaEntity> cursor = await _collection.FindAsync(x => x.Id == id);
+            return await cursor.FirstOrDefaultAsync();
         }
 
-        public Task<List<MediaEntity>> GetAll()
+        public async Task<List<MediaEntity>> GetAll()
         {
-            return _context.Media.ToListAsync();
+            BsonDocument filter = [];
+            IAsyncCursor<MediaEntity> cursor = await _collection.FindAsync(filter);
+            return await cursor.ToListAsync();
         }
     }
 }

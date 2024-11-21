@@ -21,6 +21,7 @@ namespace SportSpot.V1.User.Extensions
             await userManager.UpdateAsync(user);
             return new AuthTokenDto
             {
+                UserId = user.Id,
                 AccessToken = accessToken.Token,
                 AccessExpire = accessToken.Expire,
                 RefreshToken = refreshToken,

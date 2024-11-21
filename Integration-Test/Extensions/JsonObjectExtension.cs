@@ -14,5 +14,11 @@ namespace Integration_Test.Extensions
             return jsonObject.AsValue().GetValue<T>();
         }
 
+        public static void AddIfNotNull(this JsonObject obj, string key, JsonNode value)
+        {
+            if (value == null) return;
+            obj.Add(key, value);
+        }
+
     }
 }

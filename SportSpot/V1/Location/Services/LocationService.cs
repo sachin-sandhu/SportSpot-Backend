@@ -1,5 +1,4 @@
-﻿using SportSpot.V1.Exceptions;
-using SportSpot.V1.Exceptions.Location;
+﻿using SportSpot.V1.Exceptions.Location;
 using SportSpot.V1.Location.Dtos;
 using SportSpot.V1.Location.Enums;
 using SportSpot.V1.Request;
@@ -20,7 +19,7 @@ namespace SportSpot.V1.Location.Services
                 return cacheAddress;
 
             Dictionary<string, string> queryParams = GetDefaultQueryParams(language, $"{lat},{lng}");
-            HttpResponseMessage response = await _request.Get(_config.AzureMapsReverseLocationEndpoint, queryParams);
+            HttpResponseMessage response = await _request.Get(_config.AzureMapsReverseLocationEndpoint, queryParameters: queryParams);
             response.EnsureSuccessStatusCode();
 
             AzureReverseResponseDto reverseResponse = JsonSerializer.Deserialize<AzureReverseResponseDto>(await response.Content.ReadAsStringAsync(), _options) ?? throw new LocationNotFoundException();
@@ -46,7 +45,7 @@ namespace SportSpot.V1.Location.Services
                 queryParams["typeahead"] = entityType.ToString();
             queryParams.Add("countrySet", country);
 
-            HttpResponseMessage response = await _request.Get(_config.AzureMapsSearchEndpoint, queryParams);
+            HttpResponseMessage response = await _request.Get(_config.AzureMapsSearchEndpoint, queryParameters: queryParams);
             response.EnsureSuccessStatusCode();
 
             AzureSearchResponseDto searcheResponse = JsonSerializer.Deserialize<AzureSearchResponseDto>(await response.Content.ReadAsStringAsync(), _options) ?? throw new LocationNotFoundException();

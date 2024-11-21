@@ -8,7 +8,7 @@ namespace Rest_Emulator.Services
     {
         public bool Success { get; set; }
 
-        public string? _response;
+        private string? _response;
 
         public string Response { get => _response ?? throw new InvalidOperationException("Response is null!"); set => _response = value; }
 

@@ -31,6 +31,7 @@ namespace SportSpot.V1.Media.Services
         {
             MediaEntity mediaEntity = new()
             {
+                Id = Guid.CreateVersion7(),
                 FileName = filename,
                 CreatedBy = creator.Id,
                 CreatedAt = DateTime.UtcNow,
@@ -54,9 +55,11 @@ namespace SportSpot.V1.Media.Services
             return media;
         }
 
-        public async Task<MediaEntity> CreateOrUpdateMedia(Guid id, string filename, byte[] data, AuthUserEntity user)
+        public async Task<MediaEntity> CreateOrUpdateMedia(Guid? id, string filename, byte[] data, AuthUserEntity user)
         {
-            MediaEntity? mediaEntity = await _mediaRepository.Get(id);
+            if (!id.HasValue)
+                return await CreateMedia(filename, data, user);
+            MediaEntity? mediaEntity = await _mediaRepository.Get(id.Value);
             if (mediaEntity is null)
                 return await CreateMedia(filename, data, user);
             return await UpdateMedia(mediaEntity, filename, data, user);

@@ -5,7 +5,7 @@ namespace SportSpot.Events.Services
 {
     public class EventService : IEventService
     {
-        private static readonly List<EventPriority> _sortedPriorities = [.. Enum.GetValues(typeof(EventPriority)).Cast<EventPriority>().OrderBy(p => p)];
+        private static readonly List<EventPriority> _sortedPriorities = [.. Enum.GetValues<EventPriority>().Cast<EventPriority>().OrderBy(p => p)];
 
         private readonly List<RegisteredListener> _listener = [];
 

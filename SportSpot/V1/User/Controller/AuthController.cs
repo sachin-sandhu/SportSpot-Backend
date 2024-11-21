@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Authorization;
+﻿using Microsoft.AspNetCore.Authentication;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using SportSpot.V1.Exceptions;
@@ -59,9 +60,9 @@ namespace SportSpot.V1.User.Controller
         [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(AuthTokenDto))]
         [ProducesResponseType(StatusCodes.Status401Unauthorized)]
         [ProducesResponseType(StatusCodes.Status400BadRequest, Type = typeof(List<ErrorResult>))]
-        public async Task<IActionResult> Refresh([FromBody] RefreshTokenRequestDto request, [FromHeader(Name = "Authorization")] string authorizationToken)
+        public async Task<IActionResult> Refresh([FromBody] RefreshTokenRequestDto request)
         {
-            authorizationToken = authorizationToken.Replace("Bearer ", "");
+            string authorizationToken = await HttpContext.GetTokenAsync("access_token") ?? throw new UnauthorizedException();
             return Ok(await _authService.RefreshAccessToken(await User.GetAuthUser(_userManager), authorizationToken, request));
         }
 
