@@ -1,7 +1,4 @@
-﻿using MongoDB.Bson.Serialization;
-using MongoDB.Bson;
-using MongoDB.Bson.Serialization.Conventions;
-using MongoDB.Bson.Serialization.Serializers;
+﻿using MongoDB.Bson.Serialization.Conventions;
 using MongoDB.Driver;
 using SportSpot.V1.Database;
 using SportSpot.V1.Media.Entities;

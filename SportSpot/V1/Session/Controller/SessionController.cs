@@ -45,7 +45,8 @@ namespace SportSpot.V1.Session.Controller
         [ProducesResponseType(StatusCodes.Status400BadRequest, Type = typeof(List<ErrorResult>))]
         public async Task<IActionResult> SearchSessions([FromQuery] SessionSearchQueryDto sessionSearchDto)
         {
-            List<SessionDto> sessions = await _sessionService.GetSessionsInRange(sessionSearchDto, await User.GetAuthUser(_userManager));
+            (List<SessionDto> sessions, bool hasMoreEntries) = await _sessionService.GetSessionsInRange(sessionSearchDto, await User.GetAuthUser(_userManager));
+            Response.Headers.Append("X-Has-More-Entries", hasMoreEntries.ToString());
             return Ok(sessions);
         }
 

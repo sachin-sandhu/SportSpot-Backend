@@ -1,14 +1,10 @@
 ﻿using Integration_Test.Extensions;
 using Integration_Test.V1.Exceptions;
-using System;
-using System.Collections.Specialized;
 using System.Net;
 using System.Net.Http.Headers;
 using System.Text;
 using System.Text.Json.Nodes;
 using System.Web;
-using static Microsoft.ApplicationInsights.MetricDimensionNames.TelemetryContext;
-using static System.Runtime.InteropServices.JavaScript.JSType;
 
 namespace Integration_Test.V1.Libs
 {
@@ -110,7 +106,7 @@ namespace Integration_Test.V1.Libs
             return await _client.SendAsync(requestMessage);
         }
 
-        public async Task<JsonArray> SearchSessions(string accessToken, double latitude, double longitude, double distance, int page, int size, string sportType = null)
+        public async Task<(JsonArray, bool)> SearchSessions(string accessToken, double latitude, double longitude, double distance, int page, int size, string sportType = null)
         {
             UriBuilder uriBuilder = new($"{_client.BaseAddress}/api/v1/session/search");
             var query = HttpUtility.ParseQueryString(uriBuilder.Query);
@@ -131,7 +127,11 @@ namespace Integration_Test.V1.Libs
             HttpResponseMessage response = await _client.SendAsync(requestMessage);
             response.EnsureSuccessStatusCode();
             string responseString = await response.Content.ReadAsStringAsync();
-            return JsonSerializer.Deserialize<JsonArray>(responseString);
+            JsonArray sessions = JsonSerializer.Deserialize<JsonArray>(responseString);
+            bool hasMoreEntries = false;
+            if (response.Headers.TryGetValues("X-Has-More-Entries", out IEnumerable<string> values))
+                hasMoreEntries = bool.Parse(values.First());
+            return (sessions, hasMoreEntries);
         }
 
         public static void ValidateDefaultSession(JsonObject session, Guid creatorId)

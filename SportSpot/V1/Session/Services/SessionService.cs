@@ -142,7 +142,7 @@ namespace SportSpot.V1.Session.Services
             }
         }
 
-        public async Task<List<SessionDto>> GetSessionsInRange(SessionSearchQueryDto requestDto, AuthUserEntity sender)
+        public async Task<(List<SessionDto>, bool)> GetSessionsInRange(SessionSearchQueryDto requestDto, AuthUserEntity sender)
         {
             ValidateLatitude(requestDto.Latitude);
             ValidateLongitude(requestDto.Longitude);
@@ -150,9 +150,9 @@ namespace SportSpot.V1.Session.Services
                 throw new SessionInvalidPageException();
             if (requestDto.Distance < 0 || requestDto.Distance > 5000)
                 throw new SessionInvalidDistanceException();
-            List<SessionEntity> sessions = await _sessionRepository.GetSessionsInRange(requestDto, sender.Id);
+            (List<SessionEntity> sessions, bool hasMoreEntries) = await _sessionRepository.GetSessionsInRange(requestDto, sender.Id);
             List<SessionDto> result = sessions.Select(x => x.ToDto(false)).ToList();
-            return result;
+            return (result, hasMoreEntries);
         }
 
         private static bool IsMember(AuthUserEntity authUserEntity, SessionEntity session) => session.CreatorId == authUserEntity.Id || session.Participants.Contains(authUserEntity.Id);

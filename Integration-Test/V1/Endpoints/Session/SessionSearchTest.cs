@@ -44,7 +44,7 @@ namespace Integration_Test.V1.Endpoints.Session
             string getUserToken = getUser["accessToken"].Value<string>();
 
             // Act
-            JsonArray searchResults = await _sessionLib.SearchSessions(getUserToken,
+            (JsonArray searchResults, _) = await _sessionLib.SearchSessions(getUserToken,
                 latitude: 51.514244,
                 longitude: 7.468429, distance: 53, 0, 1);
 
@@ -70,7 +70,7 @@ namespace Integration_Test.V1.Endpoints.Session
             string getUserToken = getUser["accessToken"].Value<string>();
 
             // Act
-            JsonArray searchResults = await _sessionLib.SearchSessions(getUserToken,
+            (JsonArray searchResults, _) = await _sessionLib.SearchSessions(getUserToken,
                 latitude: 51.514244,
                 longitude: 7.468429, distance: 1, 0, 1);
 
@@ -95,16 +95,51 @@ namespace Integration_Test.V1.Endpoints.Session
             string getUserToken = getUser["accessToken"].Value<string>();
 
             // Act
-            JsonArray searchResultsBasketball = await _sessionLib.SearchSessions(getUserToken,
+            (JsonArray searchResultsBasketball, _) = await _sessionLib.SearchSessions(getUserToken,
                 latitude: 51.514244,
                 longitude: 7.468429, distance: 100, 0, 10, sportType: "Basketball");
-            JsonArray searchResultsVolleyball = await _sessionLib.SearchSessions(getUserToken,
+            (JsonArray searchResultsVolleyball, _) = await _sessionLib.SearchSessions(getUserToken,
                 latitude: 51.514244,
                 longitude: 7.468429, distance: 100, 0, 10, sportType: "Volleyball");
 
             // Assert
             Assert.AreEqual(2, searchResultsBasketball.Count);
             Assert.AreEqual(1, searchResultsVolleyball.Count);
+        }
+
+        [TestMethod]
+        public async Task TestSearchSessionInDistancePagination()
+        {
+            // Arrange
+            await _emulatorLib.SetMode(ModeType.ReverseLocation, true, LocationLib.GetDefaultReverseResponse().ToJsonString());
+
+            JsonObject createUser = await _userLib.CreateDefaultUser();
+            string createUserToken = createUser["accessToken"].Value<string>();
+
+            await _sessionLib.CreateDefaultSession(createUserToken);
+            await _sessionLib.CreateDefaultSession(createUserToken);
+            await _sessionLib.CreateDefaultSession(createUserToken);
+            await _sessionLib.CreateDefaultSession(createUserToken);
+            await _sessionLib.CreateDefaultSession(createUserToken);
+
+            JsonObject getUser = await _userLib.CreateDefaultUser(true);
+            string getUserToken = getUser["accessToken"].Value<string>();
+
+            // Act
+            List<JsonArray> sessions = [];
+            int page = 0;
+            bool hasMoreResult = false;
+            do
+            {
+                (JsonArray result, hasMoreResult) = await _sessionLib.SearchSessions(getUserToken, latitude: 51.514244, longitude: 7.468429, distance: 100, page: page, size: 1);
+                sessions.Add(result);
+                page += 1;
+            } while (hasMoreResult);
+
+            // Assert
+            Assert.AreEqual(5, page);
+            Assert.AreEqual(5, sessions.Count);
+            Assert.AreEqual(5, sessions.Select(x => x.Count).Sum());
         }
 
         [TestMethod]
@@ -124,7 +159,7 @@ namespace Integration_Test.V1.Endpoints.Session
             await Task.Delay(5000);
 
             // Act
-            JsonArray searchResults = await _sessionLib.SearchSessions(getUserToken,
+            (JsonArray searchResults, _) = await _sessionLib.SearchSessions(getUserToken,
                 latitude: 51.514244,
                 longitude: 7.468429, distance: 100, 0, 1);
 
@@ -144,7 +179,7 @@ namespace Integration_Test.V1.Endpoints.Session
             _ = await _sessionLib.CreateDefaultSession(createUserToken);
 
             // Act
-            JsonArray searchResults = await _sessionLib.SearchSessions(createUserToken,
+            (JsonArray searchResults, _) = await _sessionLib.SearchSessions(createUserToken,
                 latitude: 51.514244,
                 longitude: 7.468429, distance: 53, 0, 1);
 
