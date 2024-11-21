@@ -1,15 +1,9 @@
-﻿using MongoDB.Bson.Serialization.Attributes;
-using MongoDB.Bson;
-using SportSpot.V1.Session.Enums;
-using System.ComponentModel.DataAnnotations;
-using System.ComponentModel.DataAnnotations.Schema;
+﻿using SportSpot.V1.Session.Enums;
 
 namespace SportSpot.V1.Session.Entities
 {
     public record SessionEntity
     {
-        [Key]
-        [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
         public Guid Id { get; set; }
         public required SportType SportType { get; set; }
         public required Guid CreatorId { get; set; }

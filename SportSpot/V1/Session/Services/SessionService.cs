@@ -46,6 +46,7 @@ namespace SportSpot.V1.Session.Services
 
             SessionEntity sessionEntity = new()
             {
+                Id = Guid.CreateVersion7(),
                 SportType = createRequestDto.SportType,
                 Title = createRequestDto.Title,
                 Description = createRequestDto.Description,

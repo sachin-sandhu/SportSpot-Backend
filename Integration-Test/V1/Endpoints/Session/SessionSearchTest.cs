@@ -1,12 +1,7 @@
 ﻿using Integration_Test.Extensions;
 using Integration_Test.V1.Libs;
 using Rest_Emulator.Enums;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 using System.Text.Json.Nodes;
-using System.Threading.Tasks;
 
 namespace Integration_Test.V1.Endpoints.Session
 {
@@ -43,7 +38,7 @@ namespace Integration_Test.V1.Endpoints.Session
             JsonObject createUser = await _userLib.CreateDefaultUser();
             string createUserToken = createUser["accessToken"].Value<string>();
 
-            JsonObject _ = await _sessionLib.CreateDefaultSession(createUserToken);
+            _ = await _sessionLib.CreateDefaultSession(createUserToken);
 
             JsonObject getUser = await _userLib.CreateDefaultUser(true);
             string getUserToken = getUser["accessToken"].Value<string>();
@@ -69,7 +64,7 @@ namespace Integration_Test.V1.Endpoints.Session
             JsonObject createUser = await _userLib.CreateDefaultUser();
             string createUserToken = createUser["accessToken"].Value<string>();
 
-            JsonObject _ = await _sessionLib.CreateDefaultSession(createUserToken);
+            _ = await _sessionLib.CreateDefaultSession(createUserToken);
 
             JsonObject getUser = await _userLib.CreateDefaultUser(true);
             string getUserToken = getUser["accessToken"].Value<string>();
@@ -121,12 +116,12 @@ namespace Integration_Test.V1.Endpoints.Session
             JsonObject createUser = await _userLib.CreateDefaultUser();
             string createUserToken = createUser["accessToken"].Value<string>();
 
-            JsonObject _ = await _sessionLib.CreateDefaultSession(createUserToken, DateTime.Now.AddSeconds(5));
+            _ = await _sessionLib.CreateDefaultSession(createUserToken, DateTime.Now.AddSeconds(5));
 
             JsonObject getUser = await _userLib.CreateDefaultUser(true);
             string getUserToken = getUser["accessToken"].Value<string>();
 
-            Thread.Sleep(5000);
+            await Task.Delay(5000);
 
             // Act
             JsonArray searchResults = await _sessionLib.SearchSessions(getUserToken,
@@ -146,7 +141,7 @@ namespace Integration_Test.V1.Endpoints.Session
             JsonObject createUser = await _userLib.CreateDefaultUser();
             string createUserToken = createUser["accessToken"].Value<string>();
 
-            JsonObject _ = await _sessionLib.CreateDefaultSession(createUserToken);
+            _ = await _sessionLib.CreateDefaultSession(createUserToken);
 
             // Act
             JsonArray searchResults = await _sessionLib.SearchSessions(createUserToken,

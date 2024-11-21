@@ -31,6 +31,7 @@ namespace SportSpot.V1.Media.Services
         {
             MediaEntity mediaEntity = new()
             {
+                Id = Guid.CreateVersion7(),
                 FileName = filename,
                 CreatedBy = creator.Id,
                 CreatedAt = DateTime.UtcNow,

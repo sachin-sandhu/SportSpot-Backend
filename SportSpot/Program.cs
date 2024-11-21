@@ -10,14 +10,15 @@ using SportSpot.Events.Extensions;
 using SportSpot.Events.Services;
 using SportSpot.ExceptionHandling;
 using SportSpot.Swagger;
-using SportSpot.V1.Session.Repositories;
-using SportSpot.V1.Session.Services;
+using SportSpot.V1.Extensions;
 using SportSpot.V1.Location.Dtos;
 using SportSpot.V1.Location.Services;
 using SportSpot.V1.Media.BlurHash;
 using SportSpot.V1.Media.Repositories;
 using SportSpot.V1.Media.Services;
 using SportSpot.V1.Request;
+using SportSpot.V1.Session.Repositories;
+using SportSpot.V1.Session.Services;
 using SportSpot.V1.Storage;
 using SportSpot.V1.User.Context;
 using SportSpot.V1.User.Dtos.Auth;
@@ -28,7 +29,6 @@ using SportSpot.V1.User.Services;
 using StackExchange.Redis;
 using System.Text;
 using System.Text.Json.Serialization;
-using SportSpot.V1.Extensions;
 
 var builder = WebApplication.CreateBuilder(args);
 
