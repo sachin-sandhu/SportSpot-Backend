@@ -4,6 +4,8 @@ using System.Net;
 using System.Net.Http.Headers;
 using System.Text;
 using System.Text.Json.Nodes;
+using static Microsoft.ApplicationInsights.MetricDimensionNames.TelemetryContext;
+using static System.Runtime.InteropServices.JavaScript.JSType;
 
 namespace Integration_Test.V1.Libs
 {
@@ -113,6 +115,21 @@ namespace Integration_Test.V1.Libs
             response.EnsureSuccessStatusCode();
             string responseString = await response.Content.ReadAsStringAsync();
             return JsonSerializer.Deserialize<JsonArray>(responseString);
+        }
+
+        public static void ValidateDefaultSession(JsonObject session, Guid creatorId)
+        {
+            Assert.IsTrue(session.ContainsKey("id"));
+            Assert.AreEqual("Basketball", session["sportType"].Value<string>());
+            Assert.AreEqual(creatorId.ToString(), session["creatorId"].Value<Guid>().ToString());
+
+            Assert.AreEqual("Session Title", session["title"].Value<string>());
+            Assert.AreEqual("Session Description", session["description"].Value<string>());
+            Assert.AreEqual("Everswinkel", session["location"].AsObject()["city"].Value<string>());
+            Assert.AreEqual("48351", session["location"].AsObject()["zipCode"].Value<string>());
+            Assert.AreEqual(5, session["minParticipants"].Value<int>());
+            Assert.AreEqual(10, session["maxParticipants"].Value<int>());
+            Assert.AreEqual(string.Join(' ', ["tag1", "tag2"]), string.Join(' ', session["tags"].AsArray().Select(x => x.Value<string>()).ToList()));
         }
     }
 }
