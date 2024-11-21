@@ -593,7 +593,12 @@ namespace Integration_Test.V1.Endpoints.Session
             string getUserToken = getUser["accessToken"].Value<string>();
 
             // Act
-            JsonArray searchResults = await _sessionLib.SearchSessions(getUserToken, 0, 0, 1000, 0, 1);
+            JsonArray searchResults = await _sessionLib.SearchSessions(getUserToken, 
+                latitude: 51.514244, 
+                longitude: 7.468429, distance: 53, 0, 1);
+
+            // Assert
+            Assert.AreEqual(1, searchResults.Count);
         }
 
         public static bool RunLocationTest() => string.IsNullOrEmpty(Environment.GetEnvironmentVariable("RUN_LOCATION_TEST"));

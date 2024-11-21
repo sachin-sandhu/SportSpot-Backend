@@ -45,12 +45,14 @@ namespace SportSpot.V1.Session.Repositories
                 Limit = requestDto.Size
             };
 
-            
+            // Radius
+            double radiusInDegrees = requestDto.Distance / 6378.1;
+
             List<FilterDefinition<SessionEntity>> filter = [];
             filter.Add(filterBuilder.Ne(x => x.CreatorId, userID));
             filter.Add(filterBuilder.Not(filterBuilder.AnyEq(x => x.Participants, userID)));
             filter.Add(filterBuilder.Gt(x => x.Date, DateTime.Now));
-            filter.Add(filterBuilder.NearSphere(x => x.Location.Coordinates, requestDto.Latitude, requestDto.Longitude, maxDistance: requestDto.Distance));
+            filter.Add(filterBuilder.GeoWithinCenterSphere(x => x.Location.Coordinates, requestDto.Longitude, requestDto.Latitude, radiusInDegrees));
 
 
             FilterDefinition<SessionEntity> finalFilter = filterBuilder.And(filter);
