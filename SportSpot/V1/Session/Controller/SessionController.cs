@@ -4,6 +4,7 @@ using Microsoft.AspNetCore.Mvc;
 using SportSpot.V1.Exceptions;
 using SportSpot.V1.Session.Dtos;
 using SportSpot.V1.Session.Entities;
+using SportSpot.V1.Session.Enums;
 using SportSpot.V1.Session.Services;
 using SportSpot.V1.User.Entities;
 using SportSpot.V1.User.Extensions;
@@ -67,6 +68,15 @@ namespace SportSpot.V1.Session.Controller
         {
             await _sessionService.Leave(await User.GetAuthUser(_userManager), await _sessionService.Get(sessionId));
             return Ok();
+        }
+
+        [Authorize]
+        [HttpGet("types")]
+        [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(List<SportType>))]
+        [ProducesResponseType(StatusCodes.Status400BadRequest, Type = typeof(List<ErrorResult>))]
+        public IActionResult GetSportTypes()
+        {
+            return Ok(Enum.GetValues<SportType>());
         }
 
         [Authorize]
