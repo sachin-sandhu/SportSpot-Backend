@@ -1,4 +1,6 @@
-﻿using SportSpot.V1.Session.Enums;
+﻿using MongoDB.Bson.Serialization.Attributes;
+using MongoDB.Bson;
+using SportSpot.V1.Session.Enums;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 

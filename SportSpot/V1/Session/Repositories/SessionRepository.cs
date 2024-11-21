@@ -1,66 +1,62 @@
 ﻿using Microsoft.EntityFrameworkCore;
-using MongoDB.Driver.GeoJsonObjectModel;
-using SportSpot.V1.Context;
+using MongoDB.Bson;
+using MongoDB.Driver;
 using SportSpot.V1.Session.Dtos;
 using SportSpot.V1.Session.Entities;
 
 namespace SportSpot.V1.Session.Repositories
 {
-    public class SessionRepository(DatabaseContext _context) : ISessionRepository
+    public class SessionRepository(IMongoCollection<SessionEntity> _collection) : ISessionRepository
     {
-        public async Task<SessionEntity> Add(SessionEntity sessionEntity)
+        public async Task Add(SessionEntity sessionEntity)
         {
-            await _context.Session.AddAsync(sessionEntity);
-            await _context.SaveChangesAsync();
-            return sessionEntity;
+            await _collection.InsertOneAsync(sessionEntity);
         }
 
         public async Task DeleteSession(SessionEntity sessionEntity)
         {
-            _context.Session.Remove(sessionEntity);
-            await _context.SaveChangesAsync();
+            await _collection.DeleteOneAsync(x => x.Id == sessionEntity.Id);
         }
 
         public async Task UpdateSession(SessionEntity sessionEntity)
         {
-            _context.Session.Update(sessionEntity);
-            await _context.SaveChangesAsync();
+            await _collection.ReplaceOneAsync(x => x.Id == sessionEntity.Id, sessionEntity);
         }
 
         public async Task<SessionEntity?> GetSession(Guid sessionId)
         {
-            return await _context.Session.FindAsync(sessionId);
+            IAsyncCursor<SessionEntity> cursor = await _collection.FindAsync(x => x.Id == sessionId);
+            return await cursor.FirstOrDefaultAsync();
         }
 
         public async Task<List<SessionEntity>> GetAll()
         {
-            return await _context.Session.ToListAsync();
+            BsonDocument filter = [];
+            IAsyncCursor<SessionEntity> cursor = await _collection.FindAsync(filter);
+            return await cursor.ToListAsync();
         }
 
         public async Task<List<SessionEntity>> GetSessionsInRange(SessionSearchQueryDto requestDto, Guid userID)
         {
-            List<SessionEntity> entries = await _context.Session
-                .Where(x => 
-                (x.CreatorId.ToString() != userID.ToString() && !x.Participants.Select(x => x.ToString()).Contains(userID.ToString()))
-                && x.Date > DateTime.Now && x.Location.Coordinates.)
-                .Skip(requestDto.Page * requestDto.Size)
-                .Take(requestDto.Size).ToListAsync();
-            return entries;
+            FilterDefinitionBuilder<SessionEntity> filterBuilder = Builders<SessionEntity>.Filter;
+            FindOptions<SessionEntity> options = new()
+            {
+                Skip = requestDto.Page * requestDto.Size,
+                Limit = requestDto.Size
+            };
+
+            
+            List<FilterDefinition<SessionEntity>> filter = [];
+            filter.Add(filterBuilder.Ne(x => x.CreatorId, userID));
+            filter.Add(filterBuilder.Not(filterBuilder.AnyEq(x => x.Participants, userID)));
+            filter.Add(filterBuilder.Gt(x => x.Date, DateTime.Now));
+            filter.Add(filterBuilder.NearSphere(x => x.Location.Coordinates, requestDto.Latitude, requestDto.Longitude, maxDistance: requestDto.Distance));
+
+
+            FilterDefinition<SessionEntity> finalFilter = filterBuilder.And(filter);
+            IAsyncCursor<SessionEntity> cursor = await _collection.FindAsync(finalFilter, options);
+
+            return await cursor.ToListAsync();
         }
-
-        private static double CalcDistance(double lat1, double lng1, double lat2, double lng2) 
-        {
-            const double R = 6372.8; // In kilometers
-            double dLat = ToRadians(lat2 - lat1);
-            double dLon = ToRadians(lng2 - lng1);
-            lat1 = ToRadians(lat1);
-            lat2 = ToRadians(lat2);
-
-            double a = Math.Sin(dLat / 2) * Math.Sin(dLat / 2) + Math.Sin(dLon / 2) * Math.Sin(dLon / 2) * Math.Cos(lat1) * Math.Cos(lat2);
-            double c = 2 * Math.Asin(Math.Sqrt(a));
-            return R * c;
-        }
-
-        private static double ToRadians(double angle) => Math.PI * angle / 180.0;
     }
 }

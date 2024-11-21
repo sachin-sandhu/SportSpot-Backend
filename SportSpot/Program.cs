@@ -12,7 +12,6 @@ using SportSpot.ExceptionHandling;
 using SportSpot.Swagger;
 using SportSpot.V1.Session.Repositories;
 using SportSpot.V1.Session.Services;
-using SportSpot.V1.Context;
 using SportSpot.V1.Location.Dtos;
 using SportSpot.V1.Location.Services;
 using SportSpot.V1.Media.BlurHash;
@@ -29,6 +28,7 @@ using SportSpot.V1.User.Services;
 using StackExchange.Redis;
 using System.Text;
 using System.Text.Json.Serialization;
+using SportSpot.V1.Extensions;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -54,7 +54,8 @@ if (builder.Configuration.GetValue("MariaDBCheckSchema", true))
     await dbContext.Database.MigrateAsync();
 }
 
-builder.Services.AddDbContextFactory<DatabaseContext>(optionsBuilder => optionsBuilder.UseMongoDB(mongoDbConnection, mongoDbDatabase));
+await builder.Services.AddMongoDb(mongoDbConnection, mongoDbDatabase);
+
 builder.Services.AddDbContextFactory<AuthContext>(options => options.UseMySql(sqlConnection, sqlVersion));
 
 builder.Services.AddSingleton<IConnectionMultiplexer>(sp =>
