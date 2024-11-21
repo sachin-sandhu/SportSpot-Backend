@@ -1,4 +1,5 @@
-﻿using SportSpot.Events.Services;
+﻿using MongoDB.Driver.GeoJsonObjectModel;
+using SportSpot.Events.Services;
 using SportSpot.V1.Exceptions.Location;
 using SportSpot.V1.Exceptions.Session;
 using SportSpot.V1.Location.Dtos;
@@ -16,15 +17,15 @@ namespace SportSpot.V1.Session.Services
     {
         public async Task<SessionDto> CreateSession(SessionCreateRequestDto createRequestDto, AuthUserEntity user)
         {
-            if (createRequestDto.Latitude < -90 || createRequestDto.Latitude > 90 || createRequestDto.Longitude < -180 || createRequestDto.Longitude > 180)
-                throw new SessionInvalidLocationException();
-            
+            ValidateLatitude(createRequestDto.Latitude);
+            ValidateLongitude(createRequestDto.Longitude);
+
             if (DateTime.Now >= createRequestDto.Date)
                 throw new SessionInvalidDataException();
-            
+
             if (createRequestDto.MinParticipants < 0 || createRequestDto.MaxParticipants < 0)
                 throw new SessionInvalidParticipantsException();
-            
+
             if (createRequestDto.MinParticipants > createRequestDto.MaxParticipants)
                 throw new SessionInvalidParticipantsException();
 
@@ -55,8 +56,7 @@ namespace SportSpot.V1.Session.Services
                 MaxParticipants = createRequestDto.MaxParticipants,
                 Location = new SessionLocationEntity
                 {
-                    Latitude = createRequestDto.Latitude,
-                    Longitude = createRequestDto.Longitude,
+                    Coordinates = new GeoJson2DGeographicCoordinates(createRequestDto.Longitude, createRequestDto.Latitude),
                     City = adress.Municipality,
                     ZipCode = adress.PostalCode
                 },
@@ -82,16 +82,16 @@ namespace SportSpot.V1.Session.Services
         {
             if (session.CreatorId == user.Id)
                 throw new SessionCreatorJoinException();
-            
+
             if (session.Participants.Contains(user.Id))
                 throw new SessionAlreadyJoinedException();
-            
+
             if (session.Participants.Count + 1 >= session.MaxParticipants)
                 throw new SessionFullException();
-            
+
             if (DateTime.Now >= session.Date)
                 throw new SessionExpiredException();
-            
+
             session.Participants.Add(user.Id);
             await _sessionRepository.UpdateSession(session);
         }
@@ -100,13 +100,13 @@ namespace SportSpot.V1.Session.Services
         {
             if (target.Id == sender.Id)
                 throw new SessionKickSelfException();
-            
+
             if (session.CreatorId != sender.Id)
                 throw new SessionNotCreatorException();
-            
+
             if (!session.Participants.Contains(target.Id))
                 throw new SessionNotJoinedException();
-            
+
             session.Participants.Remove(target.Id);
             await _sessionRepository.UpdateSession(session);
         }
@@ -115,10 +115,10 @@ namespace SportSpot.V1.Session.Services
         {
             if (session.CreatorId == user.Id)
                 throw new SessionCreatorLeaveException();
-            
+
             if (!session.Participants.Contains(user.Id))
                 throw new SessionNotJoinedException();
-            
+
             session.Participants.Remove(user.Id);
             await _sessionRepository.UpdateSession(session);
         }
@@ -127,7 +127,7 @@ namespace SportSpot.V1.Session.Services
         {
             if (user.Id != session.CreatorId)
                 throw new SessionNotCreatorException();
-            
+
             await _sessionRepository.DeleteSession(session);
             await _eventService.FireEvent(new SessionDeletedEvent { SessionEntity = session, Executer = user });
         }
@@ -141,17 +141,31 @@ namespace SportSpot.V1.Session.Services
             }
         }
 
-        public async Task<List<SessionDto>> GetSessionsInRange(int maxDistanceInKilometer, double lat, double lng, int page, int size, AuthUserEntity sender)
+        public async Task<List<SessionDto>> GetSessionsInRange(SessionSearchQueryDto requestDto, AuthUserEntity sender)
         {
-            if (page < 0 || size <= 0 || size > 1000)
+            ValidateLatitude(requestDto.Latitude);
+            ValidateLongitude(requestDto.Longitude);
+            if (requestDto.Page < 0 || requestDto.Size <= 0 || requestDto.Size > 1000)
                 throw new SessionInvalidPageException();
-            if (maxDistanceInKilometer < 0 || maxDistanceInKilometer > 5000)
+            if (requestDto.Distance < 0 || requestDto.Distance > 5000)
                 throw new SessionInvalidDistanceException();
-            List<SessionEntity> sessions = await _sessionRepository.GetSessionsInRange(size, page, lat, lng, maxDistanceInKilometer, sender.Id);
+            List<SessionEntity> sessions = await _sessionRepository.GetSessionsInRange(requestDto, sender.Id);
             List<SessionDto> result = sessions.Select(x => x.ToDto(false)).ToList();
             return result;
         }
 
         private static bool IsMember(AuthUserEntity authUserEntity, SessionEntity session) => session.CreatorId == authUserEntity.Id || session.Participants.Contains(authUserEntity.Id);
+
+        private static void ValidateLatitude(double latitude)
+        {
+            if (latitude < -90 || latitude > 90)
+                throw new SessionInvalidLocationException();
+        }
+
+        private static void ValidateLongitude(double longitude)
+        {
+            if (longitude < -180 || longitude > 180)
+                throw new SessionInvalidLocationException();
+        }
     }
 }

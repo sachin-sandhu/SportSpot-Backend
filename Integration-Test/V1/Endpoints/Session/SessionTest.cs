@@ -572,6 +572,30 @@ namespace Integration_Test.V1.Endpoints.Session
             Assert.IsNotNull(getCreateUserResponse["participants"]);
         }
 
+        [TestMethod]
+        public async Task TestSearchSessionInDistance()
+        {
+            if (!RunLocationTest())
+            {
+                Assert.Inconclusive($"Emulator is not running");
+            }
+
+            // Arrange
+            await _emulatorLib.SetMode(ModeType.ReverseLocation, true, LocationLib.GetDefaultReverseResponse().ToJsonString());
+
+            JsonObject createUser = await _userLib.CreateDefaultUser();
+            string createUserToken = createUser["accessToken"].Value<string>();
+
+            JsonObject session = await _sessionLib.CreateDefaultSession(createUserToken);
+            Guid sessionId = session["id"].Value<Guid>();
+
+            JsonObject getUser = await _userLib.CreateDefaultUser(true);
+            string getUserToken = getUser["accessToken"].Value<string>();
+
+            // Act
+            JsonArray searchResults = await _sessionLib.SearchSessions(getUserToken, 0, 0, 1000, 0, 1);
+        }
+
         public static bool RunLocationTest() => string.IsNullOrEmpty(Environment.GetEnvironmentVariable("RUN_LOCATION_TEST"));
     }
 }

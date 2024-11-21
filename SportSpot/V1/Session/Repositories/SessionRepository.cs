@@ -1,5 +1,7 @@
 ﻿using Microsoft.EntityFrameworkCore;
+using MongoDB.Driver.GeoJsonObjectModel;
 using SportSpot.V1.Context;
+using SportSpot.V1.Session.Dtos;
 using SportSpot.V1.Session.Entities;
 
 namespace SportSpot.V1.Session.Repositories
@@ -35,15 +37,14 @@ namespace SportSpot.V1.Session.Repositories
             return await _context.Session.ToListAsync();
         }
 
-        public async Task<List<SessionEntity>> GetSessionsInRange(int size, int page, double lat, double lng, int maxDistance, Guid userID)
+        public async Task<List<SessionEntity>> GetSessionsInRange(SessionSearchQueryDto requestDto, Guid userID)
         {
             List<SessionEntity> entries = await _context.Session
-                .Where(x => (
-                x.CreatorId == userID || x.Participants.Contains(userID)) 
-                && x.Date > DateTime.Now 
-                && CalcDistance(lat, lng, x.Location.Latitude, x.Location.Longitude) <= maxDistance)
-                .Skip(page * size)
-                .Take(size).ToListAsync();
+                .Where(x => 
+                (x.CreatorId.ToString() != userID.ToString() && !x.Participants.Select(x => x.ToString()).Contains(userID.ToString()))
+                && x.Date > DateTime.Now && x.Location.Coordinates.)
+                .Skip(requestDto.Page * requestDto.Size)
+                .Take(requestDto.Size).ToListAsync();
             return entries;
         }
 

@@ -104,5 +104,15 @@ namespace Integration_Test.V1.Libs
             requestMessage.Headers.Authorization = new AuthenticationHeaderValue("Bearer", accessToken);
             return await _client.SendAsync(requestMessage);
         }
+
+        public async Task<JsonArray> SearchSessions(string accessToken, double latitude, double longitude, double distance, int page, int size)
+        {
+            HttpRequestMessage requestMessage = new(HttpMethod.Get, $"/api/v1/session/search?latitude={latitude}&longitude={longitude}&distance={distance}&page={page}&size={size}");
+            requestMessage.Headers.Authorization = new AuthenticationHeaderValue("Bearer", accessToken);
+            HttpResponseMessage response = await _client.SendAsync(requestMessage);
+            response.EnsureSuccessStatusCode();
+            string responseString = await response.Content.ReadAsStringAsync();
+            return JsonSerializer.Deserialize<JsonArray>(responseString);
+        }
     }
 }

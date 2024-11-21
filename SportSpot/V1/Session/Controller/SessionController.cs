@@ -38,6 +38,16 @@ namespace SportSpot.V1.Session.Controller
             return Ok(session);
         }
 
+        [Authorize]
+        [HttpGet("search")]
+        [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(SessionDto))]
+        [ProducesResponseType(StatusCodes.Status400BadRequest, Type = typeof(List<ErrorResult>))]
+        public async Task<IActionResult> SearchSessions([FromQuery] SessionSearchQueryDto sessionSearchDto)
+        {
+            List<SessionDto> sessions = await _sessionService.GetSessionsInRange(sessionSearchDto, await User.GetAuthUser(_userManager));
+            return Ok(sessions);
+        }
+
 
         [Authorize]
         [HttpPut("{sessionId}/join")]
