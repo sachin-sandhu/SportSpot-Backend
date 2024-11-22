@@ -1,0 +1,59 @@
+{
+  "summary": {
+    "query": "schuter 15 everswinkel",
+    "queryType": "NON_NEAR",
+    "queryTime": 67,
+    "numResults": 1,
+    "offset": 0,
+    "totalResults": 1,
+    "fuzzyLevel": 1
+  },
+  "results": [
+    {
+      "type": "Point Address",
+      "id": "gjX1bE2Ldmo9j2go93n8YQ",
+      "score": 1,
+      "matchConfidence": {
+        "score": 1
+      },
+      "address": {
+        "streetNumber": "15",
+        "streetName": "Schuter",
+        "municipality": "Everswinkel",
+        "countrySecondarySubdivision": "Warendorf",
+        "countrySubdivision": "Nordrhein-Westfalen",
+        "countrySubdivisionName": "Nordrhein-Westfalen",
+        "countrySubdivisionCode": "NW",
+        "postalCode": "48351",
+        "countryCode": "DE",
+        "country": "Deutschland",
+        "countryCodeISO3": "DEU",
+        "freeformAddress": "Schuter 15, 48351 Everswinkel",
+        "localName": "Everswinkel"
+      },
+      "position": {
+        "lat": 51.90303,
+        "lon": 7.84269
+      },
+      "viewport": {
+        "topLeftPoint": {
+          "lat": 51.90393,
+          "lon": 7.84123
+        },
+        "btmRightPoint": {
+          "lat": 51.90213,
+          "lon": 7.84415
+        }
+      },
+      "entryPoints": [
+        {
+          "type": "main",
+          "position": {
+            "lat": 51.90304,
+            "lon": 7.8425
+          }
+        }
+      ]
+    }
+  ]
+}
