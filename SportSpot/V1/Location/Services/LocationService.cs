@@ -14,6 +14,8 @@ namespace SportSpot.V1.Location.Services
 
         public async Task<AzureAddressDto> GetAddress(string language, double lat, double lng)
         {
+            LocationInvalidException.ValidateLongitude(lng);
+            LocationInvalidException.ValidateLatitude(lat);
             AzureAddressDto? cacheAddress = await _cache.FindAddress(language, lat, lng);
             if (cacheAddress is not null)
                 return cacheAddress;
