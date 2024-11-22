@@ -11,7 +11,7 @@ using System.Text;
 
 namespace SportSpot.V1.WebSockets.Services
 {
-    public class WebSocketService(ILogger<WebSocketService> _logger, IConnectionService _connectionService, IUserService _userService, IAuthService _authService, IEventService _eventService) : IWebSocketService
+    public class WebSocketService(IConnectionService _connectionService, IUserService _userService, IAuthService _authService, IEventService _eventService) : IWebSocketService
     {
 
         private readonly static JsonSerializerOptions _options = new()
