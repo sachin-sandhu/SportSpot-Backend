@@ -161,7 +161,8 @@ if (!builder.Environment.IsDevelopment())
 {
     builder.WebHost.ConfigureKestrel(options =>
     {
-        options.ListenAnyIP(8080, listenOptions =>
+        int httpsPort = builder.Configuration.GetValue("ASPNETCORE_HTTPS_PORTS", 8080);
+        options.ListenAnyIP(httpsPort, listenOptions =>
         {
             string certFileName = builder.Configuration.GetValue<string>("CERT_FILE") ?? throw new InvalidOperationException("CERT_FILE is not set!");
             string certKeyFileName = builder.Configuration.GetValue<string>("CERT_KEY_FILE") ?? throw new InvalidOperationException("CERT_KEY_FILE is not set!");
