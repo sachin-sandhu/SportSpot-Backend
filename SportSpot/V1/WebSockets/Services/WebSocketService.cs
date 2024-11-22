@@ -24,8 +24,12 @@ namespace SportSpot.V1.WebSockets.Services
             AuthUserEntity user = await _authService.AuthorizeUser(authorization);
             if (!_connectionService.AddWebSocket(webSocket, user.Id))
             {
-                await _connectionService.RemoveWebSocket(webSocket, "Unauthorized");
-                return false;
+                // If the user is already connected, we close the old
+                WebSocket? toClose = _connectionService.GetWebSocket(user.Id);
+                if (toClose != null)
+                    await _connectionService.RemoveWebSocket(toClose, "Reconnected");
+
+                return _connectionService.AddWebSocket(webSocket, user.Id);
             }
             return true;
         }

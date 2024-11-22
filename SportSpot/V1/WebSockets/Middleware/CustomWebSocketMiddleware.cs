@@ -10,14 +10,13 @@ namespace SportSpot.V1.WebSockets.Middleware
     {
         public async Task Invoke(HttpContext context)
         {
+            if (!context.WebSockets.IsWebSocketRequest)
+            {
+                await _next(context);
+                return;
+            }
             try
             {
-                if (!context.WebSockets.IsWebSocketRequest)
-                {
-                    await _next(context);
-                    return;
-                }
-
                 if (!context.Request.Headers.TryGetValue("Sec-WebSocket-Protocol", out StringValues token))
                 {
                     await new UnauthorizedException().WriteToResponse(context.Response);
@@ -46,18 +45,7 @@ namespace SportSpot.V1.WebSockets.Middleware
                 if (!success)
                     return;
 
-                await Receive(webSocket, webSocketService, logger, async (result, buffer) =>
-                {
-                    if (result.MessageType == WebSocketMessageType.Text)
-                    {
-                        string payload = Encoding.UTF8.GetString(buffer, 0, result.Count);
-                        await webSocketService.OnReceive(webSocket, payload);
-                    }
-                    else if (result.MessageType == WebSocketMessageType.Close)
-                    {
-                        await HandleDisconnect(webSocket, webSocketService);
-                    }
-                });
+                await Receive(webSocket, webSocketService, logger);
             }
             catch (AbstractSportSpotException ex)
             {
@@ -72,10 +60,9 @@ namespace SportSpot.V1.WebSockets.Middleware
         private static async Task HandleDisconnect(WebSocket socket, IWebSocketService webSocketService)
         {
             await webSocketService.OnDisconnect(socket);
-            await socket.CloseAsync(WebSocketCloseStatus.NormalClosure, "Closed because of an error!", CancellationToken.None);
         }
 
-        private static async Task Receive(WebSocket socket, IWebSocketService webSocketService, ILogger<CustomWebSocketMiddleware> logger, Action<WebSocketReceiveResult, byte[]> handleMessage)
+        private static async Task Receive(WebSocket socket, IWebSocketService webSocketService, ILogger<CustomWebSocketMiddleware> logger)
         {
             var buffer = new byte[1024 * 4];
             try
@@ -84,7 +71,15 @@ namespace SportSpot.V1.WebSockets.Middleware
                 {
                     WebSocketReceiveResult result = await socket.ReceiveAsync(buffer: new ArraySegment<byte>(buffer),
                                                            cancellationToken: CancellationToken.None);
-                    handleMessage(result, buffer);
+                    if (result.MessageType == WebSocketMessageType.Text)
+                    {
+                        string payload = Encoding.UTF8.GetString(buffer, 0, result.Count);
+                        await webSocketService.OnReceive(socket, payload);
+                    }
+                    else if (result.MessageType == WebSocketMessageType.Close)
+                    {
+                        await HandleDisconnect(socket, webSocketService);
+                    }
                 }
             }
             catch (Exception ex)
