@@ -13,5 +13,6 @@ namespace SportSpot.V1.User.Services
         Task DeleteAllUser();
         Task<AuthTokenDto> RefreshAccessToken(AuthUserEntity user, string accessToken, RefreshTokenRequestDto request);
         Task RevokeRefreshToken(AuthUserEntity authUserEntity);
+        Task<AuthUserEntity> AuthorizeUser(string authorization);
     }
 }
