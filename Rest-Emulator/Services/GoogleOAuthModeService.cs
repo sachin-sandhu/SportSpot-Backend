@@ -16,7 +16,7 @@ namespace Rest_Emulator.Services
         {
             if (Success)
             {
-                JsonObject jobj = JsonSerializer.Deserialize<JsonObject>(Response) ?? throw new InvalidOperationException("Response is not a JSON!");
+                JsonNode jobj = JsonSerializer.Deserialize<JsonNode>(Response) ?? throw new InvalidOperationException("Response is not a JSON!");
                 OkObjectResult result = new(jobj);
                 result.ContentTypes.Add("application/json");
                 return result;

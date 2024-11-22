@@ -17,9 +17,6 @@ namespace SportSpot.V1.Session.Services
     {
         public async Task<SessionDto> CreateSession(SessionCreateRequestDto createRequestDto, AuthUserEntity user)
         {
-            ValidateLatitude(createRequestDto.Latitude);
-            ValidateLongitude(createRequestDto.Longitude);
-
             if (DateTime.Now >= createRequestDto.Date)
                 throw new SessionInvalidDataException();
 
@@ -144,8 +141,8 @@ namespace SportSpot.V1.Session.Services
 
         public async Task<(List<SessionDto>, bool)> GetSessionsInRange(SessionSearchQueryDto requestDto, AuthUserEntity sender)
         {
-            ValidateLatitude(requestDto.Latitude);
-            ValidateLongitude(requestDto.Longitude);
+            LocationInvalidException.ValidateLatitude(requestDto.Latitude);
+            LocationInvalidException.ValidateLongitude(requestDto.Longitude);
             if (requestDto.Page < 0 || requestDto.Size <= 0 || requestDto.Size > 1000)
                 throw new SessionInvalidPageException();
             if (requestDto.Distance < 0 || requestDto.Distance > 5000)
@@ -156,17 +153,5 @@ namespace SportSpot.V1.Session.Services
         }
 
         private static bool IsMember(AuthUserEntity authUserEntity, SessionEntity session) => session.CreatorId == authUserEntity.Id || session.Participants.Contains(authUserEntity.Id);
-
-        private static void ValidateLatitude(double latitude)
-        {
-            if (latitude < -90 || latitude > 90)
-                throw new SessionInvalidLocationException();
-        }
-
-        private static void ValidateLongitude(double longitude)
-        {
-            if (longitude < -180 || longitude > 180)
-                throw new SessionInvalidLocationException();
-        }
     }
 }

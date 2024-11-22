@@ -24,4 +24,9 @@
 	<ItemGroup>
 		<Using Include="Microsoft.VisualStudio.TestTools.UnitTesting" />
 	</ItemGroup>
+
+	<ItemGroup>
+		<EmbeddedResource Include="Location\Files\01-LocationResponse.json" />
+		<EmbeddedResource Include="Location\Files\01-ReverseAddressResponse.json" />
+	</ItemGroup>
 </Project>
