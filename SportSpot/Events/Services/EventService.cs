@@ -3,18 +3,27 @@ using System.Reflection;
 
 namespace SportSpot.Events.Services
 {
-    public class EventService : IEventService
+    public class EventService(IServiceProvider _serviceProvider) : IEventService
     {
-        private static readonly List<EventPriority> _sortedPriorities = [.. Enum.GetValues<EventPriority>().Cast<EventPriority>().OrderBy(p => p)];
+        private static readonly List<EventPriority> _sortedPriorities = [.. Enum.GetValues<EventPriority>().OrderBy(p => p)];
 
         private readonly List<RegisteredListener> _listener = [];
+        private readonly List<Type> _scopedListener = [];
+
 
         public async Task<bool> FireEvent(IEvent @event)
         {
             Type type = @event.GetType();
             Dictionary<EventPriority, List<RegisteredEventHandler>> registeredEventHandler = [];
 
-            foreach (RegisteredListener listener in _listener)
+            // Create Scoped Listener
+            using var scope = _serviceProvider.CreateScope();
+            List<RegisteredListener> scopedListeners = CreateScopedListener(scope);
+
+            // Concatenate all listeners (Global and Scoped)
+            List<RegisteredListener> listenerToCall = [.. _listener, .. scopedListeners];
+
+            foreach (RegisteredListener listener in listenerToCall)
             {
                 if (!listener.Events.TryGetValue(type, out List<RegisteredEventHandler>? handlers)) continue;
                 foreach (RegisteredEventHandler handler in handlers)
@@ -39,9 +48,27 @@ namespace SportSpot.Events.Services
             return ((ICancellable)@event).IsCancelled();
         }
 
+        private List<RegisteredListener> CreateScopedListener(IServiceScope scope)
+        {
+            List<RegisteredListener> scopedListeners = [];
+            foreach (Type listenerType in _scopedListener)
+            {
+                IListener listener = (IListener)scope.ServiceProvider.GetRequiredService(listenerType) ?? throw new InvalidOperationException("Listener not found");
+                RegisteredListener registeredListener = CreateRegisteredListenerFromListener(listener);
+                scopedListeners.Add(registeredListener);
+            }
+            return scopedListeners;
+        }
+
         public void RegisterListener(IListener listener)
         {
             if (_listener.Exists(x => x.Listener == listener)) return;
+            RegisteredListener registeredListener = CreateRegisteredListenerFromListener(listener);
+            _listener.Add(registeredListener);
+        }
+
+        private RegisteredListener CreateRegisteredListenerFromListener(IListener listener)
+        {
             RegisteredListener registeredListener = new() { Listener = listener };
             listener.GetType().GetMethods().ToList().ForEach(method =>
             {
@@ -58,11 +85,28 @@ namespace SportSpot.Events.Services
 
                 registeredListener.Events[eventType].Add(new RegisteredEventHandler { Attribute = attribute, Method = method, Listener = listener });
             });
-            _listener.Add(registeredListener);
+            return registeredListener;
         }
 
         public void UnRegisterListener(IListener listener) => _listener.RemoveAll(x => x.Listener == listener);
 
+        public void RegisterScopedListener(Type listenerType)
+        {
+            if (_scopedListener.Contains(listenerType)) return;
+            _scopedListener.Add(listenerType);
+        }
+
+        public void UnRegisterScopedListener(Type listenerType)
+        {
+            _scopedListener.Remove(listenerType);
+        }
+
+        public List<Type> GetScopedRegisteredListeners()
+        {
+            return _scopedListener;
+        }
+
         public List<IListener> GetRegisteredListeners() => _listener.Select(x => x.Listener).ToList();
+
     }
 }

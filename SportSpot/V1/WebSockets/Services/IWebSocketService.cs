@@ -9,6 +9,7 @@ namespace SportSpot.V1.WebSockets.Services
         Task<bool> OnConnect(WebSocket webSocket, string authorization);
         Task OnDisconnect(WebSocket webSocket);
         Task OnReceive(WebSocket webSocket, string payload);
-        Task<bool> SendMessage(AuthUserEntity user, AbstractWebSocketMessageDto message);
+        Task<bool> SendMessage(AuthUserEntity user, IWebSocketMessageDto message);
+        Task<bool> SendMessage(Guid userId, IWebSocketMessageDto message);
     }
 }

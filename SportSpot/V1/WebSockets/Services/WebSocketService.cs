@@ -41,7 +41,7 @@ namespace SportSpot.V1.WebSockets.Services
 
         public async Task OnReceive(WebSocket webSocket, string payload)
         {
-            AbstractWebSocketMessageDto message = JsonSerializer.Deserialize<AbstractWebSocketMessageDto>(payload, _options) ?? throw new InvalidWebSocketMessageException();
+            IWebSocketMessageDto message = JsonSerializer.Deserialize<IWebSocketMessageDto>(payload, _options) ?? throw new InvalidWebSocketMessageException();
             Guid userId = _connectionService.GetUser(webSocket) ?? throw new UnauthorizedException();
             AuthUserEntity user = await _userService.GetUser(userId);
 
@@ -53,9 +53,14 @@ namespace SportSpot.V1.WebSockets.Services
             await _eventService.FireEvent(webSocketMessageReceivedEvent);
         }
 
-        public async Task<bool> SendMessage(AuthUserEntity user, AbstractWebSocketMessageDto message)
+        public async Task<bool> SendMessage(AuthUserEntity user, IWebSocketMessageDto message)
         {
-            WebSocket? webSocket = _connectionService.GetWebSocket(user.Id);
+            return await SendMessage(user.Id, message);
+        }
+
+        public async Task<bool> SendMessage(Guid userId, IWebSocketMessageDto message)
+        {
+            WebSocket? webSocket = _connectionService.GetWebSocket(userId);
             if (webSocket == null)
                 return false;
             string payload = JsonSerializer.Serialize(message, _options);

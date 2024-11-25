@@ -6,21 +6,21 @@ using System.Text.Json.Serialization;
 
 namespace SportSpot.V1.WebSockets.Converter
 {
-    public class WebSocketMessageConverter : JsonConverter<AbstractWebSocketMessageDto>
+    public class WebSocketMessageConverter : JsonConverter<IWebSocketMessageDto>
     {
-        public override AbstractWebSocketMessageDto? Read(ref Utf8JsonReader reader, Type typeToConvert, JsonSerializerOptions options)
+        public override IWebSocketMessageDto? Read(ref Utf8JsonReader reader, Type typeToConvert, JsonSerializerOptions options)
         {
             using var doc = JsonDocument.ParseValue(ref reader);
             string? rawType = doc.RootElement.GetProperty("Type").GetString() ?? throw new InvalidWebSocketMessageException();
             if (!Enum.TryParse(rawType, out WebSocketMessageType type))
                 throw new UnkownWebSocketMessageException(rawType);
             object obj = JsonSerializer.Deserialize(doc.RootElement.GetRawText(), type.GetMessageType(), options) ?? throw new InvalidWebSocketMessageException();
-            return (AbstractWebSocketMessageDto)obj;
+            return (IWebSocketMessageDto)obj;
         }
 
-        public override void Write(Utf8JsonWriter writer, AbstractWebSocketMessageDto value, JsonSerializerOptions options)
+        public override void Write(Utf8JsonWriter writer, IWebSocketMessageDto value, JsonSerializerOptions options)
         {
-            JsonSerializer.Serialize(writer, value.MessageType.GetMessageType(), options);
+            JsonSerializer.Serialize(writer, value, value.MessageType.GetMessageType(), options);
         }
     }
 }

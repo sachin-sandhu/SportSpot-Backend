@@ -41,8 +41,4 @@
 	  <PackageReference Include="Swashbuckle.AspNetCore" Version="7.0.0" />
 	  <PackageReference Include="Swashbuckle.AspNetCore.Swagger" Version="7.0.0" />
   </ItemGroup>
-
-  <ItemGroup>
-    <Folder Include="V1\Session\Chat\Middleware\" />
-  </ItemGroup>
 </Project>

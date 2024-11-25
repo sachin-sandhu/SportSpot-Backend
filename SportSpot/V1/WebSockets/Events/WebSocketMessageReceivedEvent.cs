@@ -5,7 +5,7 @@ namespace SportSpot.V1.WebSockets.Events
 {
     public class WebSocketMessageReceivedEvent : IEvent
     {
-        public required AbstractWebSocketMessageDto WebSocketMessage { get; init; }
+        public required IWebSocketMessageDto WebSocketMessage { get; init; }
         public required AuthUserEntity Sender { get; init; }
     }
 }

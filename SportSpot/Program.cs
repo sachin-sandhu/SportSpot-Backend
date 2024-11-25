@@ -17,6 +17,8 @@ using SportSpot.V1.Media.BlurHash;
 using SportSpot.V1.Media.Repositories;
 using SportSpot.V1.Media.Services;
 using SportSpot.V1.Request;
+using SportSpot.V1.Session.Chat.Repositories;
+using SportSpot.V1.Session.Chat.Services;
 using SportSpot.V1.Session.Repositories;
 using SportSpot.V1.Session.Services;
 using SportSpot.V1.Storage;
@@ -153,6 +155,8 @@ builder.Services.AddTransient<ISessionService, SessionService>();
 builder.Services.AddSingleton<IConnectionService, ConnectionService>();
 builder.Services.AddScoped<IWebSocketService, WebSocketService>();
 
+builder.Services.AddScoped<IMessageRepository, MessageRepository>();
+builder.Services.AddScoped<IMessageService, MessageService>();
 
 builder.Services.RegisterEvents();
 
