@@ -67,7 +67,19 @@ namespace SportSpot.Events.Services
             _listener.Add(registeredListener);
         }
 
-        private RegisteredListener CreateRegisteredListenerFromListener(IListener listener)
+        public void RegisterScopedListener(Type listenerType)
+        {
+            if (_scopedListener.Contains(listenerType)) return;
+            _scopedListener.Add(listenerType);
+        }
+
+        public void UnRegisterListener(IListener listener) => _listener.RemoveAll(x => x.Listener == listener);
+        public void UnRegisterScopedListener(Type listenerType) => _scopedListener.Remove(listenerType);
+
+        public List<IListener> GetRegisteredListeners() => _listener.Select(x => x.Listener).ToList();
+        public List<Type> GetScopedRegisteredListeners() => [.. _scopedListener];
+
+        private static RegisteredListener CreateRegisteredListenerFromListener(IListener listener)
         {
             RegisteredListener registeredListener = new() { Listener = listener };
             listener.GetType().GetMethods().ToList().ForEach(method =>
@@ -87,26 +99,6 @@ namespace SportSpot.Events.Services
             });
             return registeredListener;
         }
-
-        public void UnRegisterListener(IListener listener) => _listener.RemoveAll(x => x.Listener == listener);
-
-        public void RegisterScopedListener(Type listenerType)
-        {
-            if (_scopedListener.Contains(listenerType)) return;
-            _scopedListener.Add(listenerType);
-        }
-
-        public void UnRegisterScopedListener(Type listenerType)
-        {
-            _scopedListener.Remove(listenerType);
-        }
-
-        public List<Type> GetScopedRegisteredListeners()
-        {
-            return _scopedListener;
-        }
-
-        public List<IListener> GetRegisteredListeners() => _listener.Select(x => x.Listener).ToList();
 
     }
 }
