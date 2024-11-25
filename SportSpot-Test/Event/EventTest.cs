@@ -1,4 +1,6 @@
-﻿using SportSpot.Events;
+﻿using Microsoft.Extensions.DependencyInjection;
+using NSubstitute;
+using SportSpot.Events;
 using SportSpot.Events.Services;
 using SportSpot_Test.Event.Listener;
 
@@ -7,12 +9,30 @@ namespace SportSpot_Test.Event
     [TestClass()]
     public class EventTest
     {
+
+        private IServiceProvider _serviceProvider = null!;
+
+        [TestInitialize]
+        public void OnInitialize()
+        {
+            _serviceProvider = Substitute.For<IServiceProvider>();
+
+            var serviceScope = Substitute.For<IServiceScope>();
+            serviceScope.ServiceProvider.Returns(_serviceProvider);
+
+            var serviceScopeFactory = Substitute.For<IServiceScopeFactory>();
+            serviceScopeFactory.CreateScope().Returns(serviceScope);
+
+            _serviceProvider.GetService(typeof(IServiceScopeFactory)).Returns(serviceScopeFactory);
+        }
+
+
         [TestMethod()]
         public async Task TestNormalEvent()
         {
             // Given: An instance of the EventService and TestEventListener
             // We register a simple TestEventListener to listen to events triggered by the EventService.
-            EventService eventService = new();
+            EventService eventService = new(_serviceProvider);
             TestEventListener eventListener = new();
             eventService.RegisterListener(eventListener);
 
@@ -31,7 +51,7 @@ namespace SportSpot_Test.Event
         {
             // Given: An EventService and a PrioEventListener that handles events by priority
             // We register a listener that handles events based on predefined priorities (HIGH, MEDIUM, LOW).
-            EventService eventService = new();
+            EventService eventService = new(_serviceProvider);
             PrioEventListener eventListener = new();
             eventService.RegisterListener(eventListener);
 
@@ -51,7 +71,7 @@ namespace SportSpot_Test.Event
         {
             // Given: An EventService and an AsyncEventListener for asynchronous event handling
             // We register an asynchronous event listener, which is designed to process events asynchronously.
-            EventService eventService = new();
+            EventService eventService = new(_serviceProvider);
             AsyncEventListener eventListener = new();
             eventService.RegisterListener(eventListener);
 
@@ -69,7 +89,7 @@ namespace SportSpot_Test.Event
         {
             // Given: An EventService and multiple listeners (AsyncEventListener, PrioEventListener, TestEventListener)
             // We register multiple listeners that handle the same event in different ways: one asynchronously, one by priority, and one simply.
-            EventService eventService = new();
+            EventService eventService = new(_serviceProvider);
             AsyncEventListener eventListener = new();
             PrioEventListener prioEventListener = new();
             TestEventListener testEventListener = new();
@@ -98,7 +118,7 @@ namespace SportSpot_Test.Event
         {
             // Given: An EventService and a TestEventListener for monitoring multiple event firings
             // We register a listener to track how many times an event is triggered and whether it correctly handles multiple events.
-            EventService eventService = new();
+            EventService eventService = new(_serviceProvider);
             TestEventListener eventListener = new();
             eventService.RegisterListener(eventListener);
 
@@ -118,7 +138,7 @@ namespace SportSpot_Test.Event
         {
             // Given: An EventService and multiple listeners (AsyncEventListener, PrioEventListener, TestEventListener)
             // We register multiple listeners that handle the same event in different ways: one asynchronously, one by priority, and one simply.
-            EventService eventService = new();
+            EventService eventService = new(_serviceProvider);
             AsyncEventListener eventListener = new();
             PrioEventListener prioEventListener = new();
             TestEventListener testEventListener = new();
