@@ -3,7 +3,7 @@ using SportSpot.V1.Session.Chat.Services;
 using SportSpot.V1.WebSockets.Enums;
 using SportSpot.V1.WebSockets.Events;
 
-namespace SportSpot.V1.Session.Chat.Events
+namespace SportSpot.V1.Session.Chat.Listener
 {
     public class MessageReceiveListener(IMessageService _messageService) : IListener
     {

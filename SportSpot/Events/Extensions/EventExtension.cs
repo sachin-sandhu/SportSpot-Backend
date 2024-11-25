@@ -1,6 +1,6 @@
 ﻿using SportSpot.Events.Services;
 using SportSpot.Listener;
-using SportSpot.V1.Session.Chat.Events;
+using SportSpot.V1.Session.Chat.Listener;
 
 namespace SportSpot.Events.Extensions
 {
