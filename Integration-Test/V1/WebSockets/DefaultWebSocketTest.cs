@@ -17,13 +17,16 @@ namespace Integration_Test.V1.WebSockets
         private readonly UserLib _userLib;
         private readonly CleanUpLib _cleanUpLib;
         private readonly SessionLib _sessionLib;
+        private readonly ChatLib _chatLib;
         private readonly RestEmulatorLib _emulatorLib;
+
 
         public DefaultWebSocketTest()
         {
             _userLib = new(baseUri);
             _cleanUpLib = new(baseUri);
             _sessionLib = new(baseUri);
+            _chatLib = new(baseUri);
             _emulatorLib = new(emulatorUri);
         }
 
@@ -56,6 +59,9 @@ namespace Integration_Test.V1.WebSockets
             requestMessage.Add("Content", "Test Message");
 
             await clientWebSocket.SendAsync(new ArraySegment<byte>(Encoding.UTF8.GetBytes(requestMessage.ToJsonString())), WebSocketMessageType.Text, true, CancellationToken.None);
+            await clientWebSocket.SendAsync(new ArraySegment<byte>(Encoding.UTF8.GetBytes(requestMessage.ToJsonString())), WebSocketMessageType.Text, true, CancellationToken.None);
+            await clientWebSocket.SendAsync(new ArraySegment<byte>(Encoding.UTF8.GetBytes(requestMessage.ToJsonString())), WebSocketMessageType.Text, true, CancellationToken.None);
+            await clientWebSocket.SendAsync(new ArraySegment<byte>(Encoding.UTF8.GetBytes(requestMessage.ToJsonString())), WebSocketMessageType.Text, true, CancellationToken.None);
 
             byte[] buffer = new byte[1024 * 4];
             WebSocketReceiveResult result = await clientWebSocket.ReceiveAsync(new ArraySegment<byte>(buffer), CancellationToken.None);
@@ -72,6 +78,19 @@ namespace Integration_Test.V1.WebSockets
             Assert.AreEqual(sessionId.ToString(), message["SessionId"].Value<string>());
             Assert.IsNotNull(message["CreatedAt"].Value<DateTime>());
             await clientWebSocket.CloseAsync(WebSocketCloseStatus.NormalClosure, "Close Test Connection", CancellationToken.None);
+
+            HttpResponseMessage messageGetResponse = await _chatLib.GetMessages(accessToken, sessionId, size: 10, page: 0);
+            messageGetResponse.EnsureSuccessStatusCode();
+
+            string rawResponseMessages = await messageGetResponse.Content.ReadAsStringAsync();
+            JsonArray messages = JsonSerializer.Deserialize<JsonArray>(rawResponseMessages);
+            Assert.AreEqual(4, messages.Count);
+
+            message = messages[0].AsObject();
+            Assert.AreEqual("Test Message", message["content"].Value<string>());
+            Assert.AreEqual(user["userId"].Value<string>(), message["creatorId"].Value<string>());
+            Assert.AreEqual(sessionId.ToString(), message["sessionId"].Value<string>());
+            Assert.IsNotNull(message["createdAt"].Value<DateTime>());
         }
     }
 }

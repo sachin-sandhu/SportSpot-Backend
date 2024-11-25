@@ -7,6 +7,7 @@ namespace SportSpot.V1.Session.Chat.Services
     public interface IMessageService
     {
         Task HandleMessage(MessageSendRequestDto requestDto, AuthUserEntity sender);
-        Task<List<MessageDto>> GetMessages(SessionEntity session);
+        Task<(List<MessageDto>, bool)> GetMessages(SessionEntity session, MessageSearchQueryDto searchQueryDto, AuthUserEntity authUserEntity);
+        Task DeleteAll();
     }
 }

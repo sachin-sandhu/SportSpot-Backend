@@ -1,4 +1,5 @@
-﻿using SportSpot.V1.Session.Chat.Entities;
+﻿using SportSpot.V1.Session.Chat.Dtos;
+using SportSpot.V1.Session.Chat.Entities;
 
 namespace SportSpot.V1.Session.Chat.Repositories
 {
@@ -6,9 +7,10 @@ namespace SportSpot.V1.Session.Chat.Repositories
     {
         Task CreateMessageAsync(MessageEntity message);
         Task<MessageEntity?> GetMessageAsync(Guid messageId);
-        Task<List<MessageEntity>> GetMessagesAsync(Guid sessionId);
+        Task<(List<MessageEntity>, bool)> GetMessagesAsync(Guid sessionId, MessageSearchQueryDto searchQueryDto);
         Task UpdateMessageAsync(MessageEntity message);
         Task DeleteMessageAsync(Guid messageId);
         Task DeleteMessagesFromSession(Guid sessionId);
+        Task DeleteAll();
     }
 }

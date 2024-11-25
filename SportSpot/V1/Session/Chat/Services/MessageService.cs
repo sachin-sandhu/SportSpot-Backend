@@ -1,4 +1,5 @@
-﻿using SportSpot.V1.Session.Chat.Dtos;
+﻿using SportSpot.V1.Exceptions.Session;
+using SportSpot.V1.Session.Chat.Dtos;
 using SportSpot.V1.Session.Chat.Entities;
 using SportSpot.V1.Session.Chat.Mapper;
 using SportSpot.V1.Session.Chat.Repositories;
@@ -11,11 +12,20 @@ namespace SportSpot.V1.Session.Chat.Services
 {
     public class MessageService(IWebSocketService _webSocketService, ISessionService _sessionService, IMessageRepository _repository) : IMessageService
     {
-        public async Task<List<MessageDto>> GetMessages(SessionEntity session)
+        public async Task DeleteAll()
         {
-            List<MessageEntity> messages = await _repository.GetMessagesAsync(session.Id);
+            await _repository.DeleteAll();
+        }
+
+        public async Task<(List<MessageDto>, bool)> GetMessages(SessionEntity session, MessageSearchQueryDto searchQueryDto, AuthUserEntity authUserEntity)
+        {
+            if (!_sessionService.IsMember(session, authUserEntity))
+                throw new NotImplementedException();
+            if (searchQueryDto.Page < 0 || searchQueryDto.Size <= 0 || searchQueryDto.Size > 1000)
+                throw new SessionInvalidPageException();
+            (List<MessageEntity> messages, bool hasMoreEntries) = await _repository.GetMessagesAsync(session.Id, searchQueryDto);
             List<MessageDto> messageDtos = messages.Select(x => x.ConvertToDto()).ToList();
-            return messageDtos;
+            return (messageDtos, hasMoreEntries);
         }
 
         public async Task HandleMessage(MessageSendRequestDto requestDto, AuthUserEntity sender)

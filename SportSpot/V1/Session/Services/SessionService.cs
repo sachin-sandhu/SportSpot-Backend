@@ -73,7 +73,7 @@ namespace SportSpot.V1.Session.Services
         public async Task<SessionDto> GetDto(Guid sessionId, AuthUserEntity user)
         {
             SessionEntity session = await Get(sessionId);
-            return session.ToDto(IsMember(user, session));
+            return session.ToDto(IsMember(session, user));
         }
 
         public async Task Join(AuthUserEntity user, SessionEntity session)
@@ -152,6 +152,6 @@ namespace SportSpot.V1.Session.Services
             return (result, hasMoreEntries);
         }
 
-        private static bool IsMember(AuthUserEntity authUserEntity, SessionEntity session) => session.CreatorId == authUserEntity.Id || session.Participants.Contains(authUserEntity.Id);
+        public bool IsMember(SessionEntity session, AuthUserEntity user) => session.CreatorId == user.Id || session.Participants.Contains(user.Id);
     }
 }
