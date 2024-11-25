@@ -20,7 +20,7 @@ namespace SportSpot.V1.Session.Chat.Services
         public async Task<(List<MessageDto>, bool)> GetMessages(SessionEntity session, MessageSearchQueryDto searchQueryDto, AuthUserEntity authUserEntity)
         {
             if (!_sessionService.IsMember(session, authUserEntity))
-                throw new NotImplementedException();
+                throw new SessionNotJoinedException();
             if (searchQueryDto.Page < 0 || searchQueryDto.Size <= 0 || searchQueryDto.Size > 1000)
                 throw new SessionInvalidPageException();
             (List<MessageEntity> messages, bool hasMoreEntries) = await _repository.GetMessagesAsync(session.Id, searchQueryDto);
