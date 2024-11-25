@@ -8,6 +8,7 @@ using SportSpot.V1.WebSockets.Dtos;
 using SportSpot.V1.WebSockets.Events;
 using System.Net.WebSockets;
 using System.Text;
+using System.Text.Json.Serialization;
 
 namespace SportSpot.V1.WebSockets.Services
 {
@@ -16,7 +17,7 @@ namespace SportSpot.V1.WebSockets.Services
 
         private readonly static JsonSerializerOptions _options = new()
         {
-            Converters = { new WebSocketMessageConverter() }
+            Converters = { new WebSocketMessageConverter(), new JsonStringEnumConverter() }
         };
 
         public async Task<bool> OnConnect(WebSocket webSocket, string authorization)
@@ -42,6 +43,8 @@ namespace SportSpot.V1.WebSockets.Services
         public async Task OnReceive(WebSocket webSocket, string payload)
         {
             IWebSocketMessageDto message = JsonSerializer.Deserialize<IWebSocketMessageDto>(payload, _options) ?? throw new InvalidWebSocketMessageException();
+            if (message.IsToSend())
+                throw new UnsupportActionWebSocketMessageException();
             Guid userId = _connectionService.GetUser(webSocket) ?? throw new UnauthorizedException();
             AuthUserEntity user = await _userService.GetUser(userId);
 
@@ -60,6 +63,8 @@ namespace SportSpot.V1.WebSockets.Services
 
         public async Task<bool> SendMessage(Guid userId, IWebSocketMessageDto message)
         {
+            if (!message.IsToSend())
+                throw new UnsupportActionWebSocketMessageException();
             WebSocket? webSocket = _connectionService.GetWebSocket(userId);
             if (webSocket == null)
                 return false;

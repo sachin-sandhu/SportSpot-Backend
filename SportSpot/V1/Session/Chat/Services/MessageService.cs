@@ -26,7 +26,7 @@ namespace SportSpot.V1.Session.Chat.Services
                 Id = Guid.CreateVersion7(),
                 SessionId = session.Id,
                 CreatorId = sender.Id,
-                Message = requestDto.Message,
+                Content = requestDto.Content,
                 ParentMessageId = requestDto.ParentMessageId,
                 CreatedAt = DateTime.Now
             };
@@ -37,7 +37,7 @@ namespace SportSpot.V1.Session.Chat.Services
             userToSend.Add(session.CreatorId);
 
             MessageDto messageDto = messageEntity.ConvertToDto();
-            MessageSendResponseDto responseDto = new MessageSendResponseDto
+            MessageSendResponseDto responseDto = new()
             {
                 Message = messageDto
             };

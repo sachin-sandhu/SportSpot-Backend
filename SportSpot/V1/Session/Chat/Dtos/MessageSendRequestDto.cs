@@ -8,7 +8,9 @@ namespace SportSpot.V1.Session.Chat.Dtos
         public WebSocketMessageType MessageType => WebSocketMessageType.MessageSendRequest;
 
         public required Guid SessionId { get; set; }
-        public required string Message { get; set; }
+        public required string Content { get; set; }
         public Guid? ParentMessageId { get; set; }
+
+        public bool IsToSend() => false;
     }
 }

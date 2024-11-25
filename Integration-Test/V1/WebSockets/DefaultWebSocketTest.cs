@@ -51,17 +51,27 @@ namespace Integration_Test.V1.WebSockets
 
             JsonObject requestMessage = [];
 
-            requestMessage.Add("Type", "MessageSendRequest");
+            requestMessage.Add("MessageType", "MessageSendRequest");
             requestMessage.Add("SessionId", sessionId);
-            requestMessage.Add("Message", "Test Message");
+            requestMessage.Add("Content", "Test Message");
 
             await clientWebSocket.SendAsync(new ArraySegment<byte>(Encoding.UTF8.GetBytes(requestMessage.ToJsonString())), WebSocketMessageType.Text, true, CancellationToken.None);
 
             byte[] buffer = new byte[1024 * 4];
-            await clientWebSocket.ReceiveAsync(new ArraySegment<byte>(buffer), CancellationToken.None);
+            WebSocketReceiveResult result = await clientWebSocket.ReceiveAsync(new ArraySegment<byte>(buffer), CancellationToken.None);
 
-            string result = Encoding.UTF8.GetString(buffer);
-            var x = 5;
+            byte[] slicedBuffer = buffer[..result.Count];
+
+            string rawResponse = Encoding.UTF8.GetString(slicedBuffer);
+            JsonObject responseMessage = JsonSerializer.Deserialize<JsonObject>(rawResponse);
+
+            Assert.AreEqual("MessageSendResponse", responseMessage["MessageType"].Value<string>());
+            JsonObject message = responseMessage["Message"].AsObject();
+            Assert.AreEqual("Test Message", message["Content"].Value<string>());
+            Assert.AreEqual(user["userId"].Value<string>(), message["CreatorId"].Value<string>());
+            Assert.AreEqual(sessionId.ToString(), message["SessionId"].Value<string>());
+            Assert.IsNotNull(message["CreatedAt"].Value<DateTime>());
+            await clientWebSocket.CloseAsync(WebSocketCloseStatus.NormalClosure, "Close Test Connection", CancellationToken.None);
         }
     }
 }

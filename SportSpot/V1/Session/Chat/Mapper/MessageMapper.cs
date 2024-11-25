@@ -12,7 +12,7 @@ namespace SportSpot.V1.Session.Chat.Mapper
                 Id = entity.Id,
                 SessionId = entity.SessionId,
                 CreatorId = entity.CreatorId,
-                Message = entity.Message,
+                Content = entity.Content,
                 CreatedAt = entity.CreatedAt,
                 ParentMessageId = entity.ParentMessageId
             };

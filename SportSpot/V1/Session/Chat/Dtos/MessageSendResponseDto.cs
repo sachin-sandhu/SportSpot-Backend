@@ -8,5 +8,7 @@ namespace SportSpot.V1.Session.Chat.Dtos
         public WebSocketMessageType MessageType => WebSocketMessageType.MessageSendResponse;
 
         public required MessageDto Message { get; set; }
+
+        public bool IsToSend() => true;
     }
 }
