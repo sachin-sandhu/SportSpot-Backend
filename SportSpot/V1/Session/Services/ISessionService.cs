@@ -15,5 +15,6 @@ namespace SportSpot.V1.Session.Services
         Task<SessionDto> GetDto(Guid sessionId, AuthUserEntity user);
         Task<SessionEntity> Get(Guid sessionId);
         Task<(List<SessionDto>, bool)> GetSessionsInRange(SessionSearchQueryDto requestDto, AuthUserEntity sender);
+        bool IsMember(SessionEntity session, AuthUserEntity user);
     }
 }

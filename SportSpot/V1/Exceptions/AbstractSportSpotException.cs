@@ -1,6 +1,4 @@
-﻿using System.Text.Json;
-
-namespace SportSpot.V1.Exceptions
+﻿namespace SportSpot.V1.Exceptions
 {
     public abstract class AbstractSportSpotException : Exception
     {
@@ -23,6 +21,7 @@ namespace SportSpot.V1.Exceptions
 
         public async virtual Task WriteToResponse(HttpResponse response)
         {
+            if (response.HasStarted) return;
             response.StatusCode = StatusCode;
             response.ContentType = "applicatzion/json";
             await response.WriteAsync(JsonSerializer.Serialize(GetErrors()));

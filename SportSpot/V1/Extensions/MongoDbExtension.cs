@@ -2,6 +2,7 @@
 using MongoDB.Driver;
 using SportSpot.V1.Database;
 using SportSpot.V1.Media.Entities;
+using SportSpot.V1.Session.Chat.Entities;
 using SportSpot.V1.Session.Entities;
 
 namespace SportSpot.V1.Extensions
@@ -23,6 +24,7 @@ namespace SportSpot.V1.Extensions
             // Create the collections
             IMongoCollection<MediaEntity> mediaCollection = db.GetCollection<MediaEntity>("Media");
             IMongoCollection<SessionEntity> sessionCollection = db.GetCollection<SessionEntity>("Session");
+            IMongoCollection<MessageEntity> messageCollection = db.GetCollection<MessageEntity>("Message");
 
             // Add custom Indexes
             CreateIndexModel<SessionEntity> geoIndex = new(Builders<SessionEntity>.IndexKeys.Geo2DSphere(x => x.Location.Coordinates));
@@ -31,6 +33,7 @@ namespace SportSpot.V1.Extensions
             // Register the collections
             services.AddSingleton(mediaCollection);
             services.AddSingleton(sessionCollection);
+            services.AddSingleton(messageCollection);
         }
     }
 }

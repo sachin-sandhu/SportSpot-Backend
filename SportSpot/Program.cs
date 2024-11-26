@@ -17,6 +17,8 @@ using SportSpot.V1.Media.BlurHash;
 using SportSpot.V1.Media.Repositories;
 using SportSpot.V1.Media.Services;
 using SportSpot.V1.Request;
+using SportSpot.V1.Session.Chat.Repositories;
+using SportSpot.V1.Session.Chat.Services;
 using SportSpot.V1.Session.Repositories;
 using SportSpot.V1.Session.Services;
 using SportSpot.V1.Storage;
@@ -26,6 +28,8 @@ using SportSpot.V1.User.Dtos.Auth.OAuth;
 using SportSpot.V1.User.Entities;
 using SportSpot.V1.User.OAuth;
 using SportSpot.V1.User.Services;
+using SportSpot.V1.WebSockets.Middleware;
+using SportSpot.V1.WebSockets.Services;
 using StackExchange.Redis;
 using System.Security.Cryptography.X509Certificates;
 using System.Text;
@@ -117,7 +121,20 @@ builder.Services.AddSingleton(new LocationConfigDto
     AzureMapsSubscriptionKey = builder.Configuration.GetValue<string>("AZURE_MAPS_SUBSCRIPTION_KEY") ?? throw new InvalidOperationException("AZURE_MAPS_SUBSCRIPTION_KEY is not set!")
 });
 
+TokenValidationParameters tokenValidationParameters = new()
+{
+    ValidateIssuer = true,
+    ValidateAudience = true,
+    ValidateLifetime = true,
+    ValidateIssuerSigningKey = true,
+    ValidAudience = jwtConfiguration.ValidAudience,
+    ValidIssuer = jwtConfiguration.ValidIsUser,
+    IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(jwtConfiguration.Secret))
+};
+
 builder.Services.AddHttpClient();
+builder.Services.AddSingleton(tokenValidationParameters);
+
 builder.Services.AddSingleton<IEventService, EventService>();
 builder.Services.AddSingleton<IRequest, Request>();
 
@@ -135,6 +152,12 @@ builder.Services.AddTransient<IUserService, UserService>();
 builder.Services.AddTransient<ISessionRepository, SessionRepository>();
 builder.Services.AddTransient<ISessionService, SessionService>();
 
+builder.Services.AddSingleton<IConnectionService, ConnectionService>();
+builder.Services.AddScoped<IWebSocketService, WebSocketService>();
+
+builder.Services.AddScoped<IMessageRepository, MessageRepository>();
+builder.Services.AddScoped<IMessageService, MessageService>();
+
 builder.Services.RegisterEvents();
 
 builder.Services.AddAuthentication(options =>
@@ -145,16 +168,7 @@ builder.Services.AddAuthentication(options =>
 {
     options.SaveToken = true;
     options.RequireHttpsMetadata = false;
-    options.TokenValidationParameters = new TokenValidationParameters()
-    {
-        ValidateIssuer = true,
-        ValidateAudience = true,
-        ValidateLifetime = true,
-        ValidateIssuerSigningKey = true,
-        ValidAudience = jwtConfiguration.ValidAudience,
-        ValidIssuer = jwtConfiguration.ValidIsUser,
-        IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(jwtConfiguration.Secret))
-    };
+    options.TokenValidationParameters = tokenValidationParameters;
 });
 
 if (!builder.Environment.IsDevelopment())
@@ -189,10 +203,18 @@ if (!app.Environment.IsDevelopment())
     app.UseHttpsRedirection();
 }
 
+// WebSockets
+WebSocketOptions webSocketOptions = new()
+{
+    KeepAliveInterval = TimeSpan.FromSeconds(120)
+};
+
 app.UseAuthentication();
 app.UseAuthorization();
 app.MapControllers();
 
+app.UseWebSockets(webSocketOptions);
+app.UseMiddleware<CustomWebSocketMiddleware>();
 app.UseMiddleware<ExceptionHandlingMiddleware>();
 
 await app.RunAsync();
