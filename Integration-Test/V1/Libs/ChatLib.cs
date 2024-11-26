@@ -15,13 +15,14 @@ namespace Integration_Test.V1.Libs
             };
         }
 
-        public async Task<HttpResponseMessage> GetMessages(string accessToken, Guid sessionId, int size = 10, int page = 0, Guid? senderId = null, string content = null, DateTime? startTime = null, DateTime? endTime = null)
+        public async Task<HttpResponseMessage> GetMessages(string accessToken, Guid sessionId, int size = 10, int page = 0, Guid? senderId = null, string content = null, DateTime? startTime = null, DateTime? endTime = null, bool ascending = true)
         {
             UriBuilder uriBuilder = new($"{_client.BaseAddress}/api/v1/Session/{sessionId}/Chat/messages");
             var query = HttpUtility.ParseQueryString(uriBuilder.Query);
 
             query.Add("page", page.ToString());
             query.Add("size", size.ToString());
+            query.Add("ascending", ascending.ToString());
             if (senderId.HasValue)
                 query.Add("senderId", senderId.ToString());
             if (!string.IsNullOrEmpty(content))

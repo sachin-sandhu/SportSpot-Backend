@@ -28,7 +28,8 @@ namespace SportSpot.V1.Session.Chat.Repositories
             FindOptions<MessageEntity> options = new()
             {
                 Limit = searchQueryDto.Size,
-                Skip = searchQueryDto.Page * searchQueryDto.Size
+                Skip = searchQueryDto.Page * searchQueryDto.Size,
+                Sort = searchQueryDto.Ascending ? Builders<MessageEntity>.Sort.Ascending(x => x.CreatedAt) : Builders<MessageEntity>.Sort.Descending(x => x.CreatedAt)
             };
 
             FilterDefinitionBuilder<MessageEntity> filterBuilder = Builders<MessageEntity>.Filter;

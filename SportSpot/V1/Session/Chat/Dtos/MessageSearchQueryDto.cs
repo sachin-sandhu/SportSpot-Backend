@@ -13,5 +13,7 @@ namespace SportSpot.V1.Session.Chat.Dtos
         public string? Content { get; init; }
         public DateTime? StartTime { get; init; }
         public DateTime? EndTime { get; init; }
+        [DefaultValue(true)]
+        public bool Ascending { get; init; } = true;
     }
 }
