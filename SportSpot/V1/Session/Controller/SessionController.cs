@@ -30,6 +30,17 @@ namespace SportSpot.V1.Session.Controller
         }
 
         [Authorize]
+        [HttpGet("")]
+        [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(List<SessionDto>))]
+        [ProducesResponseType(StatusCodes.Status400BadRequest, Type = typeof(List<ErrorResult>))]
+        public async Task<IActionResult> GetSessions([FromQuery] SessionUserSearchQueryDto requestDto)
+        {
+            (List<SessionDto> sessions, bool hasMoreEntries) = await _sessionService.GetSessionsFromUser(await User.GetAuthUser(_userManager), requestDto);
+            Response.Headers.Append("X-Has-More-Entries", hasMoreEntries.ToString());
+            return Ok(sessions);
+        }
+
+        [Authorize]
         [HttpGet("{sessionId}")]
         [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(SessionDto))]
         [ProducesResponseType(StatusCodes.Status400BadRequest, Type = typeof(List<ErrorResult>))]

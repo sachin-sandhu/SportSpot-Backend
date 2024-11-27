@@ -162,5 +162,14 @@ namespace SportSpot.V1.Session.Services
                 await Delete(user, sessionEntity);
             }
         }
+
+        public async Task<(List<SessionDto>, bool)> GetSessionsFromUser(AuthUserEntity user, SessionUserSearchQueryDto requestDto)
+        {
+            if (requestDto.Page < 0 || requestDto.Size <= 0 || requestDto.Size > 1000)
+                throw new SessionInvalidPageException();
+            (List<SessionEntity> sessions, bool hasMoreEntries) = await _sessionRepository.GetSessionsFromUser(user, requestDto);
+            List<SessionDto> result = sessions.Select(x => x.ToDto(false)).ToList();
+            return (result, hasMoreEntries);
+        }
     }
 }
