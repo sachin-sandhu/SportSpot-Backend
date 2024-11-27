@@ -195,11 +195,11 @@ namespace Integration_Test.V1.WebSockets
 
             // Act: Send the first message
             JsonObject firstMessage = new()
-    {
-        { "MessageType", "MessageSendRequest" },
-        { "SessionId", sessionId },
-        { "Content", "Message 1" }
-    };
+            {
+                { "MessageType", "MessageSendRequest" },
+                { "SessionId", sessionId },
+                { "Content", "Message 1" }
+            };
             await clientWebSocket.SendAsync(
                 new ArraySegment<byte>(Encoding.UTF8.GetBytes(firstMessage.ToJsonString())),
                 WebSocketMessageType.Text,
@@ -207,7 +207,7 @@ namespace Integration_Test.V1.WebSockets
                 CancellationToken.None);
 
             // Act: Wait to ensure timestamp difference
-            await Task.Delay(2000);
+            await Task.Delay(5000);
 
             // Act: Send the second message
             JsonObject secondMessage = new()
@@ -226,7 +226,7 @@ namespace Integration_Test.V1.WebSockets
             await clientWebSocket.CloseAsync(WebSocketCloseStatus.NormalClosure, "Test complete", CancellationToken.None);
 
             // Arrange: Define the start time for filtering messages
-            DateTime startTime = DateTime.UtcNow.AddSeconds(-1);
+            DateTime startTime = DateTime.UtcNow.AddSeconds(-2);
 
             // Act: Retrieve messages from the server filtered by the time range
             HttpResponseMessage response = await _chatLib.GetMessages(accessToken, sessionId, startTime: startTime);

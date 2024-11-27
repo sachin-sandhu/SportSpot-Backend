@@ -1,5 +1,6 @@
 ﻿using SportSpot.V1.Session.Dtos;
 using SportSpot.V1.Session.Entities;
+using SportSpot.V1.User.Entities;
 
 namespace SportSpot.V1.Session.Repositories
 {
@@ -11,5 +12,6 @@ namespace SportSpot.V1.Session.Repositories
         public Task UpdateSession(SessionEntity sessionEntity);
         public Task<List<SessionEntity>> GetAll();
         public Task<(List<SessionEntity>, bool)> GetSessionsInRange(SessionSearchQueryDto requestDto, Guid userID);
+        Task<List<SessionEntity>> GetSessionsFromUser(AuthUserEntity user);
     }
 }

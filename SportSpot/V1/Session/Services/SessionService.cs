@@ -153,5 +153,14 @@ namespace SportSpot.V1.Session.Services
         }
 
         public bool IsMember(SessionEntity session, AuthUserEntity user) => session.CreatorId == user.Id || session.Participants.Contains(user.Id);
+
+        public async Task DeleteAll(AuthUserEntity user)
+        {
+            List<SessionEntity> sessions = await _sessionRepository.GetSessionsFromUser(user);
+            foreach (SessionEntity sessionEntity in sessions)
+            {
+                await Delete(user, sessionEntity);
+            }
+        }
     }
 }

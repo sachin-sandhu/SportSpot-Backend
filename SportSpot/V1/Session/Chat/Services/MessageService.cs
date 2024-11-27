@@ -17,6 +17,11 @@ namespace SportSpot.V1.Session.Chat.Services
             await _repository.DeleteAll();
         }
 
+        public async Task DeleteAll(SessionEntity session)
+        {
+            await _repository.DeleteMessagesFromSession(session.Id);
+        }
+
         public async Task<(List<MessageDto>, bool)> GetMessages(SessionEntity session, MessageSearchQueryDto searchQueryDto, AuthUserEntity authUserEntity)
         {
             if (!_sessionService.IsMember(session, authUserEntity))
