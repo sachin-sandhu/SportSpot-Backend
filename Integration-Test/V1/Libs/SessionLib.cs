@@ -1,5 +1,6 @@
 ﻿using Integration_Test.Extensions;
 using Integration_Test.V1.Exceptions;
+using Microsoft.VisualStudio.TestPlatform.ObjectModel.DataCollection;
 using System.Net;
 using System.Net.Http.Headers;
 using System.Text;
@@ -132,6 +133,27 @@ namespace Integration_Test.V1.Libs
             if (response.Headers.TryGetValues("X-Has-More-Entries", out IEnumerable<string> values))
                 hasMoreEntries = bool.Parse(values.First());
             return (sessions, hasMoreEntries);
+        }
+
+        public async Task<JsonArray> GetSesssionFromUser(string accessToken, bool withExpired = false, int page = 0, int size = 10)
+        {
+            UriBuilder uriBuilder = new($"{_client.BaseAddress}/api/v1/session");
+            var query = HttpUtility.ParseQueryString(uriBuilder.Query);
+
+            query.Add("withExpired", withExpired.ToString());
+            query.Add("page", page.ToString());
+            query.Add("size", size.ToString());
+
+            uriBuilder.Query = query.ToString();
+            string uri = uriBuilder.ToString()[(_client.BaseAddress.ToString().Length)..];
+            HttpRequestMessage requestMessage = new(HttpMethod.Get, uri);
+            requestMessage.Headers.Authorization = new AuthenticationHeaderValue("Bearer", accessToken);
+            HttpResponseMessage response = await _client.SendAsync(requestMessage);
+            if (response.StatusCode == HttpStatusCode.NotFound)
+                throw new NotFoundException();
+            response.EnsureSuccessStatusCode();
+            string responseString = await response.Content.ReadAsStringAsync();
+            return JsonSerializer.Deserialize<JsonArray>(responseString);
         }
 
         public static void ValidateDefaultSession(JsonObject session, Guid creatorId)

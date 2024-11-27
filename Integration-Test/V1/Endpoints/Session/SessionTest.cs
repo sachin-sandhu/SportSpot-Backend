@@ -487,5 +487,24 @@ namespace Integration_Test.V1.Endpoints.Session
             Assert.IsNotNull(getCreateUserResponse["participants"]);
         }
 
+        [TestMethod]
+        public async Task TestGetSessionsFromUser()
+        {
+            // Arrange
+            await _emulatorLib.SetMode(ModeType.ReverseLocation, true, LocationLib.GetDefaultReverseResponse().ToJsonString());
+
+            JsonObject createUser = await _userLib.CreateDefaultUser();
+            string createUserToken = createUser["accessToken"].Value<string>();
+
+            // Act & Assert
+            JsonArray sessions = await _sessionLib.GetSesssionFromUser(createUserToken);
+            Assert.AreEqual(0, sessions.Count);
+
+            // Act & Assert
+            await _sessionLib.CreateDefaultSession(createUserToken);
+            sessions = await _sessionLib.GetSesssionFromUser(createUserToken);
+            Assert.AreEqual(1, sessions.Count);
+        }
+
     }
 }

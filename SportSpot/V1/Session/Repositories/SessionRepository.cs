@@ -78,5 +78,30 @@ namespace SportSpot.V1.Session.Repositories
             List<SessionEntity> result = await cursor.ToListAsync();
             return result;
         }
+
+        public async Task<(List<SessionEntity>, bool)> GetSessionsFromUser(AuthUserEntity user, SessionUserSearchQueryDto requestDto)
+        {
+            FilterDefinitionBuilder<SessionEntity> filterBuilder = Builders<SessionEntity>.Filter;
+            FindOptions<SessionEntity> options = new()
+            {
+                Skip = requestDto.Page * requestDto.Size,
+                Limit = requestDto.Size
+            };
+            List<FilterDefinition<SessionEntity>> filter = [];
+            filter.Add(filterBuilder.Eq(x => x.CreatorId, user.Id));
+            
+            if(!requestDto.WithExpired)
+                filter.Add(filterBuilder.Gt(x => x.Date, DateTime.Now));
+
+            FilterDefinition<SessionEntity> finalFilter = filterBuilder.And(filter);
+            IAsyncCursor<SessionEntity> cursor = await _collection.FindAsync(finalFilter, options);
+            List<SessionEntity> result = await cursor.ToListAsync();
+            if(result.Count < requestDto.Size)
+                return (result, false);
+            
+            long fullResultCount = await _collection.CountDocumentsAsync(finalFilter);
+            bool hasMoreEntries = fullResultCount > (requestDto.Size + (requestDto.Size * requestDto.Page));
+            return (result, hasMoreEntries);
+        }
     }
 }
