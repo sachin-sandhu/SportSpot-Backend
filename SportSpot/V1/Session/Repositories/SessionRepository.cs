@@ -3,6 +3,7 @@ using MongoDB.Bson;
 using MongoDB.Driver;
 using SportSpot.V1.Session.Dtos;
 using SportSpot.V1.Session.Entities;
+using SportSpot.V1.User.Entities;
 
 namespace SportSpot.V1.Session.Repositories
 {
@@ -69,6 +70,13 @@ namespace SportSpot.V1.Session.Repositories
             bool hasMoreEntries = fullResultCount > (requestDto.Size + (requestDto.Size * requestDto.Page));
 
             return (result, hasMoreEntries);
+        }
+
+        public async Task<List<SessionEntity>> GetSessionsFromUser(AuthUserEntity user)
+        {
+            IAsyncCursor<SessionEntity> cursor = await _collection.FindAsync(x => x.CreatorId == user.Id);
+            List<SessionEntity> result = await cursor.ToListAsync();
+            return result;
         }
     }
 }
