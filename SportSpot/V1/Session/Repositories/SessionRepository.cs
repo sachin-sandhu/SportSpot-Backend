@@ -85,7 +85,8 @@ namespace SportSpot.V1.Session.Repositories
             FindOptions<SessionEntity> options = new()
             {
                 Skip = requestDto.Page * requestDto.Size,
-                Limit = requestDto.Size
+                Limit = requestDto.Size,
+                Sort = requestDto.Ascending ? Builders<SessionEntity>.Sort.Ascending(x => x.Date) : Builders<SessionEntity>.Sort.Descending(x => x.Date)
             };
             List<FilterDefinition<SessionEntity>> filter = [];
             filter.Add(filterBuilder.Eq(x => x.CreatorId, user.Id));
