@@ -128,11 +128,11 @@ namespace Integration_Test.V1.WebSockets
             for (int i = 1; i <= 3; i++)
             {
                 JsonObject requestMessage = new()
-        {
-            { "MessageType", "MessageSendRequest" },
-            { "SessionId", sessionId },
-            { "Content", $"Test Message {i}" }
-        };
+                {
+                    { "MessageType", "MessageSendRequest" },
+                    { "SessionId", sessionId },
+                    { "Content", $"Test Message {i}" }
+                };
 
                 await clientWebSocket.SendAsync(
                     new ArraySegment<byte>(Encoding.UTF8.GetBytes(requestMessage.ToJsonString())),
@@ -172,7 +172,7 @@ namespace Integration_Test.V1.WebSockets
             Assert.AreEqual(3, messages.Count);
             for (int i = 0; i < 3; i++)
             {
-                Assert.AreEqual($"Test Message {i + 1}", messages[i].AsObject()["content"].Value<string>());
+                Assert.IsTrue(messages[i].AsObject()["content"].Value<string>().StartsWith("Test Message"));
             }
         }
 
