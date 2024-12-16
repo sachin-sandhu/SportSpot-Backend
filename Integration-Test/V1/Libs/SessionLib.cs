@@ -51,7 +51,7 @@ namespace Integration_Test.V1.Libs
             string description = "Session Description";
             double latitude = 51.924470285085526;
             double longitude = 7.846992772627526;
-            dateTime ??= DateTime.Now.AddDays(1);
+            dateTime ??= DateTime.UtcNow.AddDays(1);
             int minParticipants = 5;
             int maxParticipants = 10;
             List<string> tags = ["tag1", "tag2"];

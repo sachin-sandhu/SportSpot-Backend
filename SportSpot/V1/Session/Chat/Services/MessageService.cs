@@ -43,7 +43,7 @@ namespace SportSpot.V1.Session.Chat.Services
                 CreatorId = sender.Id,
                 Content = requestDto.Content,
                 ParentMessageId = requestDto.ParentMessageId,
-                CreatedAt = DateTime.Now
+                CreatedAt = DateTime.UtcNow
             };
             await _repository.CreateMessageAsync(messageEntity);
 

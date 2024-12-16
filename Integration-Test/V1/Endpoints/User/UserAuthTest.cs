@@ -609,9 +609,9 @@ namespace Integration_Test.V1.Endpoints.User
             Assert.IsNotNull(authToken, "Authentication token should not be null.");
             Assert.IsNotNull(authToken["userId"].Value<Guid>());
             Assert.IsFalse(string.IsNullOrEmpty(authToken["accessToken"].Value<string>()), "Access token should not be empty or null.");
-            Assert.IsTrue(authToken["accessExpire"].Value<DateTime>() > DateTime.Now, "Access token should expire in the future.");
+            Assert.IsTrue(authToken["accessExpire"].Value<DateTime>() > DateTime.UtcNow, "Access token should expire in the future.");
             Assert.IsFalse(string.IsNullOrEmpty(authToken["refreshToken"].Value<string>()), "Refresh token should not be empty or null.");
-            Assert.IsTrue(authToken["refreshExpire"].Value<DateTime>() > DateTime.Now, "Refresh token should expire in the future.");
+            Assert.IsTrue(authToken["refreshExpire"].Value<DateTime>() > DateTime.UtcNow, "Refresh token should expire in the future.");
 
             await _userLib.GetUserById(authToken["userId"].Value<Guid>(), authToken["accessToken"].Value<string>());
         }

@@ -16,7 +16,7 @@ namespace SportSpot.V1.User.Services
         {
             SymmetricSecurityKey secretKey = new(Encoding.UTF8.GetBytes(_configuration.Secret));
             SigningCredentials signinCredentials = new(secretKey, SecurityAlgorithms.HmacSha256);
-            DateTime expire = DateTime.Now.AddMinutes(_configuration.Duration.TotalMinutes);
+            DateTime expire = DateTime.UtcNow.AddMinutes(_configuration.Duration.TotalMinutes);
 
             JwtSecurityToken tokeOptions = new(
                 issuer: _configuration.ValidIsUser,
