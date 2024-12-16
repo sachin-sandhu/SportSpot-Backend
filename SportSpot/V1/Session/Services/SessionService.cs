@@ -17,7 +17,7 @@ namespace SportSpot.V1.Session.Services
     {
         public async Task<SessionDto> CreateSession(SessionCreateRequestDto createRequestDto, AuthUserEntity user)
         {
-            if (DateTime.Now >= createRequestDto.Date)
+            if (DateTime.UtcNow >= createRequestDto.Date)
                 throw new SessionInvalidDataException();
 
             if (createRequestDto.MinParticipants < 0 || createRequestDto.MaxParticipants < 0)
@@ -49,7 +49,7 @@ namespace SportSpot.V1.Session.Services
                 Description = createRequestDto.Description,
                 Date = createRequestDto.Date,
                 CreatorId = user.Id,
-                CreatedAt = DateTime.Now,
+                CreatedAt = DateTime.UtcNow,
                 MinParticipants = createRequestDto.MinParticipants,
                 MaxParticipants = createRequestDto.MaxParticipants,
                 Location = new SessionLocationEntity
@@ -87,7 +87,7 @@ namespace SportSpot.V1.Session.Services
             if (session.Participants.Count + 1 >= session.MaxParticipants)
                 throw new SessionFullException();
 
-            if (DateTime.Now >= session.Date)
+            if (DateTime.UtcNow >= session.Date)
                 throw new SessionExpiredException();
 
             session.Participants.Add(user.Id);

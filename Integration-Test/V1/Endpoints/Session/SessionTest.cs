@@ -44,7 +44,7 @@ namespace Integration_Test.V1.Endpoints.Session
             string description = "Session Description";
             double latitude = 51.924470285085526;
             double longitude = 7.846992772627526;
-            DateTime date = DateTime.Now.AddDays(1);
+            DateTime date = DateTime.UtcNow.AddDays(1);
             int minParticipants = 5;
             int maxParticipants = 10;
             List<string> tags = ["tag1", "tag2"];
@@ -93,7 +93,7 @@ namespace Integration_Test.V1.Endpoints.Session
             string description = "Session Description";
             double latitude = 51.924470285085526;
             double longitude = 7.846992772627526;
-            DateTime date = DateTime.Now.AddDays(1);
+            DateTime date = DateTime.UtcNow.AddDays(1);
             int minParticipants = 5;
             int maxParticipants = 10;
             List<string> tags = ["tag1", "tag2"];
@@ -125,7 +125,7 @@ namespace Integration_Test.V1.Endpoints.Session
             string description = string.Join(' ', Enumerable.Range(0, 1000).Select(x => "x")); //Too long
             double latitude = 51.924470285085526;
             double longitude = 7.846992772627526;
-            DateTime date = DateTime.Now.AddDays(1);
+            DateTime date = DateTime.UtcNow.AddDays(1);
             int minParticipants = 5;
             int maxParticipants = 10;
             List<string> tags = ["tag1", "tag2"];
@@ -157,7 +157,7 @@ namespace Integration_Test.V1.Endpoints.Session
             string description = "Session Description";
             double latitude = 51.924470285085526;
             double longitude = 7.846992772627526;
-            DateTime date = DateTime.Now.AddDays(1);
+            DateTime date = DateTime.UtcNow.AddDays(1);
             int minParticipants = 5;
             int maxParticipants = 10;
             List<string> tags = ["tag1", "tag2"];
@@ -196,7 +196,7 @@ namespace Integration_Test.V1.Endpoints.Session
                 description: "Session Description",
                 latitude: latitude,
                 longitude: longitude,
-                date: DateTime.Now.AddDays(1),
+                date: DateTime.UtcNow.AddDays(1),
                 minParticipants: 5,
                 maxParticipants: 10,
                 tags: ["tag1", "tag2"]
@@ -218,7 +218,7 @@ namespace Integration_Test.V1.Endpoints.Session
             string description = "Session Description";
             double latitude = 51.924470285085526;
             double longitude = 7.846992772627526;
-            DateTime date = DateTime.Now.AddDays(1);
+            DateTime date = DateTime.UtcNow.AddDays(1);
             int minParticipants = 10;
             int maxParticipants = 5; // Invalid, then min > max
             List<string> tags = ["tag1", "tag2"];
@@ -249,7 +249,7 @@ namespace Integration_Test.V1.Endpoints.Session
             string description = "Session Description";
             double latitude = 51.924470285085526;
             double longitude = 7.846992772627526;
-            DateTime date = DateTime.Now.AddDays(1);
+            DateTime date = DateTime.UtcNow.AddDays(1);
             int minParticipants = 5;
             int maxParticipants = 10;
             List<string> tags = Enumerable.Range(0, 100).Select(i => "Example Text").ToList(); // Many Tags
@@ -280,7 +280,7 @@ namespace Integration_Test.V1.Endpoints.Session
             string description = "Session Description";
             double latitude = 51.924470285085526;
             double longitude = 7.846992772627526;
-            DateTime date = DateTime.Now.AddDays(-1); // Date in the past
+            DateTime date = DateTime.UtcNow.AddDays(-1); // Date in the past
             int minParticipants = 5;
             int maxParticipants = 10;
             List<string> tags = ["tag1", "tag2"];

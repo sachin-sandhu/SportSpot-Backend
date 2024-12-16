@@ -97,7 +97,7 @@ namespace SportSpot.V1.User.Services
         public async Task<AuthTokenDto> RefreshAccessToken(AuthUserEntity user, string accessToken, RefreshTokenRequestDto request)
         {
             var principal = _tokenService.GetPrincipalFromExpiredToken(accessToken);
-            if (user is null || user.RefreshToken != request.RefreshToken || user.RefreshTokenExpiryTime <= DateTime.Now)
+            if (user is null || user.RefreshToken != request.RefreshToken || user.RefreshTokenExpiryTime <= DateTime.UtcNow)
                 throw new InvalidTokenRequestException();
 
             return await _userManager.GenerateToken(user, _tokenService, principal.Claims);

@@ -54,8 +54,14 @@ namespace SportSpot.V1.User.Services
                 authUser.LastName = updateUserDto.LastName;
             if (!string.IsNullOrEmpty(updateUserDto.FirstName))
                 authUser.FirstName = updateUserDto.FirstName;
+
             if (updateUserDto.DateOfBirth != null)
-                authUser.DateOfBirth = updateUserDto.DateOfBirth.Value;
+            {
+                DateTime date = updateUserDto.DateOfBirth.Value;
+                authUser.DateOfBirth = new(date.Year, date.Month, date.Day, 0, 0, 0, date.Kind);
+                if (authUser.DateOfBirth > DateTime.UtcNow)
+                    throw new InvalidBirthDateException();
+            }
 
             if (updateUserDto.AvatarAsBase64 != null)
             {

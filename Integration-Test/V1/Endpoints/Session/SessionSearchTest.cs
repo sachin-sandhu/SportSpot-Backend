@@ -151,7 +151,7 @@ namespace Integration_Test.V1.Endpoints.Session
             JsonObject createUser = await _userLib.CreateDefaultUser();
             string createUserToken = createUser["accessToken"].Value<string>();
 
-            _ = await _sessionLib.CreateDefaultSession(createUserToken, DateTime.Now.AddSeconds(5));
+            _ = await _sessionLib.CreateDefaultSession(createUserToken, DateTime.UtcNow.AddSeconds(5));
 
             JsonObject getUser = await _userLib.CreateDefaultUser(true);
             string getUserToken = getUser["accessToken"].Value<string>();

@@ -52,7 +52,7 @@ namespace SportSpot.V1.Session.Repositories
             List<FilterDefinition<SessionEntity>> filter = [];
             filter.Add(filterBuilder.Ne(x => x.CreatorId, userID));
             filter.Add(filterBuilder.Not(filterBuilder.AnyEq(x => x.Participants, userID)));
-            filter.Add(filterBuilder.Gt(x => x.Date, DateTime.Now));
+            filter.Add(filterBuilder.Gt(x => x.Date, DateTime.UtcNow));
             filter.Add(filterBuilder.GeoWithinCenterSphere(x => x.Location.Coordinates, requestDto.Longitude, requestDto.Latitude, radiusInDegrees));
 
             if (requestDto.SportType != null)
@@ -90,16 +90,16 @@ namespace SportSpot.V1.Session.Repositories
             };
             List<FilterDefinition<SessionEntity>> filter = [];
             filter.Add(filterBuilder.Eq(x => x.CreatorId, user.Id));
-            
-            if(!requestDto.WithExpired)
-                filter.Add(filterBuilder.Gt(x => x.Date, DateTime.Now));
+
+            if (!requestDto.WithExpired)
+                filter.Add(filterBuilder.Gt(x => x.Date, DateTime.UtcNow));
 
             FilterDefinition<SessionEntity> finalFilter = filterBuilder.And(filter);
             IAsyncCursor<SessionEntity> cursor = await _collection.FindAsync(finalFilter, options);
             List<SessionEntity> result = await cursor.ToListAsync();
-            if(result.Count < requestDto.Size)
+            if (result.Count < requestDto.Size)
                 return (result, false);
-            
+
             long fullResultCount = await _collection.CountDocumentsAsync(finalFilter);
             bool hasMoreEntries = fullResultCount > (requestDto.Size + (requestDto.Size * requestDto.Page));
             return (result, hasMoreEntries);
