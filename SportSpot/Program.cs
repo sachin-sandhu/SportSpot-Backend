@@ -31,6 +31,8 @@ using SportSpot.V1.User.Services;
 using SportSpot.V1.WebSockets.Middleware;
 using SportSpot.V1.WebSockets.Services;
 using StackExchange.Redis;
+using System.IdentityModel.Tokens.Jwt;
+using System.Security.Claims;
 using System.Security.Cryptography.X509Certificates;
 using System.Text;
 using System.Text.Json.Serialization;
@@ -129,7 +131,9 @@ TokenValidationParameters tokenValidationParameters = new()
     ValidateIssuerSigningKey = true,
     ValidAudience = jwtConfiguration.ValidAudience,
     ValidIssuer = jwtConfiguration.ValidIsUser,
-    IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(jwtConfiguration.Secret))
+    IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(jwtConfiguration.Secret)),
+    NameClaimType = JwtRegisteredClaimNames.Sub,
+    RoleClaimType = ClaimTypes.Role
 };
 
 builder.Services.AddHttpClient();

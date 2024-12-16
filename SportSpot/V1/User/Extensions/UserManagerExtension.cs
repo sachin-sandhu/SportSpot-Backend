@@ -13,12 +13,15 @@ namespace SportSpot.V1.User.Extensions
         public async static Task<AuthTokenDto> GenerateToken(this UserManager<AuthUserEntity> userManager, AuthUserEntity user, ITokenService tokenService, IEnumerable<Claim>? claims = null)
         {
             claims ??= await GetAuthClaims(userManager, user);
+
             AccessTokenDto accessToken = tokenService.GenerateAccessToken(claims);
+
             string refreshToken = tokenService.GenerateRefreshToken();
-            DateTime refreshTokenExpire = DateTime.Now.AddDays(30);
+            DateTime refreshTokenExpire = DateTime.UtcNow.AddDays(30);
             user.RefreshToken = refreshToken;
             user.RefreshTokenExpiryTime = refreshTokenExpire;
             await userManager.UpdateAsync(user);
+
             return new AuthTokenDto
             {
                 UserId = user.Id,
@@ -34,10 +37,12 @@ namespace SportSpot.V1.User.Extensions
             var userRoles = await userManager.GetRolesAsync(user);
             List<Claim> authClaims = [
                 new (ClaimTypes.Name, user.UserName ?? ""),
+                new (JwtRegisteredClaimNames.Sub, user.Id.ToString()),
                 new (JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString())
             ];
-            foreach (var userRole in userRoles)
-                authClaims.Add(new Claim(ClaimTypes.Role, userRole));
+
+            authClaims.AddRange(userRoles.Select(role => new Claim(ClaimTypes.Role, role)));
+
             return authClaims;
         }
 
