@@ -1,4 +1,5 @@
-﻿using Integration_Test.Properties;
+﻿using Integration_Test.Extensions;
+using Integration_Test.Properties;
 using Integration_Test.V1.Exceptions;
 using System.Net;
 using System.Net.Http.Headers;
@@ -29,10 +30,7 @@ namespace Integration_Test.V1.Libs
                 { "firstname", firstname },
                 { "lastname", lastname }
             };
-            if (avatarAsBase64 != null)
-            {
-                registerRequest.Add("avatarAsBase64", avatarAsBase64);
-            }
+            registerRequest.AddIfNotNull("avatarAsBase64", avatarAsBase64);
 
             StringContent content = new(registerRequest.ToJsonString(), MediaTypeHeaderValue.Parse("application/json"));
             HttpResponseMessage response = await _client.PostAsync("auth/register", content);
@@ -49,6 +47,34 @@ namespace Integration_Test.V1.Libs
 
             StringContent content = new(loginRequest.ToJsonString(), MediaTypeHeaderValue.Parse("application/json"));
             HttpResponseMessage response = await _client.PostAsync("auth/login", content);
+            return response;
+        }
+
+        public async Task<HttpResponseMessage> UpdateUser(string accessToken, string email = null, string username = null, string oldPassword = null, string newPassword = null, string firstName = null, string lastName = null, DateTime? dateOfBirth = null, string biography = null, string avaterAsBase64 = null)
+        {
+            JsonObject updateRequest = [];
+
+            updateRequest.AddIfNotNull("email", email);
+            updateRequest.AddIfNotNull("username", username);
+            if (oldPassword != null && newPassword != null)
+            {
+                JsonObject passwordData = new()
+                {
+                    { "oldPassword", oldPassword },
+                    { "newPassword", newPassword }
+                };
+                updateRequest.Add("password", passwordData);
+            }
+            updateRequest.AddIfNotNull("firstName", firstName);
+            updateRequest.AddIfNotNull("lastName", lastName);
+            updateRequest.AddIfNotNull("dateOfBirth", dateOfBirth);
+            updateRequest.AddIfNotNull("biography", biography);
+            updateRequest.AddIfNotNull("avatarAsBase64", avaterAsBase64);
+
+            HttpRequestMessage httpRequestMessage = new(HttpMethod.Patch, "user");
+            httpRequestMessage.Headers.Authorization = new AuthenticationHeaderValue("Bearer", accessToken);
+            httpRequestMessage.Content = new StringContent(updateRequest.ToJsonString(), Encoding.UTF8, "application/json");
+            HttpResponseMessage response = await _client.SendAsync(httpRequestMessage);
             return response;
         }
 
