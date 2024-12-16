@@ -33,6 +33,7 @@ namespace Integration_Test.V1.Endpoints.User
             string accessToken = authUserData["accessToken"].Value<string>();
             Guid userId = authUserData["userId"].Value<Guid>();
 
+            string username = "TestCoolUser";
             string email = "max2.musterman@gmail.com";
             string password = "password1.G.222";
             string firstname = "Nic";
@@ -44,6 +45,7 @@ namespace Integration_Test.V1.Endpoints.User
             // Act
             HttpResponseMessage response = await _userLib.UpdateUser(
                 accessToken,
+                username: username,
                 email: email,
                 newPassword: password,
                 oldPassword: "password1.G.222",
@@ -56,11 +58,32 @@ namespace Integration_Test.V1.Endpoints.User
 
             // Assert
             JsonObject newUserData = await _userLib.GetUserById(userId, accessToken);
+            Assert.AreEqual(username, newUserData["username"].Value<string>());
             Assert.AreEqual(email, newUserData["email"].Value<string>());
             Assert.AreEqual(firstname, newUserData["firstName"].Value<string>());
             Assert.AreEqual(lastname, newUserData["lastName"].Value<string>());
             Assert.AreEqual(dateOfBirth, newUserData["birthDate"].Value<DateTime>());
             Assert.AreEqual(biography, newUserData["biography"].Value<string>());
+        }
+
+        [TestMethod]
+        public async Task TestUpdateUser_UsernameNotUnique_ShouldReturnConflict()
+        {
+            // Arrange
+            string duplicateUsername = "TestUser";
+            await _userLib.CreateDefaultUser();
+
+            JsonObject secondUser = await _userLib.CreateDefaultUser(true);
+            string secondAccessToken = secondUser["accessToken"].Value<string>();
+
+            // Act
+            HttpResponseMessage response = await _userLib.UpdateUser(
+                secondAccessToken,
+                username: duplicateUsername
+            );
+
+            // Assert
+            Assert.AreEqual(HttpStatusCode.BadRequest, response.StatusCode, "Expected conflict due to duplicate username.");
         }
 
         [TestMethod]
@@ -76,9 +99,7 @@ namespace Integration_Test.V1.Endpoints.User
             // Act
             HttpResponseMessage response = await _userLib.UpdateUser(
                 secondAccessToken,
-                email: duplicateEmail,
-                oldPassword: "password1.G.222",
-                newPassword: "NewPassword!123"
+                email: duplicateEmail
             );
 
             // Assert
@@ -177,9 +198,7 @@ namespace Integration_Test.V1.Endpoints.User
             // Act
             HttpResponseMessage response = await _userLib.UpdateUser(
                 accessToken,
-                email: invalidEmail,
-                oldPassword: "password1.G.222",
-                newPassword: "Password1!"
+                email: invalidEmail
             );
 
             // Assert
