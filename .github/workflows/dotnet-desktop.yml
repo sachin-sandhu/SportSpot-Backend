@@ -121,10 +121,10 @@ jobs:
                 env_file:
                   - "/etc/environment"
                 networks:
-                  - sportspot_default
+                  - sportspot_utils_default
 
             networks:
-              sportspot_default:
+              sportspot_utils_default:
                 external: true
             EOF
             docker compose up --build -d
