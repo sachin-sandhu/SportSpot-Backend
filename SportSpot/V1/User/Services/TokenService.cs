@@ -40,7 +40,7 @@ namespace SportSpot.V1.User.Services
             {
                 ValidateIssuer = true,
                 ValidateAudience = true,
-                ValidateLifetime = true,
+                ValidateLifetime = false,
                 ValidateIssuerSigningKey = true,
                 ValidAudience = _configuration.ValidAudience,
                 ValidIssuer = _configuration.ValidIsUser,
