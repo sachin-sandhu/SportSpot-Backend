@@ -94,13 +94,32 @@ namespace SportSpot.V1.User.Services
             return token;
         }
 
-        public async Task<AuthTokenDto> RefreshAccessToken(AuthUserEntity user, string accessToken, RefreshTokenRequestDto request)
+        public async Task<AuthTokenDto> RefreshAccessToken(RefreshTokenRequestDto request)
         {
-            var principal = _tokenService.GetPrincipalFromExpiredToken(accessToken);
-            if (user is null || user.RefreshToken != request.RefreshToken || user.RefreshTokenExpiryTime <= DateTime.UtcNow)
-                throw new InvalidTokenRequestException();
+            try
+            {
+                //First 16 Byte is UserId and the full token is the refresh token
+                byte[] rawRefreshToken = Convert.FromBase64String(request.RefreshToken);
+                Guid userId = new(rawRefreshToken.Take(16).ToArray());
 
-            return await _userManager.GenerateToken(user, _tokenService, principal.Claims);
+                AuthUserEntity authUserEntity = await _userManager.FindByIdAsync(userId.ToString()) ?? throw new InvalidTokenRequestException();
+
+                RefreshTokenEntity refreshToken = await _dbContext.RefreshTokens
+                    .Where(token => token.Token == request.RefreshToken && token.UserId == userId)
+                    .FirstOrDefaultAsync() ?? throw new InvalidTokenRequestException();
+
+
+                if (refreshToken.ExpiryTime <= DateTime.UtcNow)
+                    throw new InvalidTokenRequestException();
+
+                ClaimsPrincipal principal = _tokenService.GetPrincipalFromExpiredToken(refreshToken.AccessToken);
+
+                return await _userManager.GenerateToken(authUserEntity, _tokenService, principal.Claims, oldRefreshTokenEntity: refreshToken);
+            }
+            catch (Exception)
+            {
+                throw new InvalidTokenRequestException();
+            }
         }
 
         public async Task<AuthTokenDto> Register(AuthUserRegisterRequestDto request)
@@ -131,11 +150,13 @@ namespace SportSpot.V1.User.Services
             return token;
         }
 
-        public async Task RevokeRefreshToken(AuthUserEntity authUserEntity)
+        public async Task RevokeRefreshToken(AuthUserEntity authUserEntity, string accessToken)
         {
-            authUserEntity.RefreshToken = null;
-            authUserEntity.RefreshTokenExpiryTime = null;
-            await _userManager.UpdateAsync(authUserEntity);
+            RefreshTokenEntity entity = await _dbContext.RefreshTokens
+                .Where(t => t.AccessToken == accessToken
+                && t.UserId == authUserEntity.Id).FirstOrDefaultAsync() ?? throw new InvalidTokenRequestException();
+            _dbContext.RefreshTokens.Remove(entity);
+            await _dbContext.SaveChangesAsync();
         }
 
         public async Task<AuthUserEntity> AuthorizeUser(string authorization)
