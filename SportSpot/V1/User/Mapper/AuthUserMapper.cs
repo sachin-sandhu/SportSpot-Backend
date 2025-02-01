@@ -1,5 +1,4 @@
-﻿using SportSpot.V1.User.Dtos;
-using SportSpot.V1.User.Dtos.Auth;
+﻿using SportSpot.V1.User.Dtos.Auth;
 using SportSpot.V1.User.Entities;
 
 namespace SportSpot.V1.User.Mapper
@@ -13,7 +12,7 @@ namespace SportSpot.V1.User.Mapper
                 Id = entity.Id,
                 Username = entity.UserName ?? string.Empty,
                 Biography = entity.Biography,
-                Avatar = $"http://localhost:8080/user/{entity.Id}/avatar",
+                Avatar = $"http://localhost:8080/api/v1/user/{entity.Id}/avatar",
                 FirstName = entity.FirstName,
                 LastName = entity.LastName,
                 BirthDate = entity.DateOfBirth,
