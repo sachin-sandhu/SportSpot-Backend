@@ -1,4 +1,5 @@
 ﻿using SportSpot.V1.User.Dtos;
+using SportSpot.V1.User.Entities;
 using System.Security.Claims;
 
 namespace SportSpot.V1.User.Services
@@ -7,6 +8,7 @@ namespace SportSpot.V1.User.Services
     {
         AccessTokenDto GenerateAccessToken(IEnumerable<Claim> claims);
         ClaimsPrincipal GetPrincipalFromExpiredToken(string token);
-        string GenerateRefreshToken();
+        Task<RefreshTokenEntity> CreateRefreshToken(AuthUserEntity authUser, string accessToken);
+        Task<RefreshTokenEntity> RefreshRefreshToken(RefreshTokenEntity entity, string accessToken);
     }
 }

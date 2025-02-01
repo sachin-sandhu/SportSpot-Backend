@@ -10,16 +10,19 @@ namespace SportSpot.V1.User.Extensions
 {
     public static class UserManagerExtension
     {
-        public async static Task<AuthTokenDto> GenerateToken(this UserManager<AuthUserEntity> userManager, AuthUserEntity user, ITokenService tokenService, IEnumerable<Claim>? claims = null)
+        public async static Task<AuthTokenDto> GenerateToken(this UserManager<AuthUserEntity> userManager, AuthUserEntity user, ITokenService tokenService, IEnumerable<Claim>? claims = null, RefreshTokenEntity? oldRefreshTokenEntity = null)
         {
             claims ??= await GetAuthClaims(userManager, user);
 
             AccessTokenDto accessToken = tokenService.GenerateAccessToken(claims);
 
-            string refreshToken = tokenService.GenerateRefreshToken();
-            DateTime refreshTokenExpire = DateTime.UtcNow.AddDays(30);
-            user.RefreshToken = refreshToken;
-            user.RefreshTokenExpiryTime = refreshTokenExpire;
+            RefreshTokenEntity refreshTokenEntity;
+            if (oldRefreshTokenEntity != null)
+                refreshTokenEntity = await tokenService.RefreshRefreshToken(oldRefreshTokenEntity, accessToken.Token);
+            else
+                refreshTokenEntity = await tokenService.CreateRefreshToken(user, accessToken.Token);
+
+
             await userManager.UpdateAsync(user);
 
             return new AuthTokenDto
@@ -27,8 +30,8 @@ namespace SportSpot.V1.User.Extensions
                 UserId = user.Id,
                 AccessToken = accessToken.Token,
                 AccessExpire = accessToken.Expire,
-                RefreshToken = refreshToken,
-                RefreshExpire = refreshTokenExpire
+                RefreshToken = refreshTokenEntity.Token,
+                RefreshExpire = refreshTokenEntity.ExpiryTime
             };
         }
 

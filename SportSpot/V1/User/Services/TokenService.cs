@@ -1,8 +1,9 @@
 ﻿using Microsoft.IdentityModel.Tokens;
-using SportSpot.V1.Exceptions;
 using SportSpot.V1.Exceptions.User;
+using SportSpot.V1.User.Context;
 using SportSpot.V1.User.Dtos;
 using SportSpot.V1.User.Dtos.Auth;
+using SportSpot.V1.User.Entities;
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Security.Cryptography;
@@ -10,7 +11,7 @@ using System.Text;
 
 namespace SportSpot.V1.User.Services
 {
-    public class TokenService(JwtConfigurationDto _configuration) : ITokenService
+    public class TokenService(JwtConfigurationDto _configuration, AuthContext _context) : ITokenService
     {
         public AccessTokenDto GenerateAccessToken(IEnumerable<Claim> claims)
         {
@@ -55,11 +56,37 @@ namespace SportSpot.V1.User.Services
             return principal;
         }
 
-        public string GenerateRefreshToken()
+        public async Task<RefreshTokenEntity> CreateRefreshToken(AuthUserEntity authUser, string accessToken)
+        {
+            RefreshTokenEntity tokenEntity = new()
+            {
+                UserId = authUser.Id,
+                Token = GenerateRefreshToken(authUser.Id),
+                ExpiryTime = DateTime.UtcNow.AddDays(30),
+                User = authUser,
+                AccessToken = accessToken
+            };
+            _context.RefreshTokens.Add(tokenEntity);
+            await _context.SaveChangesAsync();
+            return tokenEntity;
+        }
+
+        public async Task<RefreshTokenEntity> RefreshRefreshToken(RefreshTokenEntity entity, string accessToken)
+        {
+            entity.ExpiryTime = DateTime.UtcNow.AddDays(30);
+            entity.Token = GenerateRefreshToken(entity.UserId);
+            entity.AccessToken = accessToken;
+            _context.RefreshTokens.Update(entity);
+            await _context.SaveChangesAsync();
+            return entity;
+        }
+
+        private static string GenerateRefreshToken(Guid userId)
         {
             var randomNumber = new byte[32];
             using var rng = RandomNumberGenerator.Create();
             rng.GetBytes(randomNumber);
+            userId.ToByteArray().CopyTo(randomNumber, 0);
             return Convert.ToBase64String(randomNumber);
         }
     }

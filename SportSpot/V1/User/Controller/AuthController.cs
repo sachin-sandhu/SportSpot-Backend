@@ -55,15 +55,13 @@ namespace SportSpot.V1.User.Controller
             return Ok();
         }
 
-        [Authorize]
+        [AllowAnonymous]
         [HttpPost("token")]
         [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(AuthTokenDto))]
-        [ProducesResponseType(StatusCodes.Status401Unauthorized)]
         [ProducesResponseType(StatusCodes.Status400BadRequest, Type = typeof(List<ErrorResult>))]
         public async Task<IActionResult> Refresh([FromBody] RefreshTokenRequestDto request)
         {
-            string authorizationToken = await HttpContext.GetTokenAsync("access_token") ?? throw new UnauthorizedException();
-            return Ok(await _authService.RefreshAccessToken(await User.GetAuthUser(_userManager), authorizationToken, request));
+            return Ok(await _authService.RefreshAccessToken(request));
         }
 
         [Authorize]
@@ -72,7 +70,8 @@ namespace SportSpot.V1.User.Controller
         [ProducesResponseType(StatusCodes.Status401Unauthorized)]
         public async Task<IActionResult> Revoke()
         {
-            await _authService.RevokeRefreshToken(await User.GetAuthUser(_userManager));
+            string accessToken = await HttpContext.GetTokenAsync("access_token") ?? throw new UnauthorizedException();
+            await _authService.RevokeRefreshToken(await User.GetAuthUser(_userManager), accessToken);
             return Ok();
         }
     }
