@@ -17,6 +17,7 @@ namespace SportSpot.V1.WebSockets.Services
 
         private readonly static JsonSerializerOptions _options = new()
         {
+            PropertyNameCaseInsensitive = true,
             Converters = { new WebSocketMessageConverter(), new JsonStringEnumConverter() }
         };
 
