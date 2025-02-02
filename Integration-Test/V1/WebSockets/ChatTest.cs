@@ -49,6 +49,7 @@ namespace Integration_Test.V1.WebSockets
             // Arrange: Setup WebSocket client and connect
             ClientWebSocket clientWebSocket = new();
             Uri uri = new(webSocketUri);
+            clientWebSocket.Options.AddSubProtocol(accessToken);
             clientWebSocket.Options.SetRequestHeader("Sec-WebSocket-Protocol", accessToken);
             await clientWebSocket.ConnectAsync(uri, CancellationToken.None);
 
@@ -121,6 +122,7 @@ namespace Integration_Test.V1.WebSockets
             // Arrange: Setup WebSocket client and connect
             ClientWebSocket clientWebSocket = new();
             Uri uri = new(webSocketUri);
+            clientWebSocket.Options.AddSubProtocol(accessToken);
             clientWebSocket.Options.SetRequestHeader("Sec-WebSocket-Protocol", accessToken);
             await clientWebSocket.ConnectAsync(uri, CancellationToken.None);
 
@@ -190,6 +192,7 @@ namespace Integration_Test.V1.WebSockets
             // Arrange: Setup WebSocket client and connect
             ClientWebSocket clientWebSocket = new();
             Uri uri = new(webSocketUri);
+            clientWebSocket.Options.AddSubProtocol(accessToken);
             clientWebSocket.Options.SetRequestHeader("Sec-WebSocket-Protocol", accessToken);
             await clientWebSocket.ConnectAsync(uri, CancellationToken.None);
 
@@ -258,10 +261,12 @@ namespace Integration_Test.V1.WebSockets
 
             // Arrange: Setup WebSocket clients for both users
             ClientWebSocket wsUser1 = new();
+            wsUser1.Options.AddSubProtocol(accessToken1);
             wsUser1.Options.SetRequestHeader("Sec-WebSocket-Protocol", accessToken1);
             await wsUser1.ConnectAsync(new Uri(webSocketUri), CancellationToken.None);
 
             ClientWebSocket wsUser2 = new();
+            wsUser2.Options.AddSubProtocol(accessToken2);
             wsUser2.Options.SetRequestHeader("Sec-WebSocket-Protocol", accessToken2);
             await wsUser2.ConnectAsync(new Uri(webSocketUri), CancellationToken.None);
 
