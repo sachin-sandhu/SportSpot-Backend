@@ -49,7 +49,7 @@ namespace Integration_Test.V1.WebSockets
             // Arrange: Setup WebSocket client and connect
             ClientWebSocket clientWebSocket = new();
             Uri uri = new(webSocketUri);
-            clientWebSocket.Options.SetRequestHeader("Sec-WebSocket-Protocol", accessToken);
+            clientWebSocket.Options.AddSubProtocol(accessToken);
             await clientWebSocket.ConnectAsync(uri, CancellationToken.None);
 
             // Arrange: Prepare message payload
@@ -121,7 +121,7 @@ namespace Integration_Test.V1.WebSockets
             // Arrange: Setup WebSocket client and connect
             ClientWebSocket clientWebSocket = new();
             Uri uri = new(webSocketUri);
-            clientWebSocket.Options.SetRequestHeader("Sec-WebSocket-Protocol", accessToken);
+            clientWebSocket.Options.AddSubProtocol(accessToken);
             await clientWebSocket.ConnectAsync(uri, CancellationToken.None);
 
             // Act: Send multiple messages via WebSocket
@@ -190,7 +190,7 @@ namespace Integration_Test.V1.WebSockets
             // Arrange: Setup WebSocket client and connect
             ClientWebSocket clientWebSocket = new();
             Uri uri = new(webSocketUri);
-            clientWebSocket.Options.SetRequestHeader("Sec-WebSocket-Protocol", accessToken);
+            clientWebSocket.Options.AddSubProtocol(accessToken);
             await clientWebSocket.ConnectAsync(uri, CancellationToken.None);
 
             // Act: Send the first message
@@ -258,11 +258,11 @@ namespace Integration_Test.V1.WebSockets
 
             // Arrange: Setup WebSocket clients for both users
             ClientWebSocket wsUser1 = new();
-            wsUser1.Options.SetRequestHeader("Sec-WebSocket-Protocol", accessToken1);
+            wsUser1.Options.AddSubProtocol(accessToken1);
             await wsUser1.ConnectAsync(new Uri(webSocketUri), CancellationToken.None);
 
             ClientWebSocket wsUser2 = new();
-            wsUser2.Options.SetRequestHeader("Sec-WebSocket-Protocol", accessToken2);
+            wsUser2.Options.AddSubProtocol(accessToken2);
             await wsUser2.ConnectAsync(new Uri(webSocketUri), CancellationToken.None);
 
             // Act: User 1 sends a message

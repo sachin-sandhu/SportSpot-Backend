@@ -35,12 +35,15 @@ namespace SportSpot.V1.WebSockets.Middleware
                     await new UnauthorizedException().WriteToResponse(context.Response);
                     return;
                 }
+                WebSocket webSocket = await context.WebSockets.AcceptWebSocketAsync(new WebSocketAcceptContext
+                {
+                    SubProtocol = authorization
+                });
 
                 using var scope = _serviceProvider.CreateScope();
                 IWebSocketService webSocketService = scope.ServiceProvider.GetRequiredService<IWebSocketService>();
                 ILogger<CustomWebSocketMiddleware> logger = scope.ServiceProvider.GetRequiredService<ILogger<CustomWebSocketMiddleware>>();
 
-                WebSocket webSocket = await context.WebSockets.AcceptWebSocketAsync();
                 bool success = await webSocketService.OnConnect(webSocket, authorization);
                 if (!success)
                     return;
