@@ -11,7 +11,7 @@ namespace SportSpot.V1.WebSockets.Converter
         public override IWebSocketMessageDto? Read(ref Utf8JsonReader reader, Type typeToConvert, JsonSerializerOptions options)
         {
             using var doc = JsonDocument.ParseValue(ref reader);
-            string? rawType = GetProperty(doc.RootElement, "MessageType"); ;
+            string? rawType = GetProperty(doc.RootElement, "MessageType");
             rawType ??= GetProperty(doc.RootElement, "messageType");
             if (rawType == null)
                 throw new InvalidWebSocketMessageException();
