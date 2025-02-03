@@ -89,7 +89,11 @@ namespace SportSpot.V1.Session.Repositories
                 Sort = requestDto.Ascending ? Builders<SessionEntity>.Sort.Ascending(x => x.Date) : Builders<SessionEntity>.Sort.Descending(x => x.Date)
             };
             List<FilterDefinition<SessionEntity>> filter = [];
-            filter.Add(filterBuilder.Eq(x => x.CreatorId, user.Id));
+
+            if(!requestDto.IsMember)
+                filter.Add(filterBuilder.Eq(x => x.CreatorId, user.Id));
+            else
+                filter.Add(filterBuilder.Or(filterBuilder.Eq(x => x.CreatorId, user.Id), filterBuilder.AnyEq(x => x.Participants, user.Id)));
 
             if (!requestDto.WithExpired)
                 filter.Add(filterBuilder.Gt(x => x.Date, DateTime.UtcNow));

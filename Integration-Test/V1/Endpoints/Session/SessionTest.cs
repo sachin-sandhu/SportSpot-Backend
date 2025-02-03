@@ -506,5 +506,33 @@ namespace Integration_Test.V1.Endpoints.Session
             Assert.AreEqual(1, sessions.Count);
         }
 
+                [TestMethod]
+        public async Task TestGetSessionsFromUser_JoinedSession()
+        {
+            // Arrange
+            await _emulatorLib.SetMode(ModeType.ReverseLocation, true, LocationLib.GetDefaultReverseResponse().ToJsonString());
+
+            JsonObject createUser = await _userLib.CreateDefaultUser();
+            string createUserToken = createUser["accessToken"].Value<string>();
+
+            JsonObject joinUser = await _userLib.CreateDefaultUser(true);
+            string joinUserToken = joinUser["accessToken"].Value<string>();
+
+            // Act & Assert
+            JsonArray sessions = await _sessionLib.GetSesssionFromUser(createUserToken);
+            Assert.AreEqual(0, sessions.Count);
+
+            // Act & Assert
+            JsonObject session = await _sessionLib.CreateDefaultSession(createUserToken);
+            sessions = await _sessionLib.GetSesssionFromUser(createUserToken);
+            Assert.AreEqual(1, sessions.Count, "Creator should have created a session");
+
+            // Act & Assert
+            Guid sessionId = session["id"].Value<Guid>();
+            await _sessionLib.JoinSession(sessionId, joinUserToken);
+            sessions = await _sessionLib.GetSesssionFromUser(createUserToken);
+            Assert.AreEqual(1, sessions.Count, "Joiner should have created a session");
+        }
+
     }
 }
