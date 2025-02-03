@@ -26,7 +26,7 @@ namespace SportSpot.V1.User.Controller
         }
 
         [HttpGet("{userId}/avatar")]
-        [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(byte[]))]
+        [ProducesResponseType(typeof(byte[]), StatusCodes.Status200OK, "image/png")]
         [ProducesResponseType(StatusCodes.Status400BadRequest, Type = typeof(List<ErrorResult>))]
         public async Task<IActionResult> GetAvatar(Guid userId)
         {
