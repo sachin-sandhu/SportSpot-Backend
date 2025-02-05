@@ -23,7 +23,7 @@ namespace SportSpot.V1.User.OAuth.Types
                     Name = userData.Name,
                     Picture = await DownloadPicture(userData.Picture),
                     FirstName = userData.GivenName,
-                    LastName = userData.FamilyName
+                    LastName = userData.FamilyName ?? string.Empty
                 };
             }
             catch (InvalidOAuthAccessTokenException)
@@ -36,8 +36,10 @@ namespace SportSpot.V1.User.OAuth.Types
             }
         }
 
-        private async Task<byte[]?> DownloadPicture(string url)
+        private async Task<byte[]?> DownloadPicture(string? url)
         {
+            if (url == null)
+                return null;
             try
             {
                 HttpResponseMessage response = await _request.Get(url, accept: "image/png");

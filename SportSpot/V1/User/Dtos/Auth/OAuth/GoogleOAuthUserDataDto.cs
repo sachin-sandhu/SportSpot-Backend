@@ -9,8 +9,8 @@ namespace SportSpot.V1.User.Dtos.Auth.OAuth
         [JsonPropertyName("given_name")]
         public required string GivenName { get; init; }
         [JsonPropertyName("family_name")]
-        public required string FamilyName { get; init; }
-        public required string Picture { get; init; }
+        public string? FamilyName { get; init; }
+        public string? Picture { get; init; }
         public required string Email { get; init; }
         [JsonPropertyName("email_verified")]
         public required bool EmailVerified { get; init; }
