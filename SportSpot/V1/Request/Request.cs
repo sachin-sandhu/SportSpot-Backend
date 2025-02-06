@@ -3,19 +3,19 @@ using System.Web;
 
 namespace SportSpot.V1.Request
 {
-    public class Request(HttpClient _client) : IRequest
+    public class Request(IHttpClientFactory _clientFactory) : IRequest
     {
         public async Task<HttpResponseMessage> Get(string url, Dictionary<string, string>? headers = null, Dictionary<string, string>? queryParameters = null, string accept = "application/json")
         {
             using HttpRequestMessage requestMessage = BuildRequestMessage(url, HttpMethod.Get, headers, queryParameters, accept);
-            return await _client.SendAsync(requestMessage);
+            return await _clientFactory.CreateClient().SendAsync(requestMessage);
         }
 
         public async Task<HttpResponseMessage> Post(string url, string body, Dictionary<string, string>? headers = null, Dictionary<string, string>? queryParameters = null, string accept = "application/json", string contentType = "application/json")
         {
             using HttpRequestMessage requestMessage = BuildRequestMessage(url, HttpMethod.Post, headers, queryParameters, accept);
             requestMessage.Content = new StringContent(body, Encoding.UTF8, contentType);
-            return await _client.PostAsync(url, new StringContent(body));
+            return await _clientFactory.CreateClient().PostAsync(url, new StringContent(body));
         }
 
         private static HttpRequestMessage BuildRequestMessage(string url, HttpMethod method, Dictionary<string, string>? headers = null, Dictionary<string, string>? queryParameters = null, string accept = "application/json")
