@@ -65,7 +65,9 @@ namespace SportSpot.V1.User.Services
                     throw new UserLoginException();
                 if (user.OAuthProviderType != request.Provider)
                     throw new OAuthProviderException();
-                return await _userManager.GenerateToken(user, _tokenService);
+                AuthTokenDto newToken = await _userManager.GenerateToken(user, _tokenService);
+                await transaction.CommitAsync();
+                return newToken;
             }
 
             AuthUserEntity authUser = new()
