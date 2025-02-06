@@ -140,7 +140,7 @@ builder.Services.AddHttpClient();
 builder.Services.AddSingleton(tokenValidationParameters);
 
 builder.Services.AddSingleton<IEventService, EventService>();
-builder.Services.AddSingleton<IRequest, Request>();
+builder.Services.AddTransient<IRequest, Request>();
 
 builder.Services.AddTransient<ILocationCacheService, LocationCacheService>();
 builder.Services.AddTransient<ILocationService, LocationService>();
