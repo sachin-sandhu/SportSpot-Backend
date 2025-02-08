@@ -47,7 +47,7 @@ namespace SportSpot.V1.Session.Services
                 SportType = createRequestDto.SportType,
                 Title = createRequestDto.Title,
                 Description = createRequestDto.Description,
-                Date = createRequestDto.Date,
+                Date = createRequestDto.Date.ToUniversalTime(),
                 CreatorId = user.Id,
                 CreatedAt = DateTime.UtcNow,
                 MinParticipants = createRequestDto.MinParticipants,
