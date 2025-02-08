@@ -57,8 +57,8 @@ namespace SportSpot.V1.User.Services
 
             if (updateUserDto.DateOfBirth != null)
             {
-                DateTime date = updateUserDto.DateOfBirth.Value;
-                authUser.DateOfBirth = new(date.Year, date.Month, date.Day, 0, 0, 0, date.Kind);
+                DateTime date = updateUserDto.DateOfBirth.Value.ToUniversalTime();
+                authUser.DateOfBirth = new(date.Year, date.Month, date.Day, 0, 0, 0, DateTimeKind.Utc);
                 if (authUser.DateOfBirth > DateTime.UtcNow)
                     throw new InvalidBirthDateException();
             }
