@@ -41,7 +41,7 @@ namespace SportSpot.V1.User.Services
                     throw new UsernameChangeException(changeResult.Errors);
             }
 
-            if (updateUserDto.Password != null)
+            if (updateUserDto.Password != null && !authUser.IsOAuth)
             {
                 IdentityResult changeResult = await _userManager.ChangePasswordAsync(authUser, updateUserDto.Password.OldPassword, updateUserDto.Password.NewPassword);
                 if (!changeResult.Succeeded)
