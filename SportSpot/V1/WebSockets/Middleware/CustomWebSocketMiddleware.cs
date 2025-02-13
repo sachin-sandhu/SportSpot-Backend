@@ -74,9 +74,24 @@ namespace SportSpot.V1.WebSockets.Middleware
                 {
                     WebSocketReceiveResult result = await socket.ReceiveAsync(buffer: new ArraySegment<byte>(buffer),
                                                            cancellationToken: CancellationToken.None);
+                    using MemoryStream inputStream = new();
+                    await inputStream.WriteAsync(buffer.AsMemory(0, result.Count));
+                    while (!result.EndOfMessage)
+                    {
+                        result = await socket.ReceiveAsync(buffer: new ArraySegment<byte>(buffer),
+                                                           cancellationToken: CancellationToken.None);
+                        await inputStream.WriteAsync(buffer.AsMemory(0, result.Count));
+                        if (inputStream.Length > 1024 * 1024 * 50)
+                        {
+                            await HandleDisconnect(socket, webSocketService);
+                            return;
+                        }
+                    }
+
+
                     if (result.MessageType == WebSocketMessageType.Text)
                     {
-                        string payload = Encoding.UTF8.GetString(buffer, 0, result.Count);
+                        string payload = Encoding.UTF8.GetString(inputStream.ToArray());
                         await webSocketService.OnReceive(socket, payload);
                     }
                     else if (result.MessageType == WebSocketMessageType.Close)
