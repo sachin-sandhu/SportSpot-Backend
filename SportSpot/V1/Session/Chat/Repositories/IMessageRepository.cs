@@ -1,5 +1,6 @@
 ﻿using SportSpot.V1.Session.Chat.Dtos;
 using SportSpot.V1.Session.Chat.Entities;
+using SportSpot.V1.User.Entities;
 
 namespace SportSpot.V1.Session.Chat.Repositories
 {
@@ -12,5 +13,6 @@ namespace SportSpot.V1.Session.Chat.Repositories
         Task DeleteMessageAsync(Guid messageId);
         Task DeleteMessagesFromSession(Guid sessionId);
         Task DeleteAll();
+        Task DeleteAll(AuthUserEntity user);
     }
 }

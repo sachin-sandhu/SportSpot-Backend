@@ -90,7 +90,7 @@ namespace SportSpot.V1.Session.Repositories
             };
             List<FilterDefinition<SessionEntity>> filter = [];
 
-            if(!requestDto.IsMember)
+            if (!requestDto.IsMember)
                 filter.Add(filterBuilder.Eq(x => x.CreatorId, user.Id));
             else
                 filter.Add(filterBuilder.Or(filterBuilder.Eq(x => x.CreatorId, user.Id), filterBuilder.AnyEq(x => x.Participants, user.Id)));
@@ -107,6 +107,18 @@ namespace SportSpot.V1.Session.Repositories
             long fullResultCount = await _collection.CountDocumentsAsync(finalFilter);
             bool hasMoreEntries = fullResultCount > (requestDto.Size + (requestDto.Size * requestDto.Page));
             return (result, hasMoreEntries);
+        }
+
+        public async Task<List<SessionEntity>> GetSessionsUserIsMember(AuthUserEntity user)
+        {
+            FilterDefinitionBuilder<SessionEntity> filterBuilder = Builders<SessionEntity>.Filter;
+            List<FilterDefinition<SessionEntity>> filter = [];
+            filter.Add(filterBuilder.AnyEq(x => x.Participants, user.Id));
+            FilterDefinition<SessionEntity> finalFilter = filterBuilder.And(filter);
+
+            IAsyncCursor<SessionEntity> cursor = await _collection.FindAsync(finalFilter);
+            List<SessionEntity> result = await cursor.ToListAsync();
+            return result;
         }
     }
 }

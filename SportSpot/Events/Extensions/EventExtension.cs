@@ -1,14 +1,13 @@
 ﻿using SportSpot.Events.Services;
 using SportSpot.Listener;
 using SportSpot.V1.Session.Chat.Listener;
-using SportSpot.V1.Session.Listener;
 
 namespace SportSpot.Events.Extensions
 {
     public static class EventExtension
     {
         private readonly static List<Type> _listener = [typeof(TestListener)];
-        private readonly static List<Type> _scopedListener = [typeof(MessageReceiveListener), typeof(SessionDeleteListener), typeof(UserDeleteListener)];
+        private readonly static List<Type> _scopedListener = [typeof(MessageReceiveListener), typeof(SessionDeleteListener), typeof(V1.Session.Listener.UserDeleteListener), typeof(V1.Session.Chat.Listener.UserDeleteListener)];
 
         public static void RegisterEvents(this IServiceCollection col)
         {
