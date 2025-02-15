@@ -305,5 +305,56 @@ namespace Integration_Test.V1.WebSockets
             Assert.AreEqual(1, messages.Count);
             Assert.AreEqual("Message from User 1", messages[0].AsObject()["content"].Value<string>());
         }
+
+        [TestMethod]
+        public async Task TestWebSocket_CreatorOfMessage_Delete()
+        {
+            // Arrange: Set emulator mode and create two users
+            await _emulatorLib.SetMode(ModeType.ReverseLocation, true, LocationLib.GetDefaultReverseResponse().ToJsonString());
+            JsonObject user1 = await _userLib.CreateDefaultUser();
+            string accessToken1 = user1["accessToken"].Value<string>();
+
+            JsonObject user2 = await _userLib.CreateDefaultUser(true);
+            string accessToken2 = user2["accessToken"].Value<string>();
+
+            // Arrange: Create a session and have user2 join the session
+            JsonObject session = await _sessionLib.CreateDefaultSession(accessToken1);
+            Guid sessionId = session["id"].Value<Guid>();
+            await _sessionLib.JoinSession(sessionId, accessToken2);
+
+            // Arrange: Setup WebSocket clients for both users
+            ClientWebSocket wsUser2 = new();
+            wsUser2.Options.AddSubProtocol(accessToken2);
+            await wsUser2.ConnectAsync(new Uri(webSocketUri), CancellationToken.None);
+
+            // Act: User 2 sends a message
+            JsonObject message1 = new()
+            {
+                { "MessageType", "MessageSendRequest" },
+                { "SessionId", sessionId },
+                { "Content", "Message from User 2" }
+            };
+            await wsUser2.SendAsync(
+                new ArraySegment<byte>(Encoding.UTF8.GetBytes(message1.ToJsonString())),
+                WebSocketMessageType.Text,
+                true,
+                CancellationToken.None);
+
+
+            // Act: Close WebSocket connections for both users
+            await wsUser2.CloseAsync(WebSocketCloseStatus.NormalClosure, "Test complete", CancellationToken.None);
+
+            // Act: Delete User 2
+            await _userLib.DeleteUser(accessToken2);
+
+            // Act: Retrieve messages
+            HttpResponseMessage response = await _chatLib.GetMessages(accessToken1, sessionId);
+            response.EnsureSuccessStatusCode();
+            string rawResponse = await response.Content.ReadAsStringAsync();
+            JsonArray messages = JsonSerializer.Deserialize<JsonArray>(rawResponse);
+
+            // Assert: Verify that no messages are returned
+            Assert.AreEqual(0, messages.Count);
+        }
     }
 }
