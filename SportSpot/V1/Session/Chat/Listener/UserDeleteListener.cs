@@ -13,7 +13,10 @@ namespace SportSpot.V1.Session.Chat.Listener
             {
                 await _messageService.DeleteAll(e.AuthUser);
             }
-            catch (Exception) { }
+            catch (Exception)
+            {
+                //Ignore
+            }
         }
     }
 }

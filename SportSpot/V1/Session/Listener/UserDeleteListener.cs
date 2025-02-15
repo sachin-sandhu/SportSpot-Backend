@@ -12,12 +12,18 @@ namespace SportSpot.V1.Session.Listener
             {
                 await _sessionService.DeleteAll(e.AuthUser);
             }
-            catch (Exception) { }
+            catch (Exception)
+            {
+                //Ignore  
+            }
             try
             {
                 await _sessionService.LeaveAll(e.AuthUser);
             }
-            catch (Exception) { }
+            catch (Exception)
+            {
+                //Ignore
+            }
         }
     }
 }
