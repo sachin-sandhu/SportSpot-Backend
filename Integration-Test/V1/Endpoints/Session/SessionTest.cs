@@ -506,7 +506,7 @@ namespace Integration_Test.V1.Endpoints.Session
             Assert.AreEqual(1, sessions.Count);
         }
 
-                [TestMethod]
+        [TestMethod]
         public async Task TestGetSessionsFromUser_JoinedSession()
         {
             // Arrange
@@ -530,8 +530,39 @@ namespace Integration_Test.V1.Endpoints.Session
             // Act & Assert
             Guid sessionId = session["id"].Value<Guid>();
             await _sessionLib.JoinSession(sessionId, joinUserToken);
-            sessions = await _sessionLib.GetSesssionFromUser(createUserToken);
+            sessions = await _sessionLib.GetSesssionFromUser(joinUserToken);
             Assert.AreEqual(1, sessions.Count, "Joiner should have created a session");
+        }
+
+        [TestMethod]
+        public async Task TestGetSessionsFromUser_JoinedSession_DeleteAccount()
+        {
+            // Arrange
+            await _emulatorLib.SetMode(ModeType.ReverseLocation, true, LocationLib.GetDefaultReverseResponse().ToJsonString());
+
+            JsonObject createUser = await _userLib.CreateDefaultUser();
+            string createUserToken = createUser["accessToken"].Value<string>();
+
+            JsonObject joinUser = await _userLib.CreateDefaultUser(true);
+            string joinUserToken = joinUser["accessToken"].Value<string>();
+
+            // Act & Assert
+            JsonArray sessions = await _sessionLib.GetSesssionFromUser(createUserToken);
+            Assert.AreEqual(0, sessions.Count);
+
+            // Act & Assert
+            JsonObject session = await _sessionLib.CreateDefaultSession(createUserToken);
+            sessions = await _sessionLib.GetSesssionFromUser(createUserToken);
+            Assert.AreEqual(1, sessions.Count, "Creator should have created a session");
+
+            // Act
+            Guid sessionId = session["id"].Value<Guid>();
+            await _sessionLib.JoinSession(sessionId, joinUserToken);
+            await _userLib.DeleteUser(joinUserToken);
+
+            // Assert
+            session = await _sessionLib.GetSession(sessionId, createUserToken);
+            Assert.AreEqual(1, session["participants"].AsArray().Count);
         }
 
     }

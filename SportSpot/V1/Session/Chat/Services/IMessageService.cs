@@ -10,5 +10,6 @@ namespace SportSpot.V1.Session.Chat.Services
         Task<(List<MessageDto>, bool)> GetMessages(SessionEntity session, MessageSearchQueryDto searchQueryDto, AuthUserEntity authUserEntity);
         Task DeleteAll();
         Task DeleteAll(SessionEntity session);
+        Task DeleteAll(AuthUserEntity user);
     }
 }

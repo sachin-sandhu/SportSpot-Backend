@@ -13,6 +13,7 @@ namespace SportSpot.V1.Session.Repositories
         public Task<List<SessionEntity>> GetAll();
         public Task<(List<SessionEntity>, bool)> GetSessionsInRange(SessionSearchQueryDto requestDto, Guid userID);
         Task<List<SessionEntity>> GetSessionsFromUser(AuthUserEntity user);
+        Task<List<SessionEntity>> GetSessionsUserIsMember(AuthUserEntity user);
         Task<(List<SessionEntity>, bool)> GetSessionsFromUser(AuthUserEntity user, SessionUserSearchQueryDto requestDto);
     }
 }

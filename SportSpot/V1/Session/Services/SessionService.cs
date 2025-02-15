@@ -171,5 +171,14 @@ namespace SportSpot.V1.Session.Services
             List<SessionDto> result = sessions.Select(x => x.ToDto(false)).ToList();
             return (result, hasMoreEntries);
         }
+
+        public async Task LeaveAll(AuthUserEntity user)
+        {
+            List<SessionEntity> sessions = await _sessionRepository.GetSessionsUserIsMember(user);
+            foreach (SessionEntity sessionEntity in sessions)
+            {
+                await Leave(user, sessionEntity);
+            }
+        }
     }
 }

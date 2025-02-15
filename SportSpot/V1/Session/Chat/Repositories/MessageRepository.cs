@@ -2,6 +2,7 @@
 using MongoDB.Driver;
 using SportSpot.V1.Session.Chat.Dtos;
 using SportSpot.V1.Session.Chat.Entities;
+using SportSpot.V1.User.Entities;
 
 namespace SportSpot.V1.Session.Chat.Repositories
 {
@@ -73,6 +74,11 @@ namespace SportSpot.V1.Session.Chat.Repositories
         {
             BsonDocument filter = [];
             await _collection.DeleteManyAsync(filter);
+        }
+
+        public async Task DeleteAll(AuthUserEntity user)
+        {
+            await _collection.DeleteManyAsync(x => x.CreatorId == user.Id);
         }
     }
 }

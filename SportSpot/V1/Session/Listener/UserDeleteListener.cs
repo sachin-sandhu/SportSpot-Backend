@@ -8,7 +8,22 @@ namespace SportSpot.V1.Session.Listener
         [EventHandler]
         public async Task OnUserDelete(AuthUserDeletedEvent e)
         {
-            await _sessionService.DeleteAll(e.AuthUser);
+            try
+            {
+                await _sessionService.DeleteAll(e.AuthUser);
+            }
+            catch (Exception)
+            {
+                //Ignore  
+            }
+            try
+            {
+                await _sessionService.LeaveAll(e.AuthUser);
+            }
+            catch (Exception)
+            {
+                //Ignore
+            }
         }
     }
 }
