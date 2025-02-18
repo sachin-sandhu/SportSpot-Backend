@@ -83,7 +83,7 @@ namespace SportSpot.V1.User.Services
 
         private static string GenerateRefreshToken(Guid userId)
         {
-            var randomNumber = new byte[32];
+            var randomNumber = new byte[48];
             using var rng = RandomNumberGenerator.Create();
             rng.GetBytes(randomNumber);
             userId.ToByteArray().CopyTo(randomNumber, 0);
