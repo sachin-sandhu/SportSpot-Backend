@@ -18,4 +18,4 @@ updates:
   - package-ecosystem: "docker"
     directory: "/Rest-Emulator"
     schedule:
-      interval: "daily"
+      interval: "weekly"
