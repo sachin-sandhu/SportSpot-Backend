@@ -4,7 +4,7 @@ WORKDIR /app
 EXPOSE 8080
 
 # Build Stage with Dotnet SDK
-FROM mcr.microsoft.com/dotnet/sdk:9.0 AS build
+FROM mcr.microsoft.com/dotnet/sdk:10.0 AS build
 WORKDIR /src
 
 # copy csproj and restore as distinct layers
